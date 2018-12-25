@@ -1,0 +1,1199 @@
+@import 'normalize.min.css'
+@import 'text-field.min.css'
+
+// Set REM 
+html
+  font-size 24px
+  min-height 100%
+  width 100%
+
+  @media (max-width: 840px) and (orientation: portrait), (max-width: 1280px) and (orientation: landscape)
+    font-size 16px
+
+md-shadow(n = 1)
+  if (n == 1)
+    box-shadow 0 1px 3px rgba(0, 0, 0, .12), 0 1px 2px rgba(0, 0, 0, .24)
+  else if (n == 2)
+    box-shadow 0 3px 6px rgba(0, 0, 0, .16), 0 3px 6px rgba(0, 0, 0, .23)
+  else if (n == 3)
+    box-shadow 0 10px 20px rgba(0, 0, 0, .19), 0 6px 6px rgba(0, 0, 0, .23)
+  else if (n == 4)
+    box-shadow 0 14px 28px rgba(0, 0, 0, .25), 0 10px 10px rgba(0, 0, 0, .22)
+  else if (n == 5)
+    box-shadow 0 19px 38px rgba(0, 0, 0, .3), 0 15px 12px rgba(0, 0, 0, .22)
+  else if (n == 11)
+    box-shadow 0 1px 3px rgba(0, 0, 0, .12), 0 1px 2px rgba(0, 0, 0, .24), inset 0 0 0 1000rem rgba(0, 0, 0, .12)
+  else if (n == 12)
+    box-shadow 0 3px 6px rgba(0, 0, 0, .16), 0 3px 6px rgba(0, 0, 0, .23), inset 0 0 0 1000rem rgba(0, 0, 0, .12)
+  else if (n == 13)
+    box-shadow 0 10px 20px rgba(0, 0, 0, .19), 0 6px 6px rgba(0, 0, 0, .23), inset 0 0 0 1000rem rgba(0, 0, 0, .12)
+  else if (n == 14)
+    box-shadow 0 14px 28px rgba(0, 0, 0, .25), 0 10px 10px rgba(0, 0, 0, .22), inset 0 0 0 1000rem rgba(0, 0, 0, .12)
+  else if (n == 15)
+    box-shadow 0 19px 38px rgba(0, 0, 0, .3), 0 15px 12px rgba(0, 0, 0, .22), inset 0 0 0 1000rem rgba(0, 0, 0, .12)
+  else
+    none
+
+// Typography
+.md-display4
+  font-family 'Roboto', 'Noto Sans TC', sans-serif
+  font-size 112px
+  font-weight 300
+
+.md-display3
+  font-family 'Roboto', 'Noto Sans TC', sans-serif
+  font-size 56px
+  font-weight 400
+
+.md-display2
+  font-family 'Roboto', 'Noto Sans TC', sans-serif
+  font-size 45px
+  font-weight 400
+
+.md-display1
+  font-family 'Roboto', 'Noto Sans TC', sans-serif
+  font-size 34px
+  font-weight 400
+
+.md-headline
+  font-family 'Roboto', 'Noto Sans TC', sans-serif
+  font-size 24px
+  font-weight 400
+
+.md-title
+  font-family 'Roboto', 'Noto Sans TC', sans-serif
+  font-size 20px
+  font-weight 500
+
+.md-subheading
+  font-family 'Roboto', 'Noto Sans TC', sans-serif
+  font-size 15px
+  font-weight 400
+
+  @media (max-width: 840px) and (orientation: portrait), (max-width: 1280px) and (orientation: landscape)
+    font-size 16px
+
+.md-body2
+  font-family 'Roboto', 'Noto Sans TC', sans-serif
+  font-size 13px
+  font-weight 500
+
+  @media (max-width: 840px) and (orientation: portrait), (max-width: 1280px) and (orientation: landscape)
+    font-size 14px
+
+.md-body1
+  font-family 'Roboto', 'Noto Sans TC', sans-serif
+  font-size 13px
+  font-weight 400
+
+  @media (max-width: 840px) and (orientation: portrait), (max-width: 1280px) and (orientation: landscape)
+    font-size 14px
+
+.md-caption
+  font-family 'Roboto', 'Noto Sans TC', sans-serif
+  font-size 12px
+  font-weight 400
+
+.md-button-text
+  font-family 'Roboto', 'Noto Sans TC', sans-serif
+  font-size 14px
+  font-weight 500
+  text-transform capitalize
+
+// Cards
+.md-card
+  md-shadow(1)
+  border-radius 2px
+  display inline-flex
+  flex-direction column
+  margin .5rem
+  overflow hidden
+
+.md-rich-media
+  background #E0E0E0 no-repeat center fixed
+  background-size cover
+  width 100%
+  height 0
+  overflow hidden
+  padding-bottom 56.25%
+  position relative
+
+  .media
+    height 100%
+    left 0
+    position absolute
+    top 0
+    width 100%
+
+  &.square
+    padding-bottom 100%
+
+  &+.md-ptitle
+    padding-top 1.5rem
+
+.md-ptitle
+  width 100%
+  padding 1rem
+  box-sizing border-box
+
+  &.avatar
+    padding 1rem
+
+    &>span
+      margin-left 3rem
+
+  &>span
+    display block
+
+.md-action
+  display inline-block
+  width 100%
+  font-size 0
+  line-height 48px
+  margin 0
+  padding 0
+  position relative
+
+  &>.md-button.md-icon
+    height 48px
+    line-height 48px
+    width 48px
+
+.md-sup-text
+  width 100%
+  font-family 'Roboto', 'Noto Sans TC', sans-serif
+  font-size 13px
+  font-weight 400
+  padding 1rem
+  box-sizing border-box
+  line-height 2em
+
+  &last-child
+    padding-bottom 1.5rem
+    
+  @media (max-width: 840px) and (orientation: portrait), (max-width: 1280px) and (orientation: landscape)
+    font-size 14px
+
+/* Divider */
+.md-divider
+  border none
+  border-bottom 1px solid rgba(0, 0, 0, .12)
+  box-sizing border-box
+  height 0
+  margin 0
+  padding 0
+  width 100%
+
+/* Avatar */
+.md-avatar
+  background-color #E0E0E0
+  border-radius 50%
+  float left
+  height 40px
+  width 40px
+
+/* Button */
+.md-button
+  background none
+  border none
+  border-radius 2px
+  display inline-block
+  font-family 'Roboto', 'Noto Sans TC', sans-serif
+  font-size 14px
+  font-weight 500
+  height 36px
+  line-height 36px
+  margin .5rem
+  min-width 88px
+  overflow hidden
+  padding 0 .5rem
+  text-transform capitalize
+  outline none
+
+  &.disabled, &[disabled], &.disabled
+    color rgba(0, 0, 0, .26)
+
+  &.dense
+    font-size 13px
+    height 32px
+
+  &:not(.raised)
+    &:hover
+      background rgba(0, 0, 0, .04)
+
+    &:focus
+      background rgba(0, 0, 0, .16)
+
+  &.raised
+    box-shadow none
+    margin .5rem 0
+    padding 0 1rem
+
+    &:hover, &:focus
+      md-shadow(1)
+
+    &:focus
+      md-shadow(11)
+
+    @media (max-width: 840px) and (orientation: portrait), (max-width: 1280px) and (orientation: landscape)
+      md-shadow(1)
+
+      &:focus
+        md-shadow(12)
+
+  &.md-icon
+    border-radius 50%
+    display inline-block
+    float right
+    font-size 0
+    height 56px
+    line-height 56px
+    margin 0
+    min-height 0
+    min-width 0
+    padding 0
+    width 56px
+
+    &.mini
+      height 40px
+      line-height 40px
+      width 40px
+
+    &.fab
+      background #3F51B5
+      color #FFF
+      md-shadow(2)
+
+      &:hover, &:focus
+        md-shadow(3)
+
+      &:focus
+        md-shadow(13)
+
+    &:before
+      line-height inherit
+
+/* Lists */
+.md-list
+  display inline-flex
+  flex-direction column
+  font-family 'Roboto', 'Noto Sans TC', sans-serif
+  font-weight 400
+  list-style-type none
+  margin 0
+  min-height 40px
+  padding 0
+
+  li, a
+    align-items center
+    display inline-flex
+    flex 1
+    font-size 16px
+    height 48px
+    padding 0 1rem
+    text-decoration none
+    color rgba(0,0,0,.87)
+
+    &:first-child
+      margin-top .5rem
+
+    &:last-child
+      margin-bottom .5rem
+
+    &.md-icon>span
+      padding-left 48px
+      
+    span:first-child
+      flex 1
+
+  &.avatar
+    li, a
+      min-height 56px
+
+      &>span
+        flex 1
+
+      &>.md-avatar~span
+        padding-left 32px
+
+      &>.md-icon
+        flex 0
+
+        &:before
+          float right
+
+      &.dense
+        height 48px
+
+  &.twoline
+    li, a
+      height 72px
+
+      &.dense
+        height 60px
+
+  &.threeline
+    li, a
+      height 88px
+
+      &.dense
+        height 76px
+
+  &.twoline, &.threeline
+    li, a
+      >span
+        display block
+
+      .ptext, .stext
+        font-family 'Roboto', 'Noto Sans TC', sans-serif
+        font-weight 400
+        margin 0
+        padding 0
+
+      .ptext
+        font-size 16px
+
+      .stext
+        font-size 14px
+
+  &.dense
+    li, a
+      font-size 13px
+      min-height 40px
+
+      &:first-child
+        margin-top .25rem
+
+    &.avatar
+      li, a
+        height 48px
+
+    &.twoline
+      li, a
+        height 60px
+
+    &.threeline
+      li, a
+        height 76px
+
+// App bar
+.md-appbar
+  height 64px
+  width 100%
+  md-shadow(1)
+  align-items center
+  background-color #3F51B5
+  color #FFF
+  display flex
+
+  .md-icon:before
+    margin-left .5rem
+    padding .66667rem
+
+  .md-title
+    flex 1
+    padding-bottom 1.75px
+    padding-left 1rem
+
+  .md-nav-switch
+    display inline-block
+
+  @media (max-width: 840px) and (orientation: portrait)
+    height 56px
+
+  @media (max-width: 1280px) and (orientation: landscape)
+    height 48px
+
+// Nav drawer
+.md-nav-drawer
+  background #fff
+  border-right 1px solid #E0E0e0
+  box-sizing border-box
+  display inline-block
+  left 0
+  max-width 320px
+  min-height 100vh
+  overflow hidden
+  position fixed
+  top 0
+  transition transform .225s
+  transition-timing-function cubic-bezier(.4, 0, .2, 1)
+  width calc(100% - 64px)
+  z-index 1000
+
+  .md-nav-list
+    background #fff
+    border-top 1px solid rgba(0, 0, 0, .12)
+    display inline-flex
+    flex-direction column
+    font-family 'Roboto', 'Noto Sans TC', sans-serif
+    font-weight 400
+    list-style-type none
+    margin 0
+    min-height 40px
+    padding 0
+    width 100%
+
+    &:first-child
+      border-top none
+
+    li, a
+      align-items center
+      display inline-flex
+      flex 1
+      font-size 16px
+      height 48px
+      padding 0 1rem
+      @extend .md-body2
+      color rgba(0, 0, 0, .87)
+      text-decoration none
+      cursor pointer
+
+      &:first-child
+        margin-top .5rem
+
+      &:last-child
+        margin-bottom .5rem
+
+      &.md-icon>span
+        padding-left 48px
+
+      &>span
+        line-height 48px
+
+    .md-subheader
+      color rgba(0, 0, 0, .54)
+      cursor default
+
+  @media (max-width: 840px) and (orientation: portrait), (max-width: 1280px) and (orientation: landscape)
+    max-width 280px
+
+// Layout
+.md-content
+  color rgba(0, 0, 0, .87)
+  display flex
+  font-family 'Roboto', 'Noto Sans TC', sans-serif
+  font-size 13px
+  font-weight 400
+  max-width 1600px
+  width 100%
+  flex-direction column
+    
+  @media (max-width: 840px) and (orientation: portrait), (max-width: 1280px) and (orientation: landscape)
+    font-size 14px
+
+.md-layout
+  display block
+  margin 0
+  min-height 100%
+  overflow-x hidden
+  overflow-y auto
+  padding 0
+
+  .md-nav-switch
+    cursor pointer
+  &.navd-temporary
+    &.navd-visible
+      overflow-y hidden
+
+      .scrim
+        background rgba(0, 0, 0, .54)
+        content ''
+        display block
+        height 100%
+        left 0
+        position fixed
+        top 0
+        width 100%
+        z-index 999
+
+      .md-nav-drawer
+        transform translate(0)
+        md-shadow(5)
+
+    &.navd-invisible
+      .md-nav-drawer
+        transform translate(-320px)
+
+    .md-nav-drawer
+      transform translateX(-320px)
+
+    @media (max-width: 840px) and (orientation: portrait), (max-width: 1280px) and (orientation: landscape)
+      &, &.navd-invisible
+        .md-nav-drawer
+          transform translate(-280px)
+
+    /* .md-content
+       margin-left 0
+       &.scrim
+       position absolute
+       top 0
+       left 0
+       &:before
+       background rgba(0,0,0,.54)
+       content:"";
+       display block
+       position absolute
+       top 0
+       left 0
+       width 100%
+       height 100%
+       z-index 999 */
+
+  &.navd-permanent
+    .md-nav-switch
+      display none
+
+    .md-nav-drawer
+      transform translateX(0)
+
+    .md-content
+      margin-left 320px
+      width calc(100% - 320px)
+
+    @media (max-width: 840px) and (orientation: portrait), (max-width: 1280px) and (orientation: landscape)
+      .md-nav-switch
+        display inline-flex
+
+      .md-content
+        margin-left 0
+        width 100%
+    
+      .md-nav-drawer
+          transform translateX(-280px)
+              
+      &.navd-visible
+        overflow-y hidden
+    
+        .scrim
+          background rgba(0, 0, 0, .54)
+          content ''
+          display block
+          height 100%
+          left 0
+          position fixed
+          top 0
+          width 100%
+          z-index 999
+    
+        .md-nav-drawer
+          transform translate(0)
+          md-shadow(5)
+    
+      &.navd-invisible
+        .md-nav-drawer
+          transform translate(-280px)
+
+// Icon
+@font-face
+    font-family 'Material Icons'
+    font-style  normal
+    font-weight 400
+    src url('MaterialIcons-Regular.eot') /* For IE6-8 */
+    src local('Material Icons'), local('MaterialIcons-Regular'), url('MaterialIcons-Regular.woff2') format('woff2'), url('MaterialIcons-Regular.woff') format('woff'), url('MaterialIcons-Regular.ttf') format('truetype')
+
+/* fallback */
+.material-icons
+  display none
+
+.md-icon
+  &:before
+    direction ltr
+    /* Preferred icon size */
+    display inline-block
+    font-family 'Material Icons'
+    /* Support for IE. */
+    font-feature-settings 'liga'
+    font-size 24px
+    font-style normal
+    font-weight normal
+    letter-spacing normal
+    line-height 1
+    text-decoration none
+    /* Support for Safari and Chrome. */
+    text-rendering optimizeLegibility
+    text-transform none
+    white-space nowrap
+    word-wrap normal
+    /* Support for Firefox. */
+    -moz-osx-font-smoothing grayscale
+    /* Support for all WebKit browsers. */
+    -webkit-font-smoothing antialiased
+
+  &.error:before
+    content '\e000'
+
+  &.error_outline:before
+    content '\e001'
+
+  &.warning:before
+    content '\e002'
+
+  &.add_alert:before
+    content '\e003'
+
+  &.album:before
+    content '\e019'
+
+  &.av_timer:before
+    content '\e01b'
+
+  &.closed_caption:before
+    content '\e01c'
+
+  &.equalizer:before
+    content '\e01d'
+
+  &.explicit:before
+    content '\e01e'
+
+  &.fast_forward:before
+    content '\e01f'
+
+  &.fast_rewind:before
+    content '\e020'
+
+  &.games:before
+    content '\e021'
+
+  &.hearing:before
+    content '\e023'
+
+  &.high_quality:before
+    content '\e024'
+
+  &.loop:before
+    content '\e028'
+
+  &.mic:before
+    content '\e029'
+
+  &.mic_none:before
+    content '\e02a'
+
+  &.mic_off:before
+    content '\e02b'
+
+  &.movie:before
+    content '\e02c'
+
+  &.library_add:before
+    content '\e02e'
+
+  &.library_books:before
+    content '\e02f'
+
+  &.library_music:before
+    content '\e030'
+
+  &.new_releases:before
+    content '\e031'
+
+  &.not_interested:before
+    content '\e033'
+
+  &.pause:before
+    content '\e034'
+
+  &.pause_circlr_filled:before
+    content '\e035'
+
+  &.pause_circle_outline:before
+    content '\e036'
+
+  &.play_arrow:before
+    content '\e037'
+
+  &.play_circle_filled:before
+    content '\e038'
+
+  &.play_circle_outline:before
+    content '\e039'
+
+  &.playlist_add:before
+    content '\e03b'
+
+  &.queue:before
+    content '\e03c'
+
+  &.queue_music:before
+    content '\e03d'
+
+  &.radio:before
+    content '\e03e'
+
+  &.recent_actors:before
+    content '\e03f'
+
+  &.repeat:before
+    content '\e040'
+
+  &.repeat_one:before
+    content '\e041'
+
+  &.replay:before
+    content '\e042'
+
+  &.shuffe:before
+    content '\e043'
+
+  &.skip_next:before
+    content '\e044'
+
+  &.akip_previous:before
+    content '\e045'
+
+  &.snooze:before
+    content '\e046'
+
+  &.stop:before
+    content '\e047'
+
+  &.subtitles:before
+    content '\e048'
+
+  &.surround_sound:before
+    content '\e049'
+
+  // class name style fix
+  &.video_library:before, &.library_video:before
+    content '\e04a'
+  
+  &.videocam:before
+    content '\e04b'
+  
+  &.videocam_off:before
+    content '\e04c'
+  
+  // wait for a accuracy fix (quiet?)
+  &.volume_down:before
+    content '\e04d'
+  
+  &.volume_mute:before
+    content '\e04e'
+  
+  &.volume_off:before
+    content '\e04f'
+  
+  // wait for a accuracy fix (loud?)
+  &.volume_up:before
+    content '\e050'
+  
+  &.web:before
+    content '\e051'
+  
+  &.hd:before
+    content '\e052'
+  
+  &.sort_by_alpha:before
+    content '\e053'
+  
+  &.air_play:before
+    content '\e055'
+  
+  &.forward_10:before
+    content '\e056'
+  
+  &.forward_30:before
+    content '\e057'
+  
+  &.forward_5:before
+    content '\e058'
+  
+  &.replay_10:before
+    content '\e059'
+  
+  &.replay_30:before
+    content '\e05a'
+  
+  &.replay_5:before
+    content '\e05b'
+  
+  &.add_to_queue:before
+    content '\e05c'
+  
+  &.fiber_dvr:before
+    content '\e05d'
+  
+  &.fiber_new:before
+    content '\e05e'
+  
+  &.playlist_play:before
+    content '\e05f'
+  
+  &.art_track:before
+    content '\e060'
+  
+  &.fiber_manual_record:before
+    content '\e061'
+  
+  &.fiber_smart_record:before
+    content '\e062'
+  
+  &.music_video:before
+    content '\e063'
+  
+  &.subscriptions:before
+    content '\e064'
+  
+  &.playlist_add_check:before
+    content '\e065'
+  
+  // class name style fix
+  &.queue_play_next:before, &.play_next_queue:before
+    content '\e066'
+  
+  &.remove_from_queue:before
+    content '\e067'
+  
+  &.slow_motion_video:before
+    content '\e068'
+  
+  &.web_asset:before
+    content '\e069'
+  
+  &.fiber_pin:before
+    content '\e06a'
+  
+  &.branding_watermark:before
+    content '\e06b'
+  
+  &.call_to_action:before
+    content '\e06c'
+  
+  &.featured_play_list:before
+    content '\e06d'
+  
+  &.featured_video:before
+    content '\e06e'
+  
+  &.note:before
+    content '\e06f'
+  
+  &.video_call:before
+    content '\e070'
+  
+  &.video_label:before
+    content '\e071'
+  
+  &.business:before
+    content '\e0af'
+  
+  &.call:before
+    content '\e0b0'
+  
+  &.call_end:before
+    content '\e0b1'
+  
+  &.call_made:before
+    content '\e0b2'
+  
+  &.call_merge:before
+    content '\e0b3'
+  
+  &.call_missed:before
+    content '\e0b4'
+  
+  &.call_received:before
+    content '\e0b5'
+  
+  &.call_split:before
+    content '\e0b6'
+  
+  &.chat:before
+    content '\e0b7'
+  
+  &.clear_all:before
+    content '\e0b8'
+  
+  &.comment:before
+    content '\e0b9'
+  
+  &.contacts:before
+    content '\e0ba'
+  
+  &.dialer_sip:before
+    content '\e0bb'
+  
+  &.dialpad:before
+    content '\e0bc'
+  
+  &.email:before
+    content '\e0be'
+  
+  &.forum:before
+    content '\e0bf'
+  
+  &.import_export:before
+    content '\e0c3'
+  
+  &.invert_colors_off:before
+    content '\e0c4'
+  
+  &.live_help:before
+    content '\e0c6'
+  
+  &.location_off:before
+    content '\e0c7'
+  
+  &.location_on:before
+    content '\e0c8'
+  
+  &.message:before
+    content '\e0c9'
+  
+  &.chat_bubble:before
+    content '\e0ca'
+  
+  &.chat_bubble_outline:before
+    content '\e0cb'
+  
+  &.no_sim:before
+    content '\e0cc'
+  
+  &.phone:before
+    content '\e0cd'
+  
+  &.portable_wifi_off:before
+    content '\e0ce'
+  
+  &.contact_phone:before
+    content '\e0cf'
+  
+  &.contact_mail:before
+    content '\e0d0'
+  
+  // wait for a accuracy fix (phone?)
+  &.ring_volume:before
+    content '\e0d1'
+  
+  // wait for a accuracy fix (phone+wifi?)
+  &.speaker_phone:before
+    content '\e0d2'
+  
+  &.stay_current_landscape:before
+    content '\e0d3'
+  
+  &.stay_current_portrait:before
+    content '\e0d4'
+  
+  &.stay_primary_landscape:before
+    content '\e0d5'
+  
+  &.stay_primary_portrait:before
+    content '\e0d6'
+  
+  // class name style fix
+  &.swap_calls:before, &.call_swap:before
+    content '\e0d7'
+  
+  &.textsms:before
+    content '\e0d8'
+  
+  &.voicemail:before
+    content '\e0d9'
+  
+  &.vpn_key:before
+    content '\e0da'
+  
+  &.phonelink_erase:before
+    content '\e0db'
+  
+  &.phonelink_lock:before
+    content '\e0dc'
+  
+  &.phonelink_ring:before
+    content '\e0dd'
+  
+  &.phonrlink_setup:before
+    content '\e0de'
+  
+  &.present_to_all:before
+    content '\e0df'
+  
+  // wait for a accuracy fix (book?)
+  &.import_contacts:before
+    content '\e0e0'
+  
+  // class name style fix
+  &.mail_outline:before, &.email_outline:before
+    content '\e0e1'
+  
+  &.screen_share:before
+    content '\e0e2'
+  
+  &.stop_screen_share:before
+    content '\e0e3'
+  
+  &.call_missed_outgoing:before
+    content '\e0e4'
+  
+  &.rss_feed:before
+    content '\e0e5'
+    // List below
+  &.keyboard_arrow_down:before
+    content '\e313'
+  
+  &.keyboard_arrow_left:before
+    content '\e314'
+  
+  &.keyboard_arrow_right:before
+    content '\e315'
+  
+  &.keyboard_arrow_up:before
+    content '\e316'
+  
+  &.arrow_back:before
+    content '\e5c4'
+  
+  &.arrow_drop_down:before
+    content '\e5c5'
+  
+  &.arrow_drop_down_circle:before
+    content '\e5c6'
+  
+  &.arrow_drop_up:before
+    content '\e5c7'
+  
+  &.arrow_forward:before
+    content '\e5c8'
+  
+  &.cancel:before
+    content '\e5c9'
+  
+  &.check:before
+    content '\e5ca'
+  
+  &.chevron_left:before
+    content '\e5cb'
+  
+  &.chevron_right:before
+    content '\e5cc'
+  
+  &.close:before
+    content '\e5cd'
+  
+  &.expand_less:before
+    content '\e5ce'
+  
+  &.expand_more:before
+    content '\e5cf'
+  
+  &.fullscreen:before
+    content '\e5d0'
+  
+  &.fullscreen_exit:before
+    content '\e5d1'
+  
+  &.menu:before
+    content '\e5d2'
+  
+  &.arrow_upward:before
+    content '\e5d8'
+  
+  &.first_page:before
+    content '\e5dc'
+  
+  &.arrow_downward:before
+    content '\e5db'
+  
+  &.code:before
+    content '\e86f'
+  
+  &.dns:before
+    content '\e875'
+  
+  &.home:before
+    content '\e88a'
+  
+  &.info:before
+    content '\e88e'
+  
+  &.info_outline:before
+    content '\e88f'
+  
+
+/* &.:before
+   content "\e145"
+   &.:before
+   content "\e146"
+   &.:before
+   content "\e147"
+   &.:before
+   content "\e148"
+   &.:before
+   content "\e149"
+   &.:before
+   content "\e14a"
+   &.:before
+   content "\e14b"
+   &.:before
+   content "\e14c"
+   &.:before
+   content "\e14d"
+   &.:before
+   content "\e14e"
+   &.:before
+   content "\e14f"
+   &.:before
+   content "\e150"
+   &.:before
+   content "\e151"
+   &.:before
+   content "\e152"
+   &.:before
+   content "\e153"
+   &.:before
+   content "\e154"
+   &.:before
+   content "\e155"
+   &.:before
+   content "\e156"
+   &.:before
+   content "\e157"
+   &.:before
+   content "\e158"
+   &.:before
+   content "\e159"
+   &.:before
+   content "\e15a"
+   &.:before
+   content "\e15b"
+   &.:before
+   content "\e15c"
+   &.:before
+   content "\e15d"
+   &.:before
+   content "\e15e"
+   &.:before
+   content "\e15f"
+   &.:before
+   content "\e160"
+   &.:before
+   content "\e161"
+   &.:before
+   content "\e162"
+   &.:before
+   content "\e163"
+   &.:before
+   content "\e164"
+   &.:before
+   content "\e165"
+   &.:before
+   content "\e166"
+   &.:before
+   content "\e167"
+   &.:before
+   content "\e168"
+   &.:before
+   content "\e169"
+   &.:before
+   content "\e16a"
+   &.:before
+   content "\e16b"
+   &.:before
+   content "\e16c"
+   &.:before
+   content "\e16d"
+   &.:before
+   content "\e" */

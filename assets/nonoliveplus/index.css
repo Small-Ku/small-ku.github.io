@@ -1,0 +1,60 @@
+.first-sight {
+	background-color: #f2f2f2;
+	z-index: 50;
+	width: 100vw;
+	height: calc(100vh - 64px);
+	display: flex;
+	justify-content: end;
+	box-sizing: border-box;
+  flex-flow: column;
+  align-items: center;
+}
+.logo {
+	max-width: 200px;
+	max-height: 200px;
+}
+.install {
+  background: #e33d3d;
+  color: #fff;
+}
+.md-appbar {
+  background-color: #f2f2f2;
+  color: rgba(0,0,0,.72);
+  z-index: 49;
+}
+.md-appbar .md-title {
+	text-align: center;
+  margin: 0;
+  padding: 0;
+}
+a {
+  display: inline-block;
+}
+.disclaimer {
+  justify-self: flex-end;
+}
+.github {
+  background: #fff;
+}
+.title {
+  margin: 10px 0 2px;
+  position: relative;
+}
+.description {
+  margin: 0 0 2px;
+}
+.title .tag {
+	position: absolute;
+	top: -5px;
+	background: #fed300;
+	padding: 2px 8px;
+	border-radius: 10px;
+	right: -16%;
+}
+.center {
+	flex-flow: column;
+	display: flex;
+	flex: 1;
+	justify-content: center;
+	align-items: center;
+}
