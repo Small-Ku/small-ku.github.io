@@ -8,6 +8,7 @@
   padding: 10px;
 }
 .item::before {
+  max-width:100%;
   width: 100%;
   height:100%;
   content: attr(data-content);
@@ -21,6 +22,7 @@
   position: absolute;
 }
 .item::after {
+  max-width:100%;
   width: auto;
   content: attr(data-content);
   white-space: nowrap;
