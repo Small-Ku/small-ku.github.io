@@ -102,9 +102,9 @@ textarea {
   font-style: normal;
   font-weight: 400;
   src: local('Kaomoto'),
-       url('../assets/Kaomoto-MM-VF.woff2') format('woff2'), 
-       url('../assets/Kaomoto-MM-VF.woff') format('woff'),
-       url('../assets/Kaomoto-MM-VF.ttf') format('ttf');
+       url('../assets/Kaomoto-VF.woff2') format('woff2'), 
+       url('../assets/Kaomoto-VF.woff') format('woff'),
+       url('../assets/Kaomoto-VF.ttf') format('ttf');
 }
 
 .kaomoto {
@@ -113,6 +113,7 @@ textarea {
     max-width: 100%;
     padding: 2%;
     overflow: hidden;
+    position: relative;
 }
 
 .item {
