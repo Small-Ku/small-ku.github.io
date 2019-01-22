@@ -111,13 +111,13 @@ textarea {
     font-family: 'Kaomoto';
     display: block;
     max-width: 100%;
-    padding: 2%;
-    overflow: hidden;
+    margin: 2%;
     position: relative;
 }
 
 .item {
     display: inline-block;
+    max-width:100%;
     width: 1.2em;
     line-height: 1.2;
     height: 1.2em;
