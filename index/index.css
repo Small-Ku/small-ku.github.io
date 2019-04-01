@@ -1,40 +1,64 @@
 .region {
-    height: 99vh;
-    width: 100%;
-    position: relative
+  height: 99vh;
+  width: 100%;
+  position: relative
 }
+
 .center-content {
-    margin: 0;
-    position: absolute;
-    top: 45%;
-    left: 50%;
-    margin-right: -50%;
-    transform: translate(-50%, -50%);
-    text-align: center;
+  margin: 0;
+  position: absolute;
+  top: 45%;
+  left: 50%;
+  margin-right: -50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
 }
+
 .avatar {
-    width: 12.5em;
-    height: 12.5em;
-    display: inline-block;
-    border-radius: 50%;
-    border: .5em #000 solid;
+  width: 12.5em;
+  height: 12.5em;
+  display: inline-block;
+  border-radius: 50%;
+  border: .5em #000 solid;
 }
+
 .mini-avatar {
-    width: 7.5em;
-    height: 7.5em;
-    display: inline-block;
-    border-radius: 50%;
-    border: .15em #000 solid;
+  width: 7.5em;
+  height: 7.5em;
+  display: inline-block;
+  border-radius: 50%;
+  border: .15em #000 solid;
 }
+
 .name {
-    font-size: 2em;
+  font-size: 2em;
 }
+
 .thrid-region {
-    width: 30%;
-    margin: 2.3% 0.7% 1% 1.7%;
-    height: 90%;
-    background: #f9f9f9;
-    display: inline-block;
-    overflow: hidden;
-    position: relative;
+  width: 30%;
+  margin: 2.3% 0.7% 1% 1.7%;
+  height: 90%;
+  background: #f9f9f9;
+  display: inline-block;
+  overflow: hidden;
+  position: relative;
+}
+
+.item {
+  display: inline-block;
+  width: 100%;
+  background: rgb(253, 251, 251);
+  min-height: 2em;
+  margin: .5em 0;
+  color: #304f57;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.footer {
+  height: 1.15em;
+  text-align: center;
+  padding: 1.8em 2em 2em;
+  background: #304f57;
+  color: #f9f9f9;
 }
