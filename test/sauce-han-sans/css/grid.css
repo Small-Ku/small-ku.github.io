@@ -1,0 +1,44 @@
+.item {
+  width: auto;
+  height: 58px;
+  white-space: nowrap;
+  word-break: keep-all;
+  font-size: 0;
+  position: relative;
+  padding: 10px;
+}
+.item::before {
+  max-width:100%;
+  width: 100%;
+  height:100%;
+  content: attr(data-content);
+  white-space: nowrap;
+  word-break: keep-all;
+  display:inline-block;
+  font-size: 72px;
+  line-height: 1.2;
+  height: 1.2em;
+  padding: .2em;
+  position: absolute;
+}
+.item::after {
+  max-width:100%;
+  width: auto;
+  content: attr(data-content);
+  white-space: nowrap;
+  word-break: keep-all;
+  display:inline-block;
+  font-size: 72px;
+  padding: 10px;
+  opacity: 0;
+  font-variation-settings: 'wght' 900;
+}
+
+@media (max-width: 767px) and (orientation: portrait), (max-width: 1023px) and (orientation: landscape) {
+  .item::before {
+    font-size: 48px;
+  }
+  .item::after {
+    font-size: 48px;
+  }
+}
