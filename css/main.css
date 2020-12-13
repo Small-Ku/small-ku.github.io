@@ -98,17 +98,17 @@ textarea {
    ========================================================================== */
 
 @font-face {
-  font-family: 'Sauce Han Sans';
+  font-family: 'Kaomoto';
   font-style: normal;
   font-weight: 400;
-  src: url('../assets/SourceHanSans-VF.woff2') format('woff2'), 
-       url('../assets/SourceHanSans-VF.woff') format('woff'),
-       url('../assets/SourceHanSans-VF.ttf') format('ttf'),
-       url('../assets/SourceHanSans-VF.otf') format('otf');
+  src: local('Kaomoto'),
+       url('../assets/Kaomoto-VF.subset.woff2') format('woff2'), 
+       url('../assets/Kaomoto-VF.subset.woff') format('woff'),
+       url('../assets/Kaomoto-VF.subset.ttf') format('ttf');
 }
 
 .kaomoto {
-    font-family: 'Sauce Han Sans';
+    font-family: 'Kaomoto';
     display: block;
     max-width: 100%;
     margin: 2%;

@@ -1,0 +1,10 @@
+
+@font-face {
+    font-family: 'Kaomoto';
+    font-style: normal;
+    font-weight: 400;
+    src: local('Kaomoto'),
+         url('../../assets/Kaomoto-VF.woff2') format('woff2'), 
+         url('../../assets/Kaomoto-VF.woff') format('woff'),
+         url('../../assets/Kaomoto-VF.ttf') format('ttf');
+  }
