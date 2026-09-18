@@ -1,0 +1,39 @@
+.filter-switch {
+  display: inline-flex;
+  gap: var(--ft-s1);
+  padding: var(--ft-s1);
+  border: 1px solid var(--ft-rule);
+  border-radius: var(--ft-radius-sm);
+  background: color-mix(in srgb, var(--ft-surface) 90%, transparent);
+  box-shadow: 0 1px 0 rgb(255 255 255 / 0.35) inset;
+}
+
+.filter-switch__button {
+  appearance: none;
+  min-height: 2rem;
+  border: 0;
+  border-radius: var(--ft-radius-xs);
+  background: transparent;
+  color: var(--ft-ink-soft);
+  padding: 0.46rem 0.72rem;
+  font: 500 var(--ft-text-xs)/1 var(--ft-font-mono);
+  text-transform: uppercase;
+  letter-spacing: var(--ft-tracking-meta);
+  cursor: pointer;
+}
+
+.filter-switch__button:hover {
+  color: var(--ft-ink);
+  background: var(--ft-hover);
+}
+
+.filter-switch__button.is-active,
+.filter-switch__button[aria-pressed="true"] {
+  color: var(--ft-canvas);
+  background: var(--ft-ink);
+}
+
+.filter-switch__button:focus-visible {
+  outline: 2px solid var(--ft-focus);
+  outline-offset: 2px;
+}

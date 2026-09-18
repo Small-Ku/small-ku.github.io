@@ -1,0 +1,7 @@
+.text-link {
+  text-decoration-line: underline;
+  text-decoration-color: var(--ft-rule-strong);
+  text-underline-offset: 0.2em;
+  text-decoration-thickness: 1px;
+}
+.text-link:hover { text-decoration-color: currentColor; }

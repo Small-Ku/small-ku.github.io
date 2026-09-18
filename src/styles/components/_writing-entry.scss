@@ -1,0 +1,114 @@
+.writing-stream {
+  display: grid;
+}
+
+.writing-entry {
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--ft-chrono-date) var(--ft-chrono-rail) minmax(0, 1fr);
+  gap: var(--ft-chrono-gap);
+  align-items: start;
+  min-width: 0;
+  padding-block: var(--ft-s5);
+  color: inherit;
+  text-decoration: none;
+}
+
+.writing-entry__date {
+  padding-top: 0.28rem;
+  color: var(--ft-ink-muted);
+  text-align: right;
+}
+.writing-entry__rail {
+  position: relative;
+  align-self: stretch;
+  min-height: 100%;
+}
+.writing-entry__rail::before {
+  content: "";
+  position: absolute;
+  inset-block: calc(var(--ft-s5) * -1);
+  left: 50%;
+  width: 1px;
+  background: var(--ft-rule-strong);
+}
+.writing-entry__rail::after {
+  content: "";
+  position: absolute;
+  top: 0.52rem;
+  left: 50%;
+  width: 0.68rem;
+  height: 0.68rem;
+  transform: translateX(-50%);
+  border: 1px solid var(--ft-rule-strong);
+  border-radius: 50%;
+  background: var(--ft-canvas);
+}
+.writing-stream > .writing-entry:first-child .writing-entry__rail::before { top: 0.52rem; }
+
+.writing-entry__copy {
+  min-width: 0;
+  padding-bottom: var(--ft-s5);
+  border-bottom: 1px solid var(--ft-rule);
+}
+.writing-entry__kicker {
+  display: block;
+  margin-bottom: var(--ft-s2);
+  color: var(--ft-ink-muted);
+}
+.writing-entry__title-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--ft-s5);
+}
+.writing-entry__title-row h2,
+.writing-entry__title-row h3 {
+  margin: 0;
+  font-size: clamp(1.2rem, 1.7vw, 1.62rem);
+  line-height: 1.22;
+  letter-spacing: -0.026em;
+  font-weight: 560;
+}
+.writing-entry__title-row > span {
+  margin-right: var(--ft-chrono-arrow-inset);
+  color: var(--ft-ink-muted);
+}
+.writing-entry p {
+  max-width: 64ch;
+  margin: var(--ft-s2) 0 var(--ft-s3);
+  color: var(--ft-ink-soft);
+  line-height: 1.58;
+}
+.writing-entry__meta { color: var(--ft-ink-muted); }
+.writing-entry:hover .writing-entry__title-row h2,
+.writing-entry:hover .writing-entry__title-row h3 {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.22em;
+}
+.writing-entry:hover .writing-entry__title-row > span { color: var(--ft-ink); }
+
+/* Timeline owns date/rail columns; only the shared content grammar remains. */
+.writing-entry--embedded {
+  display: block;
+  padding: 0.1rem 0 var(--ft-s6);
+}
+.writing-entry--embedded .writing-entry__copy { padding-bottom: 0; }
+
+@media (max-width: 48rem) {
+  .writing-entry {
+    grid-template-columns: var(--ft-chrono-rail) minmax(0, 1fr);
+    column-gap: var(--ft-s3);
+  }
+  .writing-entry__date {
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: start;
+    padding-top: 0;
+    margin-bottom: calc(var(--ft-s2) * -1);
+    text-align: left;
+  }
+  .writing-entry__rail { grid-column: 1; grid-row: 1 / span 2; }
+  .writing-entry__copy { grid-column: 2; grid-row: 2; }
+}

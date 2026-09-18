@@ -1,0 +1,141 @@
+.work-head {
+  position: relative;
+  isolation: isolate;
+  min-block-size: calc(100svh - 3.5rem);
+  display: grid;
+  align-content: center;
+  gap: clamp(var(--ft-s6), 4vw, var(--ft-s8));
+  padding-block: clamp(var(--ft-s7), 6vw, var(--ft-s9));
+  overflow: clip;
+  border-bottom: 1px solid var(--ft-rule);
+  background: var(--ft-surface);
+}
+
+/*
+ * This is the actual project destination plane. It intentionally owns the full
+ * hero bounds, so a clicked card grows into a viewport-scale surface instead of
+ * stopping at a small content rectangle.
+ */
+.work-head__transition-surface {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  background: var(--ft-surface);
+  pointer-events: none;
+}
+.work-head__transition-surface::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle, var(--ft-dot) 0 1px, transparent 1.2px);
+  background-size: 24px 24px;
+  opacity: 0.72;
+  mask-image: linear-gradient(to bottom, transparent 0%, black 14%, black 72%, transparent 100%);
+}
+
+/* Keep the destination topology aligned with source project cards:
+ * visual first/left, title content second/right. This lets both shared objects
+ * travel in parallel rather than crossing each other on the way to the page.
+ */
+.work-head__primary {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(18rem, 0.95fr) minmax(20rem, 1.05fr);
+  gap: clamp(var(--ft-s6), 5vw, var(--ft-s9));
+  align-items: center;
+}
+.work-head--no-visual .work-head__primary {
+  grid-template-columns: minmax(0, 48rem);
+  justify-content: center;
+}
+.work-head__copy {
+  min-width: 0;
+  max-width: 44rem;
+}
+.work-head__copy .eyebrow { margin-bottom: var(--ft-s4); }
+.work-head__title-slot { min-width: 0; width: fit-content; max-width: 100%; }
+.work-head__title-slot .article-head__title {
+  margin: 0;
+  font-size: clamp(2.7rem, 5vw, 5.35rem);
+  line-height: 0.98;
+  letter-spacing: -0.052em;
+}
+.work-head__supporting { margin-top: var(--ft-s5); }
+.work-head__actions { display: flex; flex-wrap: wrap; gap: var(--ft-s2); margin-top: var(--ft-s6); }
+
+.work-head__visual-wrap {
+  min-width: 0;
+  margin: 0;
+}
+.work-head__visual {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1.32;
+  overflow: hidden;
+  border: 1px solid var(--ft-rule-strong);
+  border-radius: var(--ft-radius-md);
+  background: var(--ft-surface-raised);
+  box-shadow: var(--ft-shadow-card);
+}
+
+.work-head__facts {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0;
+  border-top: 1px solid var(--ft-rule-strong);
+}
+.work-head__facts span {
+  display: grid;
+  grid-template-columns: 2rem 1fr;
+  gap: var(--ft-s3);
+  padding: var(--ft-s3) var(--ft-s3) var(--ft-s3) 0;
+  border-bottom: 1px solid var(--ft-rule);
+  color: var(--ft-ink-soft);
+  font-size: var(--ft-text-sm);
+}
+.work-head__facts b { color: var(--ft-ink-muted); font: 400 var(--ft-text-xs)/1.4 var(--ft-font-mono); }
+
+.work-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 14rem;
+  gap: var(--ft-s9);
+  padding-block: var(--ft-s9);
+  align-items: start;
+}
+.work-related { padding-top: 0; padding-bottom: var(--ft-s9); }
+
+@media (max-width: 62rem) {
+  .work-head__primary {
+    grid-template-columns: minmax(15rem, 0.9fr) minmax(18rem, 1.1fr);
+    gap: var(--ft-s7);
+  }
+  .work-head__title-slot .article-head__title { font-size: clamp(2.35rem, 5.5vw, 4.25rem); }
+  .work-head__facts,
+  .work-body { grid-template-columns: 1fr; }
+  .work-body { gap: var(--ft-s6); }
+}
+
+/* Source cards switch to visual-above-copy at the same interaction boundary. */
+@media (max-width: 48rem) {
+  .work-head {
+    min-block-size: calc(100svh - 3.5rem);
+    align-content: start;
+    gap: var(--ft-s6);
+    padding-block: var(--ft-s6) var(--ft-s7);
+  }
+  .work-head__primary,
+  .work-head--no-visual .work-head__primary {
+    grid-template-columns: 1fr;
+    gap: var(--ft-s5);
+  }
+  .work-head__visual-wrap { grid-row: 1; }
+  .work-head__copy { grid-row: 2; max-width: none; }
+  .work-head__visual { aspect-ratio: 1.28; }
+  .work-head__title-slot .article-head__title {
+    font-size: clamp(2.25rem, 11vw, 3.65rem);
+    line-height: 1;
+  }
+}

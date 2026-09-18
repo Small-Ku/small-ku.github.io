@@ -1,0 +1,18 @@
+.content-frame {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--ft-rule);
+  border-radius: var(--ft-radius-md);
+  background: var(--ft-surface);
+}
+.content-frame__media { min-height: 18rem; }
+.content-frame__caption {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--ft-s4);
+  padding: var(--ft-s3) var(--ft-s4);
+  border-top: 1px solid var(--ft-rule);
+  color: var(--ft-ink-muted);
+  font-family: var(--ft-font-mono);
+  font-size: var(--ft-text-xs);
+}

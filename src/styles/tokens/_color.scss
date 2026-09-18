@@ -1,0 +1,43 @@
+:root {
+  color-scheme: light dark;
+
+  --ft-bg: #f7f7f5;
+  --ft-canvas: #ffffff;
+  --ft-field: #f4f4f1;
+  --ft-surface: #f3f3f1;
+  --ft-surface-raised: #ffffff;
+  --ft-ink: #171717;
+  --ft-ink-soft: #515151;
+  --ft-ink-muted: #7d7d78;
+  --ft-rule: #deded9;
+  --ft-rule-strong: #b9b9b2;
+  --ft-hover: #ecece8;
+  --ft-selected: #e4e4df;
+  --ft-focus: #2d2d2b;
+  --ft-dot: color-mix(in srgb, var(--ft-ink) 13%, transparent);
+  --ft-code-bg: #f0f0ed;
+  --ft-overlay: rgb(255 255 255 / 0.92);
+  --ft-shadow-card: 0 1px 2px rgb(20 20 18 / 0.04), 0 14px 38px rgb(20 20 18 / 0.08);
+  --ft-shadow-card-hover: 0 2px 4px rgb(20 20 18 / 0.05), 0 22px 52px rgb(20 20 18 / 0.13);
+}
+
+:root[data-theme="dark"] {
+  --ft-bg: #111111;
+  --ft-canvas: #171717;
+  --ft-field: #151515;
+  --ft-surface: #1d1d1d;
+  --ft-surface-raised: #232323;
+  --ft-ink: #ddddda;
+  --ft-ink-soft: #b1b1ac;
+  --ft-ink-muted: #858580;
+  --ft-rule: #343432;
+  --ft-rule-strong: #575753;
+  --ft-hover: #292927;
+  --ft-selected: #323230;
+  --ft-focus: #e7e7e3;
+  --ft-dot: color-mix(in srgb, var(--ft-ink) 12%, transparent);
+  --ft-code-bg: #20201f;
+  --ft-overlay: rgb(23 23 23 / 0.92);
+  --ft-shadow-card: 0 1px 2px rgb(0 0 0 / 0.2), 0 16px 42px rgb(0 0 0 / 0.28);
+  --ft-shadow-card-hover: 0 2px 4px rgb(0 0 0 / 0.24), 0 24px 56px rgb(0 0 0 / 0.4);
+}

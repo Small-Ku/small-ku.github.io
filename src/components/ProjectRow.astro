@@ -1,0 +1,17 @@
+---
+interface Props {
+  href: string;
+  title: string;
+  summary: string;
+  year: string;
+  kind: string;
+}
+const { href, title, summary, year, kind } = Astro.props;
+---
+<a class="project-row" href={href}>
+  <div>
+    <h3 class="project-row__title">{title}</h3>
+    <p class="project-row__summary">{summary}</p>
+  </div>
+  <div class="project-row__meta meta"><span>{kind}</span><span>{year}</span></div>
+</a>

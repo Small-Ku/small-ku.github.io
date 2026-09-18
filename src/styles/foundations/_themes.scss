@@ -1,0 +1,3 @@
+.theme-transition *, .theme-transition *::before, .theme-transition *::after {
+  transition: background-color var(--ft-normal) var(--ft-ease), border-color var(--ft-normal) var(--ft-ease), color var(--ft-normal) var(--ft-ease) !important;
+}

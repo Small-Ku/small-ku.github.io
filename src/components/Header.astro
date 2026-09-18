@@ -1,0 +1,22 @@
+---
+import { siteConfig } from "../site.config";
+
+const path = Astro.url.pathname;
+const current = (href: string) => href === "/" ? path === "/" : path.startsWith(href);
+---
+<header class="site-header" data-vt-site-header>
+  <div class="page site-header__inner">
+    <a class="site-brand" href="/">
+      <span>{siteConfig.name}</span>
+    </a>
+    <nav class="site-nav" aria-label="Primary">
+      {siteConfig.navigation.map((item) => (
+        <a href={item.href} aria-current={current(item.href) ? "page" : undefined}>{item.label}</a>
+      ))}
+      <button class="button button--quiet theme-toggle" type="button" data-theme-toggle aria-label="Toggle color theme">
+        <span class="theme-toggle__label theme-toggle__label--dark" aria-hidden="true">Dark</span>
+        <span class="theme-toggle__label theme-toggle__label--light" aria-hidden="true">Light</span>
+      </button>
+    </nav>
+  </div>
+</header>

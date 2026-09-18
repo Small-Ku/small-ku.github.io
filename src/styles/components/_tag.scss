@@ -1,0 +1,13 @@
+.tag {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.5rem;
+  padding: 0.18rem 0.45rem;
+  border: 1px solid var(--ft-rule);
+  border-radius: var(--ft-radius-sm);
+  background: var(--ft-surface);
+  color: var(--ft-ink-soft);
+  font-family: var(--ft-font-mono);
+  font-size: var(--ft-text-xs);
+  letter-spacing: 0.015em;
+}

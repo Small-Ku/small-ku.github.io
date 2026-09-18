@@ -1,0 +1,101 @@
+---
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import { siteConfig } from "../site.config";
+import { absoluteUrl, jsonLd, websiteStructuredData, type StructuredData } from "../lib/seo";
+import "../styles/index.scss";
+
+interface Props {
+  title?: string;
+  description?: string;
+  routeKind?: "home" | "timeline" | "project" | "writing" | "other";
+  routeId?: string;
+  canonicalUrl?: string | null;
+  noindex?: boolean;
+  ogType?: "website" | "article";
+  structuredData?: StructuredData;
+}
+
+const {
+  title = siteConfig.title,
+  description = siteConfig.description,
+  routeKind = "other",
+  routeId,
+  canonicalUrl: canonicalProp,
+  noindex = false,
+  ogType = routeKind === "writing" ? "article" : "website",
+  structuredData = routeKind === "home" ? websiteStructuredData() : undefined
+} = Astro.props;
+const canonicalUrl = canonicalProp === null ? undefined : canonicalProp ?? absoluteUrl(Astro.url.pathname);
+const rssUrl = absoluteUrl("/rss.xml");
+const ogImage = siteConfig.ogImage ? absoluteUrl(siteConfig.ogImage) : undefined;
+---
+<!doctype html>
+<html lang={siteConfig.language} data-route-kind={routeKind} data-route-id={routeId}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="description" content={description} />
+    <meta name="color-scheme" content="light dark" />
+    <meta
+      name="theme-color"
+      content={siteConfig.themeColor.light}
+      data-theme-color-light={siteConfig.themeColor.light}
+      data-theme-color-dark={siteConfig.themeColor.dark}
+    />
+    <meta name="generator" content={Astro.generator} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+    {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="alternate" type="application/rss+xml" title={`${siteConfig.name} writing`} href={rssUrl} />
+
+    <meta property="og:type" content={ogType} />
+    <meta property="og:site_name" content={siteConfig.name} />
+    <meta property="og:locale" content={siteConfig.locale} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    {canonicalUrl && <meta property="og:url" content={canonicalUrl} />}
+    {ogImage && <meta property="og:image" content={ogImage} />}
+    <meta name="twitter:card" content={ogImage ? "summary_large_image" : "summary"} />
+    {ogImage && <meta name="twitter:image" content={ogImage} />}
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+
+    <title>{title}</title>
+    {structuredData && <script type="application/ld+json" set:html={jsonLd(structuredData)}></script>}
+    <script is:inline>
+      (() => {
+        let value = null;
+        try { value = localStorage.getItem('personal-site-theme'); } catch { /* storage may be blocked */ }
+        const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const theme = value === 'light' || value === 'dark' ? value : (dark ? 'dark' : 'light');
+        document.documentElement.dataset.theme = theme;
+        const themeMeta = document.querySelector('meta[name="theme-color"]');
+        const themeColor = themeMeta?.getAttribute(`data-theme-color-${theme}`);
+        if (themeMeta && themeColor) themeMeta.setAttribute('content', themeColor);
+      })();
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <div class="sr-only" aria-live="polite" aria-atomic="true" data-route-announcer></div>
+    <div class="site-shell">
+      <Header />
+      <main id="main-content" tabindex="-1"><slot /></main>
+      <Footer />
+    </div>
+    <script>
+      import { bindThemeToggle } from "../scripts/theme";
+      import { bindFilterSwitch } from "../scripts/filter-switch";
+      import { bindTimelineFilter } from "../scripts/timeline";
+      import { bindNavigation } from "../scripts/navigation";
+      bindThemeToggle();
+      bindFilterSwitch();
+      bindTimelineFilter();
+      bindNavigation();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,11 @@
+pre {
+  overflow-x: auto;
+  margin: var(--ft-s5) 0;
+  padding: var(--ft-s4);
+  border: 1px solid var(--ft-rule);
+  border-radius: var(--ft-radius-sm);
+  background: var(--ft-code-bg);
+  font-family: var(--ft-font-mono);
+  font-size: 0.82rem;
+  line-height: 1.65;
+}

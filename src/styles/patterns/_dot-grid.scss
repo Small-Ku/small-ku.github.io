@@ -1,0 +1,29 @@
+.dot-field {
+  --dot-step: 20px;
+  --dot-size: 1px;
+  position: relative;
+  isolation: isolate;
+}
+
+.dot-field::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: radial-gradient(circle, var(--ft-dot) 0 var(--dot-size), transparent calc(var(--dot-size) + 0.2px));
+  background-size: var(--dot-step) var(--dot-step);
+  mask-image: linear-gradient(to bottom, transparent 0%, black 14%, black 72%, transparent 100%);
+}
+
+.dot-field--radial::before {
+  mask-image: radial-gradient(ellipse at 40% 44%, black 0%, rgb(0 0 0 / 0.76) 45%, transparent 76%);
+}
+
+.dot-field--quiet { --dot-step: 24px; }
+.dot-field--quiet::before { opacity: 0.72; }
+
+.dot-field--home::before {
+  opacity: 0.9;
+  mask-image: linear-gradient(to bottom, black 0%, black 88%, transparent 100%);
+}

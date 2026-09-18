@@ -1,0 +1,46 @@
+---
+import type { ProjectTone, ProjectVisualVariant } from "../lib/content-schema";
+
+interface Props {
+  tone: ProjectTone;
+  variant: ProjectVisualVariant;
+  label?: string;
+  alt?: string;
+}
+
+const { tone, variant, label, alt } = Astro.props;
+---
+<div
+  class:list={["project-visual", `project-visual--${tone}`]}
+  role={alt ? "img" : undefined}
+  aria-label={alt}
+  aria-hidden={alt ? undefined : "true"}
+>
+  {variant === "network" && (
+    <div class="project-visual__canvas project-visual__canvas--network">
+      <span class="project-visual__node project-visual__node--a">01</span>
+      <span class="project-visual__node project-visual__node--b">02</span>
+      <span class="project-visual__node project-visual__node--c">03</span>
+      <i class="project-visual__route project-visual__route--ab"></i>
+      <i class="project-visual__route project-visual__route--bc"></i>
+      {label && <span class="project-visual__label">{label}</span>}
+    </div>
+  )}
+  {variant === "matrix" && (
+    <div class="project-visual__canvas project-visual__canvas--matrix">
+      <div class="project-visual__axis"><span>A</span><span>B</span><span>C</span></div>
+      <div class="project-visual__matrix-grid">
+        {Array.from({ length: 20 }).map(() => <i></i>)}
+      </div>
+      <div class="project-visual__mark">{label ?? "FIELD / STATE"}</div>
+    </div>
+  )}
+  {variant === "stack" && (
+    <div class="project-visual__canvas project-visual__canvas--stack">
+      <div class="project-visual__stack-title">{label ?? "SYSTEM"}</div>
+      <div class="project-visual__candidate project-visual__candidate--1"><b>01</b><span>Primary layer</span></div>
+      <div class="project-visual__candidate project-visual__candidate--2"><b>02</b><span>Secondary layer</span></div>
+      <div class="project-visual__candidate project-visual__candidate--3"><b>03</b><span>Fallback layer</span></div>
+    </div>
+  )}
+</div>

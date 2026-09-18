@@ -1,0 +1,21 @@
+---
+import SiteLayout from "../layouts/SiteLayout.astro";
+import { siteConfig } from "../site.config";
+---
+<SiteLayout
+  title={`Page not found — ${siteConfig.name}`}
+  description="The requested page does not exist."
+  routeKind="other"
+  noindex={true}
+  canonicalUrl={null}
+>
+  <section class="error-page page" aria-labelledby="error-title">
+    <p class="eyebrow">404 / Not found</p>
+    <h1 id="error-title">This page is not here.</h1>
+    <p>The address may have moved, or the page may never have existed.</p>
+    <div class="error-page__actions">
+      <a class="button button--secondary" href="/">Home</a>
+      <a class="button button--quiet" href="/timeline/">Timeline</a>
+    </div>
+  </section>
+</SiteLayout>

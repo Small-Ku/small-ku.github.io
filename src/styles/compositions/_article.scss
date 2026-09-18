@@ -1,0 +1,7 @@
+.article-head { padding-block: var(--ft-s8) var(--ft-s7); border-bottom: 1px solid var(--ft-rule); }
+.article-head__title { max-width: 16ch; margin: var(--ft-s3) 0 var(--ft-s5); font-size: var(--ft-text-2xl); line-height: var(--ft-leading-tight); letter-spacing: -0.045em; font-weight: 560; }
+.article-head__dek { max-width: 58ch; margin: 0; color: var(--ft-ink-soft); font-size: var(--ft-text-lg); line-height: 1.55; }
+.article-body { display: grid; grid-template-columns: minmax(0, var(--ft-reading)) minmax(10rem, 1fr); gap: clamp(3rem, 8vw, 8rem); padding-block: var(--ft-s8); }
+.article-aside { font-family: var(--ft-font-mono); font-size: var(--ft-text-xs); color: var(--ft-ink-muted); line-height: 1.65; }
+.article-aside > div { position: sticky; top: var(--ft-s5); }
+@media (max-width: 52rem) { .article-body { grid-template-columns: 1fr; } .article-aside { order: -1; } .article-aside > div { position: static; } }

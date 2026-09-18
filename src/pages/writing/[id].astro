@@ -1,0 +1,62 @@
+---
+import { render, type CollectionEntry } from "astro:content";
+import SiteLayout from "../../layouts/SiteLayout.astro";
+import { siteConfig } from "../../site.config";
+import { displayDate, getProjects, getWriting, htmlDate, projectHref, writingHref } from "../../lib/content";
+import { absoluteUrl, articleStructuredData } from "../../lib/seo";
+
+export async function getStaticPaths() {
+  const writing = await getWriting();
+  return writing.map((entry) => ({ params: { id: entry.id }, props: { entry } }));
+}
+
+interface Props { entry: CollectionEntry<"writing">; }
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const projects = await getProjects();
+const relatedProjects = entry.data.relatedProjects
+  .map((id) => projects.find((project) => project.id === id))
+  .filter((project): project is CollectionEntry<"projects"> => Boolean(project));
+const internalUrl = absoluteUrl(writingHref(entry.id));
+const canonicalUrl = entry.data.canonicalUrl ?? internalUrl;
+const structuredData = articleStructuredData({
+  title: entry.data.title,
+  summary: entry.data.summary,
+  url: canonicalUrl,
+  date: entry.data.date,
+  updated: entry.data.updated,
+  tags: entry.data.tags
+});
+---
+<SiteLayout
+  title={`${entry.data.title} — ${siteConfig.name}`}
+  description={entry.data.summary}
+  routeKind="writing"
+  routeId={entry.id}
+  canonicalUrl={canonicalUrl}
+  ogType="article"
+  structuredData={structuredData}
+>
+  <header class="article-head page" data-writing-slug={entry.id}>
+    <div class="article-head__meta">
+      <span class="eyebrow">{entry.data.kind}</span>
+      <time class="meta" datetime={htmlDate(entry.data.date)}>{displayDate(entry.data.date)}</time>
+    </div>
+    <div class="article-head__title-slot" data-vt-writing-title>
+      <h1 class="article-head__title">{entry.data.title}</h1>
+    </div>
+    <p class="article-head__dek">{entry.data.summary}</p>
+    {relatedProjects.length > 0 && (
+      <div class="article-head__relations meta">
+        Related /
+        {relatedProjects.map((project, index) => (
+          <><a href={projectHref(project.id)}>{project.data.title}</a>{index < relatedProjects.length - 1 ? " / " : ""}</>
+        ))}
+      </div>
+    )}
+  </header>
+
+  <div class="page article-body">
+    <article class="prose reading"><Content /></article>
+  </div>
+</SiteLayout>

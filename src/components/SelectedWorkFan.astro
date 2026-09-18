@@ -1,0 +1,50 @@
+---
+import type { ProjectEntry } from "../lib/content";
+import { projectHref } from "../lib/content";
+import ProjectVisual from "./ProjectVisual.astro";
+
+interface Props { projects: ProjectEntry[]; }
+const { projects } = Astro.props;
+---
+<div class:list={["selected-fan", projects.length === 0 && "selected-fan--empty"]} aria-label="Selected work">
+  {projects.length > 0 ? (
+    <div class="selected-fan__viewport">
+      <div class="selected-fan__track">
+        {projects.map((project, index) => (
+          <a
+            class:list={["fan-card", `fan-card--${project.data.tone}`]}
+            href={projectHref(project.id)}
+            data-work-slug={project.id}
+            data-vt-project-origin
+          >
+            <span class="fan-card__transition-surface" data-vt-project-surface aria-hidden="true"></span>
+            <div
+              class:list={["fan-card__visual", !project.data.visual && "fan-card__visual--empty"]}
+              data-vt-project-visual={project.data.visual ? "" : undefined}
+            >
+              {project.data.visual ? (
+                <ProjectVisual tone={project.data.tone} variant={project.data.visual.variant} label={project.data.visual.label} alt={project.data.visual.alt} />
+              ) : (
+                <span class="fan-card__visual-placeholder meta">Project</span>
+              )}
+            </div>
+            <div class="fan-card__body">
+              <div class="fan-card__index meta">{String(index + 1).padStart(2, "0")}</div>
+              <div>
+                <div class="fan-card__title-slot" data-vt-project-title><h2>{project.data.title}</h2></div>
+                <p>{project.data.kicker}</p>
+              </div>
+              <span class="fan-card__arrow" aria-hidden="true">↗</span>
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  ) : (
+    <div class="selected-fan__empty surface">
+      <span class="eyebrow">Selected work</span>
+      <p>No selected work published yet.</p>
+      <small>Selected projects will appear here when they are ready.</small>
+    </div>
+  )}
+</div>

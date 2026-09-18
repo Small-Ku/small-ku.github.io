@@ -1,0 +1,44 @@
+:root {
+  /* Effects change appearance without claiming spatial movement. */
+  --ft-motion-effect-fast: 90ms;
+  --ft-motion-effect: 150ms;
+  --ft-motion-effect-slow: 220ms;
+
+  /* Spatial motion changes geometry inside the current composition. */
+  --ft-motion-spatial-fast: 180ms;
+  --ft-motion-spatial: 260ms;
+  --ft-motion-spatial-slow: 340ms;
+
+  /* Container transforms are the longest authored motion on the site. */
+  --ft-motion-container: 560ms;
+  /* JS navigation recalculates this from travel distance + surface area ratio. */
+  --ft-motion-route: var(--ft-motion-container);
+  --ft-motion-reveal: 320ms;
+
+  --ft-ease-standard: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --ft-ease-enter: cubic-bezier(0.16, 1, 0.3, 1);
+  --ft-ease-exit: cubic-bezier(0.4, 0, 1, 1);
+  --ft-ease-emphasized: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ft-ease-container: cubic-bezier(0.18, 0.78, 0.18, 1);
+
+  /* Backwards-compatible aliases for existing component motion. */
+  --ft-ease: var(--ft-ease-standard);
+  --ft-fast: var(--ft-motion-effect-fast);
+  --ft-normal: var(--ft-motion-spatial-fast);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --ft-motion-effect-fast: 0ms;
+    --ft-motion-effect: 0ms;
+    --ft-motion-effect-slow: 0ms;
+    --ft-motion-spatial-fast: 0ms;
+    --ft-motion-spatial: 0ms;
+    --ft-motion-spatial-slow: 0ms;
+    --ft-motion-container: 1ms;
+    --ft-motion-route: 1ms;
+    --ft-motion-reveal: 1ms;
+    --ft-fast: 0ms;
+    --ft-normal: 0ms;
+  }
+}

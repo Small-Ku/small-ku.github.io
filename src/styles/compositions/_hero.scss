@@ -1,0 +1,7 @@
+.hero { min-height: clamp(27rem, 68vh, 43rem); display: grid; align-items: center; border-bottom: 1px solid var(--ft-rule); }
+.hero__inner { padding-block: var(--ft-s9); }
+.hero__copy { max-width: 54rem; }
+.hero__copy .eyebrow { margin-bottom: var(--ft-s5); }
+.hero__copy .display { margin-bottom: var(--ft-s5); }
+.hero__lede { max-width: 56ch; margin-bottom: 0; color: var(--ft-ink-soft); font-size: var(--ft-text-lg); line-height: 1.55; }
+.hero__actions { display: flex; flex-wrap: wrap; gap: var(--ft-s2); margin-top: var(--ft-s6); }

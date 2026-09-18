@@ -1,0 +1,16 @@
+:root {
+  --ft-font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --ft-font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+
+  --ft-text-xs: 0.6875rem;
+  --ft-text-sm: 0.8125rem;
+  --ft-text-base: 1rem;
+  --ft-text-lg: clamp(1.125rem, 1.04rem + 0.35vw, 1.3125rem);
+  --ft-text-xl: clamp(1.45rem, 1.22rem + 0.95vw, 2rem);
+  --ft-text-2xl: clamp(2.2rem, 1.62rem + 2.2vw, 3.65rem);
+
+  --ft-leading-tight: 1.12;
+  --ft-leading-ui: 1.35;
+  --ft-leading-copy: 1.72;
+  --ft-tracking-meta: 0.055em;
+}

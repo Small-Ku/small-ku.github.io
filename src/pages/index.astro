@@ -1,0 +1,29 @@
+---
+import SiteLayout from "../layouts/SiteLayout.astro";
+import SelectedWorkFan from "../components/SelectedWorkFan.astro";
+import LatestWriting from "../components/LatestWriting.astro";
+import { siteConfig } from "../site.config";
+import { getContentIndex, latestWriting, projectTitleMap, selectedProjects } from "../lib/content";
+
+const { projects, listedProjects, writing } = await getContentIndex();
+const selected = selectedProjects(listedProjects, siteConfig.home.selectedProjects);
+const latest = latestWriting(writing, siteConfig.home.latestWriting);
+const projectTitles = projectTitleMap(projects);
+---
+<SiteLayout routeKind="home">
+  <section class="home-field dot-field dot-field--home" aria-labelledby="hero-title">
+    <div class="page home-field__inner">
+      <div class="home-intro">
+        <h1 id="hero-title" class="display">{siteConfig.hero.title}</h1>
+        <p class="home-intro__lede">{siteConfig.hero.lede}</p>
+        <div class="home-intro__links meta">
+          <a href="/timeline/">Timeline ↗</a>
+        </div>
+      </div>
+      <SelectedWorkFan projects={selected} />
+    </div>
+    <a class="home-field__scroll" href="#latest-writing" aria-label="Scroll to latest writing">↓</a>
+  </section>
+
+  <LatestWriting items={latest} projectTitles={projectTitles} />
+</SiteLayout>

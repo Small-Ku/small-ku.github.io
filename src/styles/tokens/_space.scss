@@ -1,0 +1,20 @@
+:root {
+  --ft-s1: 0.25rem;
+  --ft-s2: 0.5rem;
+  --ft-s3: 0.75rem;
+  --ft-s4: 1rem;
+  --ft-s5: 1.5rem;
+  --ft-s6: 2rem;
+  --ft-s7: 3rem;
+  --ft-s8: 4rem;
+  --ft-s9: 6rem;
+  --ft-s10: 8rem;
+  --ft-gutter: clamp(1rem, 4vw, 3rem);
+  --ft-page: 76rem;
+  --ft-reading: 44rem;
+  --ft-writing-measure: 68rem;
+  --ft-chrono-date: 7.5rem;
+  --ft-chrono-rail: 1.5rem;
+  --ft-chrono-gap: 1rem;
+  --ft-chrono-arrow-inset: var(--ft-s5);
+}

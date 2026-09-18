@@ -1,0 +1,108 @@
+---
+import FilterSwitch from "./FilterSwitch.astro";
+import ProjectVisual from "./ProjectVisual.astro";
+import WritingEntry from "./WritingEntry.astro";
+import ContinuationRow from "./ContinuationRow.astro";
+import type { TimelineItem } from "../lib/content";
+import { displayDate, htmlDate } from "../lib/content";
+
+interface Props {
+  items: TimelineItem[];
+  latestWritingIds?: string[];
+  projectTitles?: Record<string, string>;
+}
+
+const { items, latestWritingIds = [], projectTitles = {} } = Astro.props;
+const latestRankById = new Map(latestWritingIds.map((id, index) => [id, index + 1]));
+const filterOptions = [
+  { value: "all", label: "All" },
+  { value: "writing", label: "Writing" },
+  { value: "work", label: "Projects" }
+];
+---
+<section
+  class="timeline-section page"
+  id="timeline"
+  aria-labelledby="timeline-title"
+  data-timeline
+  data-vt-timeline-destination
+>
+  <span class="timeline-section__transition-surface" data-vt-timeline-surface aria-hidden="true"></span>
+  <div class="timeline-head">
+    <div>
+      <p class="eyebrow">Timeline / chronological</p>
+      <h1 id="timeline-title">Work in motion, and the notes around it.</h1>
+    </div>
+    {items.length > 0 && <FilterSwitch options={filterOptions} active="all" label="Filter timeline" />}
+  </div>
+
+  {items.length > 0 ? (
+    <div class="timeline-list" data-timeline-list>
+      <span class="timeline-origin" data-vt-timeline-start aria-hidden="true"></span>
+
+      {items.map((item) => (
+        item.type === "writing" ? (
+          <div
+            class="timeline-entry timeline-entry--writing"
+            data-timeline-type="writing"
+            data-latest-rank={latestRankById.get(item.writing.id)}
+          >
+            <WritingEntry
+              item={item.writing}
+              projectTitles={projectTitles}
+              headingLevel={2}
+              latestRank={latestRankById.get(item.writing.id)}
+            />
+          </div>
+        ) : (
+          <div
+            class:list={[
+              "timeline-entry",
+              "timeline-entry--work",
+              `timeline-entry--tone-${item.project.data.tone}`,
+              item.project.data.visual && "timeline-entry--has-visual"
+            ]}
+            data-timeline-type="work"
+          >
+            <time class="timeline-entry__date meta" datetime={htmlDate(item.date)}>{displayDate(item.date)}</time>
+            <a
+              class="timeline-entry__content"
+              href={item.href}
+              data-work-slug={item.project.id}
+              data-vt-project-origin
+            >
+              <span class="timeline-entry__transition-surface" data-vt-project-surface aria-hidden="true"></span>
+              {item.project.data.visual ? (
+                <div class="timeline-entry__visual" data-vt-project-visual>
+                  <ProjectVisual
+                    tone={item.project.data.tone}
+                    variant={item.project.data.visual.variant}
+                    label={item.project.data.visual.label}
+                    alt={item.project.data.visual.alt}
+                  />
+                </div>
+              ) : (
+                <span class="timeline-entry__band" aria-hidden="true"></span>
+              )}
+              <div class="timeline-entry__copy">
+                <span class="timeline-entry__kicker meta">Project / {item.project.data.kicker} · {item.project.data.status}</span>
+                <div class="timeline-entry__title-row">
+                  <div class="timeline-entry__title-slot" data-vt-project-title><h2>{item.project.data.title}</h2></div>
+                  <span aria-hidden="true">↗</span>
+                </div>
+                <p>{item.project.data.summary}</p>
+                <span class="timeline-entry__meta meta">{item.project.data.visibility}</span>
+              </div>
+            </a>
+          </div>
+        )
+      ))}
+
+      <ContinuationRow label="End" terminal={true} />
+    </div>
+  ) : (
+    <div class="timeline-empty" role="status">
+      <p>Nothing published yet.</p>
+    </div>
+  )}
+</section>

@@ -1,0 +1,217 @@
+.selected-fan {
+  /* Geometry is constrained by the actual space this composition receives. */
+  container-type: inline-size;
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+}
+
+.selected-fan__viewport {
+  position: relative;
+  min-block-size: clamp(41rem, 96cqi, 44rem);
+}
+.selected-fan__track {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  perspective: 1200px;
+}
+
+.fan-card {
+  --fan-x: 0rem;
+  --fan-y: 0rem;
+  --fan-r: 0deg;
+  --fan-scale: 1;
+  --fan-z: 1;
+  position: absolute;
+  inline-size: clamp(27rem, 78cqi, 34rem);
+  block-size: clamp(13.25rem, 32cqi, 14.25rem);
+  display: grid;
+  grid-template-columns: minmax(0, 1.7fr) minmax(11rem, 0.82fr);
+  grid-template-rows: 1fr;
+  overflow: hidden;
+  border: 1px solid var(--ft-rule-strong);
+  border-radius: var(--ft-radius-md);
+  background: var(--ft-surface-raised);
+  color: var(--ft-ink);
+  text-decoration: none;
+  box-shadow: var(--ft-shadow-card);
+  transform: translate(var(--fan-x), var(--fan-y)) rotate(var(--fan-r)) scale(var(--fan-scale));
+  transform-origin: 50% 50%;
+  z-index: var(--fan-z);
+  transition: transform var(--ft-normal) var(--ft-ease), box-shadow var(--ft-normal) var(--ft-ease), opacity var(--ft-normal) var(--ft-ease);
+}
+
+/*
+ * Two-column desktop crescent.  The captions are a protected region: cards are
+ * spread far enough vertically that no card body can be obscured by a sibling.
+ * Overlap, when rotation creates any, is limited to the visual edge.
+ */
+.fan-card:nth-child(1) { --fan-x: 2.4rem; --fan-y: -14.6rem; --fan-r: 1.8deg; --fan-z: 2; }
+.fan-card:nth-child(2) { --fan-x: -3.2rem; --fan-y: 0rem; --fan-r: 0deg; --fan-z: 3; }
+.fan-card:nth-child(3) { --fan-x: 2.8rem; --fan-y: 14.6rem; --fan-r: -1.8deg; --fan-z: 2; }
+
+.fan-card__transition-surface {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  background: var(--ft-surface-raised);
+  pointer-events: none;
+}
+
+.selected-fan__track:has(.fan-card:hover) .fan-card:not(:hover),
+.selected-fan__track:has(.fan-card:focus-visible) .fan-card:not(:focus-visible) { opacity: 0.76; }
+.fan-card:hover,
+.fan-card:focus-visible {
+  --fan-scale: 1.035;
+  z-index: 8;
+  box-shadow: var(--ft-shadow-card-hover);
+}
+
+.fan-card__visual {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  border-right: 1px solid color-mix(in srgb, var(--ft-rule) 68%, transparent);
+}
+.fan-card__body {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-content: center;
+  gap: var(--ft-s3);
+  padding: var(--ft-s4);
+  background: color-mix(in srgb, var(--ft-surface-raised) 95%, transparent);
+}
+.fan-card__body h2 {
+  margin: 0 0 var(--ft-s1);
+  font-size: clamp(1.05rem, 1.35vw, var(--ft-text-lg));
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+}
+.fan-card__body p {
+  margin: 0;
+  color: var(--ft-ink-soft);
+  font-size: clamp(0.72rem, 0.9vw, var(--ft-text-sm));
+  line-height: 1.42;
+}
+.fan-card__index { padding-top: 0.18rem; }
+.fan-card__arrow { color: var(--ft-ink-muted); }
+
+/*
+ * When selected work owns a genuinely wide row, spend that width on three portrait
+ * objects instead of making one crescent card absurdly long. This query is based on
+ * the composition's own width, not viewport aspect ratio.
+ */
+@container (min-width: 56rem) {
+  .selected-fan__viewport { min-block-size: clamp(27rem, 39cqi, 31rem); }
+  .fan-card {
+    inline-size: clamp(17.5rem, 29cqi, 21.5rem);
+    block-size: clamp(23.5rem, 37cqi, 28rem);
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(0, 1fr) auto;
+  }
+  .fan-card:nth-child(1) { --fan-x: -28cqi; --fan-y: 0.45rem; --fan-r: -2.4deg; --fan-z: 1; }
+  .fan-card:nth-child(2) { --fan-x: 0rem; --fan-y: 0rem; --fan-r: 0deg; --fan-z: 3; }
+  .fan-card:nth-child(3) { --fan-x: 28cqi; --fan-y: 0.45rem; --fan-r: 2.4deg; --fan-z: 2; }
+  .fan-card__visual {
+    border-right: 0;
+    border-bottom: 1px solid color-mix(in srgb, var(--ft-rule) 68%, transparent);
+  }
+  .fan-card__body {
+    min-height: 5.5rem;
+    align-content: start;
+  }
+}
+
+/* Mobile changes interaction, not the content model. */
+@media (max-width: 48rem) {
+  .selected-fan__viewport {
+    min-height: 0;
+    margin-inline: calc(var(--ft-gutter) * -1);
+  }
+  .selected-fan__track {
+    position: static;
+    display: flex;
+    gap: var(--ft-s4);
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    padding: 0 var(--ft-gutter) var(--ft-s4);
+    perspective: none;
+  }
+  .selected-fan__track::-webkit-scrollbar { display: none; }
+  .fan-card,
+  .fan-card:nth-child(1),
+  .fan-card:nth-child(2),
+  .fan-card:nth-child(3),
+  .fan-card:hover,
+  .fan-card:focus-visible {
+    position: relative;
+    flex: 0 0 min(82vw, 20.5rem);
+    inline-size: min(82vw, 20.5rem);
+    block-size: clamp(24rem, 112vw, 28rem);
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(0, 1fr) auto;
+    --fan-x: 0rem;
+    --fan-y: 0rem;
+    --fan-r: 0deg;
+    --fan-scale: 1;
+    transform: none;
+    scroll-snap-align: center;
+    opacity: 1;
+  }
+  .fan-card__visual {
+    border-right: 0;
+    border-bottom: 1px solid color-mix(in srgb, var(--ft-rule) 68%, transparent);
+  }
+  .fan-card__body {
+    min-height: 6rem;
+    align-content: start;
+  }
+  .selected-fan__track:has(.fan-card:hover) .fan-card:not(:hover),
+  .selected-fan__track:has(.fan-card:focus-visible) .fan-card:not(:focus-visible) { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fan-card { transition: none; }
+}
+
+.fan-card__title-slot { min-width: 0; width: fit-content; max-width: 100%; }
+
+.selected-fan--empty {
+  display: grid;
+  min-block-size: clamp(14rem, 34vw, 24rem);
+  align-items: center;
+}
+.selected-fan__empty {
+  width: min(100%, 32rem);
+  min-height: 11rem;
+  display: grid;
+  align-content: center;
+  gap: var(--ft-s3);
+  padding: var(--ft-s6);
+  border: 1px solid var(--ft-rule);
+  border-radius: var(--ft-radius-md);
+  background: color-mix(in srgb, var(--ft-surface-raised) 82%, transparent);
+  color: var(--ft-ink-soft);
+}
+.selected-fan__empty p { margin: 0; color: var(--ft-ink); font-size: var(--ft-text-lg); }
+.selected-fan__empty small { max-width: 42ch; line-height: 1.55; }
+.selected-fan__empty code { font-family: var(--ft-font-mono); font-size: 0.9em; }
+.fan-card__visual--empty {
+  display: grid;
+  place-items: end start;
+  padding: var(--ft-s4);
+  background:
+    linear-gradient(var(--ft-rule), var(--ft-rule)) 0 0 / 100% 1px no-repeat,
+    radial-gradient(circle at 30% 30%, color-mix(in srgb, var(--ft-ink) 8%, transparent), transparent 42%),
+    var(--ft-surface);
+}
+.fan-card__visual-placeholder { color: var(--ft-ink-muted); }

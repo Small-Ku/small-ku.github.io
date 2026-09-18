@@ -1,0 +1,23 @@
+h1, h2, h3, p { margin-top: 0; }
+h1, h2, h3 { text-wrap: balance; }
+p { text-wrap: pretty; }
+.eyebrow,
+.meta {
+  font-family: var(--ft-font-mono);
+  font-size: var(--ft-text-xs);
+  letter-spacing: var(--ft-tracking-meta);
+  text-transform: uppercase;
+  color: var(--ft-ink-muted);
+}
+.display {
+  font-size: var(--ft-text-2xl);
+  line-height: var(--ft-leading-tight);
+  letter-spacing: -0.045em;
+  font-weight: 520;
+}
+.section-title {
+  font-size: var(--ft-text-sm);
+  line-height: var(--ft-leading-ui);
+  letter-spacing: 0.01em;
+  font-weight: 650;
+}

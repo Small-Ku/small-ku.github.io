@@ -1,0 +1,4 @@
+:where(a, button, summary, input, textarea, select):focus-visible {
+  outline: 2px solid var(--ft-focus);
+  outline-offset: 3px;
+}

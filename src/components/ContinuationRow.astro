@@ -1,0 +1,45 @@
+---
+interface Props {
+  label: string;
+  href?: string;
+  direction?: "right" | "down";
+  terminal?: boolean;
+  transitionTarget?: boolean;
+}
+const {
+  label,
+  href,
+  direction = "right",
+  terminal = false,
+  transitionTarget = false
+} = Astro.props;
+---
+{href ? (
+  <a
+    class:list={["continuation-row", terminal && "continuation-row--terminal"]}
+    href={href}
+    data-vt-continuation={transitionTarget ? "" : undefined}
+    data-vt-timeline-origin={transitionTarget ? "" : undefined}
+  >
+    {transitionTarget && <span class="continuation-row__transition-surface" data-vt-timeline-surface aria-hidden="true"></span>}
+    <span class="continuation-row__date" aria-hidden="true"></span>
+    <span class="continuation-row__rail" aria-hidden="true"></span>
+    <span class="continuation-row__content">
+      <span class="continuation-row__label">{label}</span>
+      {!terminal && <span class="continuation-row__arrow" aria-hidden="true">{direction === "down" ? "↓" : "↗"}</span>}
+    </span>
+  </a>
+) : (
+  <div
+    class:list={["continuation-row", terminal && "continuation-row--terminal"]}
+    data-vt-continuation={transitionTarget ? "" : undefined}
+    data-vt-timeline-origin={transitionTarget ? "" : undefined}
+  >
+    {transitionTarget && <span class="continuation-row__transition-surface" data-vt-timeline-surface aria-hidden="true"></span>}
+    <span class="continuation-row__date" aria-hidden="true"></span>
+    <span class="continuation-row__rail" aria-hidden="true"></span>
+    <span class="continuation-row__content">
+      <span class="continuation-row__label">{label}</span>
+    </span>
+  </div>
+)}

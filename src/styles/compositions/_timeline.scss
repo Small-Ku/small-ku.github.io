@@ -1,0 +1,251 @@
+.timeline-section {
+  --timeline-project-band: 0.42rem;
+  --timeline-project-rail-offset: calc((var(--ft-chrono-rail) - var(--timeline-project-band)) / 2);
+  position: relative;
+  isolation: isolate;
+  padding-block: clamp(var(--ft-s8), 8vw, var(--ft-s10));
+}
+.timeline-section__transition-surface {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--ft-canvas);
+  pointer-events: none;
+}
+.timeline-head,
+.timeline-list { position: relative; z-index: 1; }
+.timeline-head {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: var(--ft-s7);
+  margin-bottom: var(--ft-s8);
+}
+.timeline-head .eyebrow { margin-bottom: var(--ft-s3); }
+.timeline-head h1 {
+  max-width: 18ch;
+  margin: 0;
+  font-size: clamp(var(--ft-text-xl), 3vw, 2.75rem);
+  line-height: 1.18;
+  letter-spacing: -0.03em;
+  font-weight: 560;
+}
+
+.timeline-list {
+  position: relative;
+  display: grid;
+}
+.timeline-origin {
+  position: absolute;
+  top: calc(var(--ft-s5) + 0.52rem);
+  left: calc(var(--ft-chrono-date) + var(--ft-chrono-gap) + (var(--ft-chrono-rail) / 2));
+  width: 1px;
+  height: 1px;
+  pointer-events: none;
+}
+
+.timeline-entry {
+  display: grid;
+  grid-template-columns: var(--ft-chrono-date) var(--ft-chrono-rail) minmax(0, 1fr);
+  gap: var(--ft-chrono-gap);
+  position: relative;
+  align-items: start;
+  padding-block: var(--ft-s4);
+}
+.timeline-entry[hidden] { display: none; }
+.timeline-entry::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(var(--ft-chrono-date) + var(--ft-chrono-gap) + (var(--ft-chrono-rail) / 2));
+  width: 1px;
+  background: var(--ft-rule-strong);
+}
+.timeline-origin + .timeline-entry::before,
+.timeline-entry[data-first-visible="true"]::before {
+  top: calc(var(--ft-s4) + 0.88rem);
+}
+.timeline-entry__date { padding-top: 0.45rem; color: var(--ft-ink-muted); text-align: right; }
+.timeline-entry__marker {
+  position: relative;
+  z-index: 2;
+  justify-self: center;
+  margin-top: 0.55rem;
+  width: 0.68rem;
+  height: 0.68rem;
+  border: 1px solid var(--ft-rule-strong);
+  border-radius: 50%;
+  background: var(--ft-canvas);
+}
+.timeline-entry__writing-wrap { grid-column: 3; min-width: 0; }
+
+/* Writing rows intentionally reuse the exact same WritingEntry box on Home and
+ * Timeline. The outer timeline wrapper exists only for filtering/chronology state;
+ * it must not invent a second date/rail/content geometry for the same object. */
+.timeline-entry--writing {
+  display: block;
+  padding: 0;
+}
+.timeline-entry--writing::before { content: none; }
+.timeline-entry--writing[hidden] { display: none; }
+.timeline-entry--writing > .writing-entry { width: 100%; }
+.timeline-origin + .timeline-entry--writing .writing-entry__rail::before,
+.timeline-entry--writing[data-first-visible="true"] .writing-entry__rail::before {
+  top: 0.52rem;
+}
+
+.timeline-entry__content { min-width: 0; color: inherit; text-decoration: none; }
+.timeline-entry__kicker { display: block; margin-bottom: var(--ft-s3); color: var(--ft-ink-muted); }
+.timeline-entry__title-row { display: flex; align-items: baseline; justify-content: space-between; gap: var(--ft-s5); }
+.timeline-entry--work .timeline-entry__title-row { position: relative; }
+.timeline-entry--work .timeline-entry__title-row > span {
+  /* The Project copy already owns the shared s5 end padding; do not cancel it.
+   * Writing/continuation arrows add the same inset explicitly because their
+   * rows do not have a padded copy wrapper. */
+  margin-right: 0;
+}
+.timeline-entry__title-row h2 {
+  margin: 0;
+  font-size: clamp(1.25rem, 1.9vw, 1.8rem);
+  line-height: 1.2;
+  letter-spacing: -0.027em;
+  font-weight: 560;
+}
+.timeline-entry__title-row > span { color: var(--ft-ink-muted); }
+.timeline-entry__content p { margin: var(--ft-s2) 0 var(--ft-s3); color: var(--ft-ink-soft); line-height: 1.58; }
+.timeline-entry__meta { color: var(--ft-ink-muted); }
+
+/* Projects cover the rail: compact visual on the left, text on the right. */
+.timeline-entry--work .timeline-entry__content {
+  grid-column: 2 / -1;
+  position: relative;
+  z-index: 3;
+  /* Place the band's centre exactly on the chronology centreline instead of
+   * letting the card intrude to the left of it. */
+  margin-left: var(--timeline-project-rail-offset);
+  max-inline-size: calc(
+    var(--ft-writing-measure)
+    - var(--ft-chrono-date)
+    - var(--ft-chrono-gap)
+    - var(--timeline-project-rail-offset)
+  );
+  display: grid;
+  grid-template-columns: var(--timeline-project-band) minmax(0, 1fr);
+  overflow: hidden;
+  border: 1px solid var(--ft-rule);
+  border-radius: var(--ft-radius-md);
+  background: var(--ft-surface-raised);
+  box-shadow: 0 1px 2px rgb(20 20 18 / 0.035);
+  transition: transform var(--ft-fast) var(--ft-ease), border-color var(--ft-fast) var(--ft-ease), box-shadow var(--ft-fast) var(--ft-ease);
+}
+.timeline-entry--work.timeline-entry--has-visual .timeline-entry__content {
+  grid-template-columns: minmax(10.5rem, 13.5rem) minmax(0, 1fr);
+}
+.timeline-entry__transition-surface {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  background: var(--ft-surface-raised);
+  pointer-events: none;
+}
+.timeline-entry--work .timeline-entry__visual,
+.timeline-entry--work .timeline-entry__band,
+.timeline-entry--work .timeline-entry__copy { position: relative; z-index: 1; }
+.timeline-entry--work .timeline-entry__visual {
+  position: relative;
+  min-height: 10.5rem;
+  border-right: 1px solid var(--ft-rule);
+  background: var(--ft-surface);
+}
+.timeline-entry--work .timeline-entry__band {
+  display: block;
+  min-height: 100%;
+  background: var(--ft-rule-strong);
+}
+.timeline-entry--tone-violet .timeline-entry__band { background: linear-gradient(#6756d9, #e28b68); }
+.timeline-entry--tone-teal .timeline-entry__band { background: linear-gradient(#326e78, #45a59f); }
+.timeline-entry--tone-coral .timeline-entry__band { background: linear-gradient(#c66055, #5d9073); }
+.timeline-entry--work .timeline-entry__copy { padding: var(--ft-s5); }
+.timeline-entry--work .timeline-entry__content p { max-width: 68ch; }
+.timeline-entry--work .timeline-entry__content:hover {
+  transform: translateY(-2px);
+  border-color: var(--ft-rule-strong);
+  box-shadow: 0 8px 24px rgb(20 20 18 / 0.07);
+}
+.timeline-entry--work .timeline-entry__content:hover .timeline-entry__title-row > span { color: var(--ft-ink); }
+
+@media (max-width: 62rem) {
+  .timeline-head { align-items: start; flex-direction: column; }
+}
+
+/* When the small visual no longer earns its width, collapse every project to a color band + text. */
+@media (max-width: 52rem) {
+  .timeline-entry--work .timeline-entry__content,
+  .timeline-entry--work.timeline-entry--has-visual .timeline-entry__content {
+    grid-template-columns: var(--timeline-project-band) minmax(0, 1fr);
+  }
+  .timeline-entry--work .timeline-entry__visual,
+  .timeline-entry--work .timeline-entry__band {
+    display: none;
+  }
+  .timeline-entry--work .timeline-entry__content::before {
+    content: "";
+    display: block;
+    min-height: 100%;
+    background: var(--ft-rule-strong);
+  }
+  .timeline-entry--tone-violet .timeline-entry__content::before { background: linear-gradient(#6756d9, #e28b68); }
+  .timeline-entry--tone-teal .timeline-entry__content::before { background: linear-gradient(#326e78, #45a59f); }
+  .timeline-entry--tone-coral .timeline-entry__content::before { background: linear-gradient(#c66055, #5d9073); }
+}
+
+@media (max-width: 48rem) {
+  .timeline-origin {
+    left: calc(var(--ft-chrono-rail) / 2);
+  }
+  .timeline-entry {
+    grid-template-columns: var(--ft-chrono-rail) minmax(0, 1fr);
+    column-gap: var(--ft-s3);
+  }
+  .timeline-entry::before {
+    left: calc(var(--ft-chrono-rail) / 2);
+  }
+  .timeline-entry__date {
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: start;
+    padding-top: 0;
+    margin-bottom: calc(var(--ft-s2) * -1);
+    text-align: left;
+  }
+  .timeline-entry__marker { grid-column: 1; grid-row: 1 / span 2; }
+  .timeline-entry__writing-wrap { grid-column: 2; grid-row: 2; }
+  .timeline-entry--work .timeline-entry__content {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    margin-left: var(--timeline-project-rail-offset);
+    max-inline-size: calc(100% - var(--timeline-project-rail-offset));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .timeline-entry--work .timeline-entry__content { transition: none; }
+}
+
+.timeline-entry__title-slot { min-width: 0; width: fit-content; max-width: 100%; flex: 0 1 auto; margin-right: auto; }
+
+/* Shared Latest Writing rows use the same measure on Home and Timeline. Keeping
+ * this box width identical prevents the entire row/rail snapshot from drifting
+ * sideways simply because Timeline has a wider list container. */
+.timeline-entry--writing > .writing-entry {
+  inline-size: min(100%, var(--ft-writing-measure));
+  max-inline-size: var(--ft-writing-measure);
+}
+
+/* Timeline continuation shares the same chronology measure as WritingEntry. */
+.timeline-list > .continuation-row {
+  inline-size: min(100%, var(--ft-writing-measure));
+  max-inline-size: var(--ft-writing-measure);
+}

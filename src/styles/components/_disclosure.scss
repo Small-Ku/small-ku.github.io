@@ -1,0 +1,7 @@
+.disclosure { border-top: 1px solid var(--ft-rule); }
+.disclosure:last-child { border-bottom: 1px solid var(--ft-rule); }
+.disclosure summary { display: flex; justify-content: space-between; gap: var(--ft-s4); padding: var(--ft-s3) 0; cursor: pointer; list-style: none; }
+.disclosure summary::-webkit-details-marker { display: none; }
+.disclosure summary::after { content: "+"; font-family: var(--ft-font-mono); color: var(--ft-ink-muted); }
+.disclosure[open] summary::after { content: "−"; }
+.disclosure__body { padding: 0 0 var(--ft-s4); color: var(--ft-ink-soft); line-height: 1.6; }

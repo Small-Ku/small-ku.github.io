@@ -1,0 +1,10 @@
+.prose { font-size: var(--ft-text-base); line-height: var(--ft-leading-copy); color: var(--ft-ink); }
+.prose > * + * { margin-top: 1.25em; }
+.prose h2 { margin-top: 2.4em; margin-bottom: 0.7em; font-size: var(--ft-text-xl); line-height: 1.22; letter-spacing: -0.03em; }
+.prose h3 { margin-top: 2em; margin-bottom: 0.6em; font-size: var(--ft-text-lg); line-height: 1.3; }
+.prose p { margin-bottom: 0; }
+.prose a { text-decoration-color: var(--ft-rule-strong); text-underline-offset: 0.2em; }
+.prose a:hover { text-decoration-color: currentColor; }
+.prose blockquote { margin-inline: 0; padding-left: var(--ft-s4); border-left: 2px solid var(--ft-rule-strong); color: var(--ft-ink-soft); }
+.prose hr { border: 0; border-top: 1px solid var(--ft-rule); margin-block: var(--ft-s7); }
+.prose code:not(pre code) { padding: 0.12em 0.28em; background: var(--ft-code-bg); border-radius: var(--ft-radius-xs); font-family: var(--ft-font-mono); font-size: 0.9em; }

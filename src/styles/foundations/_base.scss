@@ -1,0 +1,14 @@
+html { min-inline-size: 20rem; background: var(--ft-bg); overflow-x: auto; }
+body {
+  min-inline-size: 20rem;
+  min-height: 100vh;
+  background: var(--ft-canvas);
+  color: var(--ft-ink);
+  font-family: var(--ft-font-sans);
+  text-rendering: optimizeLegibility;
+  transition: background var(--ft-normal) var(--ft-ease), color var(--ft-normal) var(--ft-ease);
+}
+::selection { background: var(--ft-selected); color: var(--ft-ink); }
+.site-shell { min-height: 100vh; overflow: clip; }
+.page { width: min(100% - (2 * var(--ft-gutter)), var(--ft-page)); margin-inline: auto; }
+.reading { width: min(100%, var(--ft-reading)); }

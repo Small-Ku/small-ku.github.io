@@ -1,0 +1,5 @@
+# Keep pnpm's strict dependency-build policy enabled. Only the build scripts
+# reviewed for this exact draft dependency graph are allowed to execute.
+allowBuilds:
+  '@parcel/watcher@2.6.0': true
+  'esbuild@0.28.2': true

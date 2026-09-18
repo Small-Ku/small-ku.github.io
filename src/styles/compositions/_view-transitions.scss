@@ -1,0 +1,425 @@
+/*
+ * Motion grammar
+ * --------------
+ * Project navigation is a true container transform:
+ *   1. the card plane expands into the actual viewport-scale Project hero plane;
+ *   2. the project visual and title remain above that plane and travel to their
+ *      destination slots;
+ *   3. source and destination layouts deliberately keep the same topology
+ *      (visual first/left, title second/right; stacked in the same order mobile),
+ *      so the shared trajectories never need to cross;
+ *   4. only new, non-shared Project content fades/settles in after the plane has
+ *      taken ownership of the frame.
+ *
+ * Timeline expansion keeps its own portal transform. Writing keeps title identity.
+ */
+/* No generic page dissolve. Un-authored navigations are effectively instant. */
+::view-transition-group(root) { animation-duration: 1ms; }
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+::view-transition-old(root) { opacity: 0; }
+::view-transition-new(root) { opacity: 1; }
+
+/* Stable chrome. */
+::view-transition-group(site-header) {
+  z-index: 60;
+  animation-duration: var(--ft-motion-spatial-fast);
+  animation-timing-function: var(--ft-ease-standard);
+}
+::view-transition-old(site-header),
+::view-transition-new(site-header) { mix-blend-mode: normal; }
+
+/* Writing: a title is genuinely the same object across overview/detail. */
+::view-transition-group(writing-title) {
+  z-index: 35;
+  animation-duration: var(--ft-motion-route);
+  animation-timing-function: var(--ft-ease-emphasized);
+}
+::view-transition-old(writing-title),
+::view-transition-new(writing-title) { mix-blend-mode: normal; }
+
+/* -------------------------------------------------------------------------- */
+/* Project container transform                                                */
+/* -------------------------------------------------------------------------- */
+
+/* The plane owns the largest geometric change and sits above the old page. */
+::view-transition-group(project-surface) {
+  z-index: 20;
+  overflow: clip;
+  animation-duration: var(--ft-motion-route);
+  animation-timing-function: var(--ft-ease-container);
+}
+::view-transition-image-pair(project-surface) { isolation: auto; }
+::view-transition-old(project-surface) {
+  animation: ft-project-surface-old var(--ft-motion-route) linear both;
+  mix-blend-mode: normal;
+}
+::view-transition-new(project-surface) {
+  animation: ft-project-surface-new var(--ft-motion-route) linear both;
+  mix-blend-mode: normal;
+}
+
+/* Shared project objects move above the expanding plane, never underneath it. */
+::view-transition-group(project-visual),
+::view-transition-group(project-title) {
+  z-index: 42;
+  animation-duration: var(--ft-motion-route);
+  animation-timing-function: var(--ft-ease-container);
+}
+::view-transition-image-pair(project-visual),
+::view-transition-image-pair(project-title) { isolation: auto; }
+::view-transition-old(project-visual),
+::view-transition-new(project-visual),
+::view-transition-old(project-title),
+::view-transition-new(project-title) { mix-blend-mode: normal; }
+
+/* Visual snapshots intentionally fill the interpolated group box instead of
+ * preserving their original aspect ratio. The Project artwork is abstract UI
+ * texture, so a temporary squash/stretch communicates the container morph
+ * better than holding one scale and flashing to the destination aspect ratio
+ * at the end. Both rasters crossfade while sharing the same warped geometry. */
+::view-transition-old(project-visual),
+::view-transition-new(project-visual) {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: fill;
+}
+
+/* Shared geometry remains continuous, but the low-resolution source raster
+ * hands off early. The destination snapshot was captured at its final size, so
+ * letting it dominate the second half avoids visibly enlarging the old pixels. */
+::view-transition-old(project-title),
+::view-transition-new(project-title) { transform-origin: left center; }
+
+/* Raster ownership is directional. Entering Project grows the geometry, so the
+ * destination-resolution snapshot takes over early. Exiting shrinks it, so the
+ * larger outgoing snapshot stays authoritative until the group is near its
+ * small destination. This avoids upscaling whichever raster is lower-res. */
+html[data-motion-type="project-enter"] {
+  &::view-transition-old(project-visual) {
+    animation: ft-shared-grow-old var(--ft-motion-route) linear both;
+  }
+  &::view-transition-new(project-visual) {
+    animation: ft-shared-grow-new var(--ft-motion-route) linear both;
+  }
+  &::view-transition-old(project-title) {
+    animation: ft-title-grow-old var(--ft-motion-route) linear both;
+  }
+  &::view-transition-new(project-title) {
+    animation: ft-title-grow-new var(--ft-motion-route) linear both;
+  }
+}
+
+html[data-motion-type="project-exit"] {
+  &::view-transition-old(project-visual) {
+    animation: ft-shared-shrink-old var(--ft-motion-route) linear both;
+  }
+  &::view-transition-new(project-visual) {
+    animation: ft-shared-shrink-new var(--ft-motion-route) linear both;
+  }
+  &::view-transition-old(project-title) {
+    animation: ft-title-shrink-old var(--ft-motion-route) linear both;
+  }
+  &::view-transition-new(project-title) {
+    animation: ft-title-shrink-new var(--ft-motion-route) linear both;
+  }
+}
+
+/* New-only project content sits above the plane but below shared identity. */
+::view-transition-group(project-eyebrow),
+::view-transition-group(project-supporting-content),
+::view-transition-group(project-facts),
+::view-transition-group(project-body) {
+  z-index: 32;
+  animation-duration: var(--ft-motion-route);
+}
+::view-transition-new(project-eyebrow),
+::view-transition-new(project-supporting-content),
+::view-transition-new(project-facts),
+::view-transition-new(project-body),
+::view-transition-old(project-eyebrow),
+::view-transition-old(project-supporting-content),
+::view-transition-old(project-facts),
+::view-transition-old(project-body) {
+  mix-blend-mode: normal;
+}
+
+html[data-motion-type="project-enter"] {
+  /* Old environment remains intact underneath until the growing plane covers it. */
+  &::view-transition-group(root) { z-index: 0; }
+  &::view-transition-old(root) { opacity: 1; }
+  &::view-transition-new(root) { opacity: 0; }
+
+  &::view-transition-new(project-eyebrow) {
+    animation: ft-project-reveal-early var(--ft-motion-route) var(--ft-ease-enter) both;
+  }
+  &::view-transition-new(project-supporting-content) {
+    animation: ft-project-reveal var(--ft-motion-route) var(--ft-ease-enter) both;
+  }
+  &::view-transition-new(project-facts) {
+    animation: ft-project-reveal-late var(--ft-motion-route) var(--ft-ease-enter) both;
+  }
+  &::view-transition-new(project-body) {
+    animation: ft-project-body-reveal var(--ft-motion-route) var(--ft-ease-enter) both;
+  }
+}
+
+html[data-motion-type="project-exit"] {
+  /* Home is already behind the contracting project plane. */
+  &::view-transition-group(root) { z-index: 0; }
+  &::view-transition-old(root) { opacity: 0; }
+  &::view-transition-new(root) { opacity: 1; }
+
+  &::view-transition-old(project-eyebrow),
+  &::view-transition-old(project-supporting-content),
+  &::view-transition-old(project-facts),
+  &::view-transition-old(project-body) {
+    animation: ft-project-exit-detail var(--ft-motion-route) var(--ft-ease-exit) both;
+  }
+}
+
+/* Surface snapshots deliberately overlap in opacity. There is never a midpoint
+ * at which the expanding plane becomes translucent and exposes the old page. */
+@keyframes ft-project-surface-old {
+  0%, 24% { opacity: 1; }
+  38%, 100% { opacity: 0; }
+}
+@keyframes ft-project-surface-new {
+  0% { opacity: 0; }
+  18%, 100% { opacity: 1; }
+}
+
+@keyframes ft-shared-grow-old {
+  0% { opacity: 1; }
+  30% { opacity: 0.9; }
+  58% { opacity: 0.38; }
+  78%, 100% { opacity: 0; }
+}
+@keyframes ft-shared-grow-new {
+  0%, 18% { opacity: 0; }
+  36% { opacity: 0.2; }
+  62% { opacity: 0.72; }
+  80%, 100% { opacity: 1; }
+}
+@keyframes ft-title-grow-old {
+  0%, 12% { opacity: 1; }
+  34%, 100% { opacity: 0; }
+}
+@keyframes ft-title-grow-new {
+  0%, 18% { opacity: 0; }
+  38%, 100% { opacity: 1; }
+}
+@keyframes ft-shared-shrink-old {
+  0% { opacity: 1; }
+  38% { opacity: 0.88; }
+  68% { opacity: 0.34; }
+  90%, 100% { opacity: 0; }
+}
+@keyframes ft-shared-shrink-new {
+  0%, 20% { opacity: 0; }
+  42% { opacity: 0.2; }
+  70% { opacity: 0.76; }
+  92%, 100% { opacity: 1; }
+}
+@keyframes ft-title-shrink-old {
+  0%, 72% { opacity: 1; }
+  90%, 100% { opacity: 0; }
+}
+@keyframes ft-title-shrink-new {
+  0%, 78% { opacity: 0; }
+  96%, 100% { opacity: 1; }
+}
+
+@keyframes ft-project-reveal-early {
+  0%, 48% { opacity: 0; transform: translateY(0.22rem); }
+  78%, 100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes ft-project-reveal {
+  0%, 58% { opacity: 0; transform: translateY(0.35rem); }
+  88%, 100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes ft-project-reveal-late {
+  0%, 68% { opacity: 0; transform: translateY(0.4rem); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes ft-project-body-reveal {
+  0%, 78% { opacity: 0; transform: translateY(0.5rem); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes ft-project-exit-detail {
+  0% { opacity: 1; transform: translateY(0); }
+  28%, 100% { opacity: 0; transform: translateY(0.18rem); }
+}
+
+/* -------------------------------------------------------------------------- */
+/* Latest writing <-> Timeline shared rows                                    */
+/* -------------------------------------------------------------------------- */
+
+/* These three rows remain genuine shared objects during the portal transform.
+ * They must sit above the expanding canvas, otherwise the surface visually
+ * swallows them before they reach their Timeline positions. */
+::view-transition-group(latest-writing-1),
+::view-transition-group(latest-writing-2),
+::view-transition-group(latest-writing-3) {
+  z-index: 46;
+  animation-duration: var(--ft-motion-route);
+  animation-timing-function: var(--ft-ease-container);
+}
+::view-transition-image-pair(latest-writing-1),
+::view-transition-image-pair(latest-writing-2),
+::view-transition-image-pair(latest-writing-3) { isolation: auto; }
+::view-transition-old(latest-writing-1),
+::view-transition-old(latest-writing-2),
+::view-transition-old(latest-writing-3),
+::view-transition-new(latest-writing-1),
+::view-transition-new(latest-writing-2),
+::view-transition-new(latest-writing-3) {
+  mix-blend-mode: normal;
+}
+html[data-motion-type="timeline-expand"] {
+  &::view-transition-old(latest-writing-1),
+  &::view-transition-old(latest-writing-2),
+  &::view-transition-old(latest-writing-3) {
+    animation: ft-row-grow-old var(--ft-motion-route) linear both;
+  }
+  &::view-transition-new(latest-writing-1),
+  &::view-transition-new(latest-writing-2),
+  &::view-transition-new(latest-writing-3) {
+    animation: ft-row-grow-new var(--ft-motion-route) linear both;
+  }
+}
+html[data-motion-type="timeline-collapse"] {
+  &::view-transition-old(latest-writing-1),
+  &::view-transition-old(latest-writing-2),
+  &::view-transition-old(latest-writing-3) {
+    animation: ft-row-shrink-old var(--ft-motion-route) linear both;
+  }
+  &::view-transition-new(latest-writing-1),
+  &::view-transition-new(latest-writing-2),
+  &::view-transition-new(latest-writing-3) {
+    animation: ft-row-shrink-new var(--ft-motion-route) linear both;
+  }
+}
+
+/* Rows keep the higher-resolution side of the pair for most of the transform. */
+@keyframes ft-row-grow-old {
+  0%, 20% { opacity: 1; }
+  44%, 100% { opacity: 0; }
+}
+@keyframes ft-row-grow-new {
+  0%, 26% { opacity: 0; }
+  48%, 100% { opacity: 1; }
+}
+@keyframes ft-row-shrink-old {
+  0%, 62% { opacity: 1; }
+  84%, 100% { opacity: 0; }
+}
+@keyframes ft-row-shrink-new {
+  0%, 70% { opacity: 0; }
+  92%, 100% { opacity: 1; }
+}
+
+/* -------------------------------------------------------------------------- */
+/* Timeline portal transform                                                  */
+/* -------------------------------------------------------------------------- */
+
+::view-transition-group(timeline-surface) {
+  z-index: 20;
+  overflow: clip;
+  animation-duration: var(--ft-motion-route);
+  animation-timing-function: var(--ft-ease-container);
+}
+::view-transition-image-pair(timeline-surface) { isolation: auto; }
+::view-transition-old(timeline-surface) {
+  animation: ft-timeline-surface-old var(--ft-motion-route) linear both;
+  mix-blend-mode: normal;
+}
+::view-transition-new(timeline-surface) {
+  animation: ft-timeline-surface-new var(--ft-motion-route) linear both;
+  mix-blend-mode: normal;
+}
+
+::view-transition-group(timeline-origin-content),
+::view-transition-group(timeline-destination-content) {
+  z-index: 32;
+  animation-duration: var(--ft-motion-route);
+}
+::view-transition-old(timeline-origin-content) {
+  animation: ft-timeline-origin-out var(--ft-motion-route) var(--ft-ease-exit) both;
+  mix-blend-mode: normal;
+}
+::view-transition-new(timeline-destination-content) {
+  animation: ft-timeline-destination-in var(--ft-motion-route) var(--ft-ease-enter) both;
+  mix-blend-mode: normal;
+}
+
+html[data-motion-type="timeline-expand"] {
+  &::view-transition-group(root) { z-index: 0; }
+  &::view-transition-old(root) { opacity: 1; }
+  &::view-transition-new(root) { opacity: 0; }
+}
+
+html[data-motion-type="timeline-collapse"] {
+  /* The restored Home page is already behind the contracting Timeline plane.
+   * Shared latest-writing rows remain above both surfaces for the whole trip. */
+  &::view-transition-group(root) { z-index: 0; }
+  &::view-transition-old(root) { opacity: 0; }
+  &::view-transition-new(root) { opacity: 1; }
+
+  &::view-transition-old(timeline-destination-content) {
+    animation: ft-timeline-destination-out var(--ft-motion-route) var(--ft-ease-exit) both;
+  }
+  &::view-transition-new(timeline-origin-content) {
+    animation: ft-timeline-origin-in var(--ft-motion-route) var(--ft-ease-enter) both;
+  }
+}
+
+@keyframes ft-timeline-surface-old {
+  0%, 26% { opacity: 1; }
+  42%, 100% { opacity: 0; }
+}
+@keyframes ft-timeline-surface-new {
+  0% { opacity: 0; }
+  20%, 100% { opacity: 1; }
+}
+@keyframes ft-timeline-origin-out {
+  0%, 16% { opacity: 1; transform: scale(1); }
+  44%, 100% { opacity: 0; transform: scale(0.992); }
+}
+@keyframes ft-timeline-destination-in {
+  0%, 54% { opacity: 0; transform: translateY(0.35rem); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes ft-timeline-destination-out {
+  0% { opacity: 1; transform: translateY(0); }
+  36%, 100% { opacity: 0; transform: translateY(0.2rem); }
+}
+@keyframes ft-timeline-origin-in {
+  0%, 58% { opacity: 0; transform: scale(0.994); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation-duration: 1ms !important;
+    animation-delay: 0ms !important;
+  }
+
+  ::view-transition-new(project-eyebrow),
+  ::view-transition-new(project-supporting-content),
+  ::view-transition-new(project-facts),
+  ::view-transition-new(project-body),
+  ::view-transition-old(project-eyebrow),
+  ::view-transition-old(project-supporting-content),
+  ::view-transition-old(project-facts),
+  ::view-transition-old(project-body),
+  ::view-transition-old(timeline-origin-content),
+  ::view-transition-new(timeline-destination-content) {
+    transform: none;
+  }
+}

@@ -1,0 +1,26 @@
+---
+interface Option {
+  value: string;
+  label: string;
+}
+
+interface Props {
+  options: Option[];
+  active?: string;
+  label?: string;
+}
+
+const { options, active = options[0]?.value ?? "", label = "Filter" } = Astro.props;
+---
+<div class="filter-switch" data-filter-switch role="group" aria-label={label}>
+  {options.map((option) => (
+    <button
+      class:list={["filter-switch__button", { "is-active": option.value === active }]}
+      type="button"
+      data-filter={option.value}
+      aria-pressed={option.value === active ? "true" : "false"}
+    >
+      {option.label}
+    </button>
+  ))}
+</div>

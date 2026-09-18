@@ -1,0 +1,37 @@
+---
+import type { WritingEntry as WritingContentEntry } from "../lib/content";
+import WritingEntry from "./WritingEntry.astro";
+import ContinuationRow from "./ContinuationRow.astro";
+
+interface Props {
+  items: WritingContentEntry[];
+  projectTitles?: Record<string, string>;
+  continuationHref?: string;
+  continuationLabel?: string;
+  markLatest?: boolean;
+  emptyLabel?: string;
+}
+
+const {
+  items,
+  projectTitles = {},
+  continuationHref,
+  continuationLabel,
+  markLatest = false,
+  emptyLabel = "No writing yet"
+} = Astro.props;
+---
+<div class="writing-stream">
+  {items.length > 0 ? items.map((item, index) => (
+    <WritingEntry item={item} projectTitles={projectTitles} latestRank={markLatest ? index + 1 : undefined} />
+  )) : (
+    <ContinuationRow label={emptyLabel} terminal={true} />
+  )}
+  {items.length > 0 && continuationLabel && (
+    <ContinuationRow
+      label={continuationLabel}
+      href={continuationHref}
+      transitionTarget={markLatest}
+    />
+  )}
+</div>

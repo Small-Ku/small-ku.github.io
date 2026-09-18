@@ -1,0 +1,118 @@
+.project-visual {
+  --pv-a: #77736d;
+  --pv-b: #373734;
+  --pv-c: #b5afa4;
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+.project-visual--violet { --pv-a: #6756d9; --pv-b: #9c6ee8; --pv-c: #e28b68; }
+.project-visual--teal { --pv-a: #326e78; --pv-b: #45a59f; --pv-c: #d0c06f; }
+.project-visual--coral { --pv-a: #c66055; --pv-b: #e19a68; --pv-c: #5d9073; }
+.project-visual--neutral { --pv-a: #5e5d58; --pv-b: #8b8880; --pv-c: #c2bcb0; }
+.project-visual__canvas { position: absolute; inset: 0; }
+
+.project-visual__canvas--network {
+  background:
+    radial-gradient(circle at 20% 20%, rgb(255 255 255 / 0.2), transparent 34%),
+    linear-gradient(145deg, var(--pv-a) 0%, var(--pv-b) 50%, var(--pv-c) 100%);
+}
+.project-visual__node {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  width: clamp(3.3rem, 18%, 4.4rem);
+  aspect-ratio: 1;
+  border: 1px solid rgb(255 255 255 / 0.72);
+  border-radius: 50%;
+  background: rgb(24 20 45 / 0.24);
+  color: white;
+  font: 600 clamp(0.52rem, 0.8vw, 0.64rem)/1 var(--ft-font-mono);
+  letter-spacing: 0.05em;
+  backdrop-filter: blur(8px);
+}
+.project-visual__node--a { left: 18%; top: 23%; }
+.project-visual__node--b { right: 16%; top: 34%; }
+.project-visual__node--c { left: 42%; bottom: 14%; }
+.project-visual__route { position: absolute; height: 1px; background: rgb(255 255 255 / 0.7); transform-origin: 0 0; }
+.project-visual__route--ab { left: 35%; top: 34%; width: 44%; transform: rotate(9deg); }
+.project-visual__route--bc { left: 72%; top: 47%; width: 35%; transform: rotate(139deg); }
+.project-visual__label {
+  position: absolute;
+  right: 1rem;
+  bottom: 0.9rem;
+  color: rgb(255 255 255 / 0.82);
+  font: var(--ft-text-xs)/1.2 var(--ft-font-mono);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.project-visual__canvas--matrix {
+  padding: 1.2rem;
+  background: linear-gradient(160deg, color-mix(in srgb, var(--pv-a) 28%, #101118), color-mix(in srgb, var(--pv-b) 45%, #1c2230) 54%, var(--pv-a));
+  color: rgb(255 255 255 / 0.82);
+}
+.project-visual__axis {
+  display: flex;
+  justify-content: space-between;
+  font: clamp(0.48rem, 0.7vw, 0.56rem)/1 var(--ft-font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  opacity: 0.74;
+}
+.project-visual__matrix-grid {
+  position: absolute;
+  inset: 24% 10% 25%;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: clamp(0.22rem, 0.55vw, 0.34rem);
+  transform: skewY(-4deg);
+}
+.project-visual__matrix-grid i {
+  border: 1px solid rgb(255 255 255 / 0.18);
+  background: var(--pv-b);
+  opacity: 0.66;
+}
+.project-visual__matrix-grid i:nth-child(3n) { transform: translateY(-0.35rem); background: var(--pv-a); opacity: 0.86; }
+.project-visual__matrix-grid i:nth-child(4n) { opacity: 0.42; }
+.project-visual__matrix-grid i:nth-child(5n) { background: var(--pv-c); opacity: 0.9; }
+.project-visual__mark {
+  position: absolute;
+  left: 1.2rem;
+  right: 1.2rem;
+  bottom: 0.9rem;
+  border-top: 1px solid rgb(255 255 255 / 0.26);
+  padding-top: 0.5rem;
+  font: clamp(0.5rem, 0.72vw, 0.58rem)/1.2 var(--ft-font-mono);
+  letter-spacing: 0.04em;
+}
+
+.project-visual__canvas--stack {
+  padding: 1rem 1.1rem;
+  background: linear-gradient(155deg, color-mix(in srgb, var(--pv-c) 18%, #f4efe7), #f7f3ec 45%, color-mix(in srgb, var(--pv-a) 18%, #eef2ed) 100%);
+  color: #20201e;
+}
+.project-visual__stack-title {
+  margin: 0.15rem 0 0.7rem;
+  font: 600 clamp(0.84rem, 1.2vw, 1.1rem)/1 var(--ft-font-mono);
+  letter-spacing: 0.04em;
+}
+.project-visual__candidate {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.7rem;
+  align-items: center;
+  padding: 0.48rem 0.62rem;
+  margin-top: 0.4rem;
+  border: 1px solid rgb(37 37 31 / 0.12);
+  background: rgb(255 255 255 / 0.6);
+  box-shadow: 0 1px 0 rgb(255 255 255 / 0.8) inset;
+}
+.project-visual__candidate b { font-size: clamp(0.8rem, 1vw, 1rem); font-weight: 650; }
+.project-visual__candidate span { font: clamp(0.46rem, 0.62vw, 0.52rem)/1.2 var(--ft-font-mono); color: #69665f; text-transform: uppercase; }
+.project-visual__candidate--1 { border-left: 3px solid var(--pv-a); }
+.project-visual__candidate--2 { border-left: 3px solid var(--pv-b); transform: translateX(0.6rem); }
+.project-visual__candidate--3 { border-left: 3px solid var(--pv-c); }

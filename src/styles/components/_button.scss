@@ -1,0 +1,22 @@
+.button {
+  min-height: 2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ft-s2);
+  padding: 0.42rem 0.72rem;
+  border: 1px solid var(--ft-rule-strong);
+  border-radius: var(--ft-radius-sm);
+  background: var(--ft-ink);
+  color: var(--ft-canvas);
+  text-decoration: none;
+  font-size: var(--ft-text-sm);
+  line-height: 1;
+  cursor: pointer;
+  transition: opacity var(--ft-fast) var(--ft-ease), background var(--ft-fast) var(--ft-ease), border-color var(--ft-fast) var(--ft-ease);
+}
+.button:hover { opacity: 0.82; }
+.button--secondary { background: var(--ft-canvas); color: var(--ft-ink); border-color: var(--ft-rule); }
+.button--secondary:hover { background: var(--ft-hover); opacity: 1; }
+.button--quiet { background: transparent; color: var(--ft-ink-soft); border-color: transparent; }
+.button--quiet:hover { color: var(--ft-ink); background: var(--ft-hover); opacity: 1; }

@@ -1,0 +1,40 @@
+---
+import type { WritingEntry as WritingContentEntry } from "../lib/content";
+import { displayDate, htmlDate, writingHref } from "../lib/content";
+
+interface Props {
+  item: WritingContentEntry;
+  projectTitles?: Record<string, string>;
+  headingLevel?: 2 | 3;
+  latestRank?: number;
+}
+
+const {
+  item,
+  projectTitles = {},
+  headingLevel = 3,
+  latestRank
+} = Astro.props;
+
+const related = item.data.relatedProjects
+  .map((id) => projectTitles[id] ?? id)
+  .join(" / ");
+---
+<a
+  class="writing-entry"
+  href={writingHref(item.id)}
+  data-writing-slug={item.id}
+  data-latest-rank={latestRank}
+>
+  <time class="writing-entry__date meta" datetime={htmlDate(item.data.date)}>{displayDate(item.data.date)}</time>
+  <span class="writing-entry__rail" aria-hidden="true"></span>
+  <div class="writing-entry__copy">
+    <span class="writing-entry__kicker meta">{item.data.kind}</span>
+    <div class="writing-entry__title-row">
+      {headingLevel === 2 ? <h2 data-vt-writing-title>{item.data.title}</h2> : <h3 data-vt-writing-title>{item.data.title}</h3>}
+      <span aria-hidden="true">↗</span>
+    </div>
+    <p>{item.data.summary}</p>
+    {related && <span class="writing-entry__meta meta">Related / {related}</span>}
+  </div>
+</a>

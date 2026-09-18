@@ -1,0 +1,114 @@
+---
+import { render, type CollectionEntry } from "astro:content";
+import SiteLayout from "../../layouts/SiteLayout.astro";
+import WritingStream from "../../components/WritingStream.astro";
+import ProjectVisual from "../../components/ProjectVisual.astro";
+import { siteConfig } from "../../site.config";
+import {
+  displayYear,
+  getProjects,
+  getWriting,
+  projectHref,
+  projectTitleMap,
+  relatedWriting
+} from "../../lib/content";
+import { absoluteUrl, projectStructuredData } from "../../lib/seo";
+
+export async function getStaticPaths() {
+  const projects = await getProjects();
+  return projects.map((project) => ({ params: { id: project.id }, props: { project } }));
+}
+
+interface Props { project: CollectionEntry<"projects">; }
+const { project } = Astro.props;
+const { Content } = await render(project);
+const writing = await getWriting();
+const allProjects = await getProjects();
+const notes = relatedWriting(project.id, writing);
+const projectTitles = projectTitleMap(allProjects);
+const hasVisual = Boolean(project.data.visual);
+const internalUrl = absoluteUrl(projectHref(project.id));
+const canonicalUrl = project.data.canonicalUrl ?? internalUrl;
+const structuredData = projectStructuredData({
+  title: project.data.title,
+  summary: project.data.summary,
+  url: canonicalUrl,
+  date: project.data.date,
+  updated: project.data.updated,
+  tags: project.data.tags,
+  sourceUrl: project.data.sourceUrl
+});
+---
+<SiteLayout
+  title={`${project.data.title} — ${siteConfig.name}`}
+  description={project.data.summary}
+  routeKind="project"
+  routeId={project.id}
+  canonicalUrl={canonicalUrl}
+  noindex={project.data.visibility === "unlisted"}
+  structuredData={structuredData}
+>
+  <header
+    class:list={[`work-head work-head--${project.data.tone}`, !hasVisual && "work-head--no-visual"]}
+    data-project-page
+    data-work-slug={project.id}
+    data-project-selected={project.data.selected ? "true" : "false"}
+    data-vt-project-destination
+  >
+    <span class="work-head__transition-surface" data-vt-project-surface aria-hidden="true"></span>
+
+    <div class="page work-head__primary">
+      {project.data.visual && (
+        <div class="work-head__visual-wrap">
+          <div class="work-head__visual" data-vt-project-visual>
+            <ProjectVisual
+              tone={project.data.tone}
+              variant={project.data.visual.variant}
+              label={project.data.visual.label}
+              alt={project.data.visual.alt}
+            />
+          </div>
+        </div>
+      )}
+
+      <div class="work-head__copy" data-vt-project-copy>
+        <p class="eyebrow" data-vt-project-eyebrow>Project / {project.data.status} / {displayYear(project.data.date)}</p>
+        <div class="work-head__title-slot" data-vt-project-title>
+          <h1 class="article-head__title">{project.data.title}</h1>
+        </div>
+        <div class="work-head__supporting" data-vt-project-supporting>
+          <p class="article-head__dek">{project.data.summary}</p>
+          <div class="work-head__actions">
+            {project.data.externalUrl && <a class="button button--secondary" href={project.data.externalUrl}>Visit ↗</a>}
+            {project.data.sourceUrl && <a class="button button--secondary" href={project.data.sourceUrl}>Source ↗</a>}
+            <a class="button button--quiet" href="/timeline/">Timeline</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {project.data.facts.length > 0 && (
+      <div class="page work-head__facts" data-vt-project-facts>
+        {project.data.facts.map((fact, index) => <span><b>{String(index + 1).padStart(2, "0")}</b>{fact}</span>)}
+      </div>
+    )}
+  </header>
+
+  <div class="page work-body" data-vt-project-support>
+    <article class="prose reading"><Content /></article>
+    <aside class="article-aside" aria-label="Project metadata">
+      <div>
+        STATUS<br />{project.data.status}<br /><br />
+        VISIBILITY<br />{project.data.visibility}<br /><br />
+        RELATION<br />{notes.length} writing item{notes.length === 1 ? "" : "s"}
+      </div>
+    </aside>
+  </div>
+
+  {notes.length > 0 && (
+    <section class="section page work-related">
+      <div class="section__head"><h2 class="section-title">Related writing</h2><p>Notes attached to this project</p></div>
+      <WritingStream items={notes} projectTitles={projectTitles} />
+    </section>
+  )}
+</SiteLayout>
