@@ -1,24 +1,24 @@
 ---
 import { render, type CollectionEntry } from "astro:content";
-import SiteLayout from "../../layouts/SiteLayout.astro";
-import { siteConfig } from "../../site.config";
-import { contentKey, displayDate, getProjects, getWriting, htmlDate, projectHref, writingHref } from "../../lib/content";
-import { absoluteUrl, articleStructuredData } from "../../lib/seo";
+import SiteLayout from "../../../layouts/SiteLayout.astro";
+import { siteConfig } from "../../../site.config";
+import { contentKey, displayDate, getProjects, getWriting, htmlDate, projectHref, writingHref } from "../../../lib/content";
+import { absoluteUrl, articleStructuredData } from "../../../lib/seo";
 
 export async function getStaticPaths() {
-  const writing = await getWriting();
+  const writing = await getWriting("zh");
   return writing.map((entry) => ({ params: { id: contentKey(entry) }, props: { entry } }));
 }
 
 interface Props { entry: CollectionEntry<"writing">; }
 const { entry } = Astro.props;
 const { Content } = await render(entry);
-const projects = await getProjects();
-const chineseEntry = (await getWriting("zh")).find((candidate) => contentKey(candidate) === contentKey(entry));
+const projects = await getProjects("zh");
+const englishEntry = (await getWriting("en")).find((candidate) => contentKey(candidate) === contentKey(entry));
 const relatedProjects = entry.data.relatedProjects
   .map((id) => projects.find((project) => contentKey(project) === id))
   .filter((project): project is CollectionEntry<"projects"> => Boolean(project));
-const internalUrl = absoluteUrl(writingHref(contentKey(entry)));
+const internalUrl = absoluteUrl(writingHref(contentKey(entry), "zh"));
 const canonicalUrl = entry.data.canonicalUrl ?? internalUrl;
 const structuredData = articleStructuredData({
   title: entry.data.title,
@@ -27,10 +27,11 @@ const structuredData = articleStructuredData({
   date: entry.data.date,
   updated: entry.data.updated,
   tags: entry.data.tags,
-  locale: "en"
+  locale: "zh"
 });
 ---
 <SiteLayout
+  locale="zh"
   title={`${entry.data.title} — ${siteConfig.name}`}
   description={entry.data.summary}
   routeKind="writing"
@@ -38,28 +39,24 @@ const structuredData = articleStructuredData({
   canonicalUrl={canonicalUrl}
   ogType="article"
   structuredData={structuredData}
-  alternatePaths={chineseEntry ? { en: writingHref(contentKey(entry)), zh: writingHref(contentKey(entry), "zh") } : { en: writingHref(contentKey(entry)) }}
+  alternatePaths={englishEntry ? { en: writingHref(contentKey(entry)), zh: writingHref(contentKey(entry), "zh") } : { zh: writingHref(contentKey(entry), "zh") }}
 >
   <header class="article-head page" data-writing-slug={contentKey(entry)}>
     <div class="article-head__meta">
       <span class="eyebrow">{entry.data.kind}</span>
       <time class="meta" datetime={htmlDate(entry.data.date)}>{displayDate(entry.data.date)}</time>
     </div>
-    <div class="article-head__title-slot" data-vt-writing-title>
-      <h1 class="article-head__title">{entry.data.title}</h1>
-    </div>
+    <div class="article-head__title-slot" data-vt-writing-title><h1 class="article-head__title">{entry.data.title}</h1></div>
     <p class="article-head__dek">{entry.data.summary}</p>
     {relatedProjects.length > 0 && (
       <div class="article-head__relations meta">
-        Related /
+        關聯 /
         {relatedProjects.map((project, index) => (
-          <><a href={projectHref(contentKey(project))}>{project.data.title}</a>{index < relatedProjects.length - 1 ? " / " : ""}</>
+          <><a href={projectHref(contentKey(project), "zh")}>{project.data.title}</a>{index < relatedProjects.length - 1 ? " / " : ""}</>
         ))}
       </div>
     )}
   </header>
 
-  <div class="page article-body">
-    <article class="prose reading"><Content /></article>
-  </div>
+  <div class="page article-body"><article class="prose reading"><Content /></article></div>
 </SiteLayout>

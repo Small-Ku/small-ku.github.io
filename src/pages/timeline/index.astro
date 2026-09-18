@@ -2,7 +2,7 @@
 import SiteLayout from "../../layouts/SiteLayout.astro";
 import Timeline from "../../components/Timeline.astro";
 import { siteConfig } from "../../site.config";
-import { getContentIndex, latestWriting, projectTitleMap, timelineItems } from "../../lib/content";
+import { contentKey, getContentIndex, latestWriting, projectTitleMap, timelineItems } from "../../lib/content";
 
 const { projects, listedProjects, writing } = await getContentIndex();
 const latest = latestWriting(writing, siteConfig.home.latestWriting);
@@ -11,10 +11,12 @@ const latest = latestWriting(writing, siteConfig.home.latestWriting);
   title={`Timeline — ${siteConfig.name}`}
   description="A chronological stream of projects and writing."
   routeKind="timeline"
+  alternatePaths={{ en: "/timeline/", zh: "/zh/timeline/" }}
 >
   <Timeline
     items={timelineItems(listedProjects, writing)}
-    latestWritingIds={latest.map((entry) => entry.id)}
+    latestWritingIds={latest.map((entry) => contentKey(entry))}
     projectTitles={projectTitleMap(projects)}
+    locale="en"
   />
 </SiteLayout>

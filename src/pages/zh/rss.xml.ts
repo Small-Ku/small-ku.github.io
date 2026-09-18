@@ -1,18 +1,19 @@
 import type { APIRoute } from "astro";
-import { contentKey, getWriting, writingHref } from "../lib/content";
-import { absoluteUrl } from "../lib/seo";
-import { siteConfig } from "../site.config";
-import { escapeXml, rfc822Date } from "../lib/xml";
+import { contentKey, getWriting, writingHref } from "../../lib/content";
+import { absoluteUrl } from "../../lib/seo";
+import { siteConfig } from "../../site.config";
+import { escapeXml, rfc822Date } from "../../lib/xml";
 
 export const prerender = true;
 
 export const GET: APIRoute = async () => {
-  const writing = await getWriting();
-  const self = absoluteUrl("/rss.xml");
-  const channel = absoluteUrl("/");
+  const writing = await getWriting("zh");
+  const self = absoluteUrl("/zh/rss.xml");
+  const channel = absoluteUrl("/zh/");
+  const copy = siteConfig.locales.zh;
 
   const items = writing.map((entry) => {
-    const link = entry.data.canonicalUrl ?? absoluteUrl(writingHref(contentKey(entry)));
+    const link = entry.data.canonicalUrl ?? absoluteUrl(writingHref(contentKey(entry), "zh"));
     const pubDate = rfc822Date(entry.data.date);
     return [
       "    <item>",
@@ -30,10 +31,10 @@ export const GET: APIRoute = async () => {
     '<?xml version="1.0" encoding="UTF-8"?>',
     '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">',
     "  <channel>",
-    `    <title>${escapeXml(siteConfig.title)}</title>`,
-    `    <description>${escapeXml(siteConfig.description)}</description>`,
+    `    <title>${escapeXml(copy.title)}</title>`,
+    `    <description>${escapeXml(copy.description)}</description>`,
     `    <link>${escapeXml(channel)}</link>`,
-    `    <language>${escapeXml(siteConfig.language)}</language>`,
+    `    <language>${escapeXml(copy.language)}</language>`,
     `    <atom:link href="${escapeXml(self)}" rel="self" type="application/rss+xml" />`,
     items,
     "  </channel>",

@@ -1,9 +1,11 @@
 ---
+locale: en
+# translationKey: my-project
 title: My Project
 kicker: Short project category
 summary: One or two sentences used on cards and metadata.
-date: 2026-09
-updated: 2026-09-19
+date: "2026-09"
+updated: "2026-09-19"
 draft: true
 status: Active
 selected: false

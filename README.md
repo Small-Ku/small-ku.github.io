@@ -90,6 +90,19 @@ Then place the new files under `src/content/projects/` or `src/content/writing/`
 
 If a collection is empty, its dynamic route simply generates no detail pages.
 
+The site also has a static Traditional Chinese route family:
+
+```text
+/zh/                      Chinese home (`lang="zh-Hant"`)
+/zh/timeline/             Chinese chronology
+/zh/projects/<slug>/      Chinese project, when authored
+/zh/writing/<slug>/       Chinese writing, when authored
+```
+
+English remains the default locale without an `/en/` prefix. Author translated content under
+the `zh/` content directories with the same `translationKey`; routes without translated content
+are not silently populated with English.
+
 ## Build-time content checks
 
 The content layer fails the build for structural mistakes that should not be silently hidden, including:

@@ -1,5 +1,6 @@
 import type { APIRoute } from "astro";
-import { getContentIndex, projectHref, writingHref } from "../lib/content";
+import { contentKey, getContentIndex, projectHref, writingHref } from "../lib/content";
+import { supportedLocales, localizedPath } from "../lib/i18n";
 import { absoluteUrl } from "../lib/seo";
 import { escapeXml, fullDate } from "../lib/xml";
 
@@ -9,26 +10,26 @@ const ownsCanonical = (internalUrl: string, explicit?: string) =>
   !explicit || new URL(explicit).href === new URL(internalUrl).href;
 
 export const GET: APIRoute = async () => {
-  const { listedProjects, writing } = await getContentIndex();
-  const projectPages = listedProjects.flatMap((entry) => {
-    const loc = absoluteUrl(projectHref(entry.id));
-    return ownsCanonical(loc, entry.data.canonicalUrl)
-      ? [{ loc, lastmod: fullDate(entry.data.updated ?? entry.data.date) }]
-      : [];
-  });
-  const writingPages = writing.flatMap((entry) => {
-    const loc = absoluteUrl(writingHref(entry.id));
-    return ownsCanonical(loc, entry.data.canonicalUrl)
-      ? [{ loc, lastmod: fullDate(entry.data.updated ?? entry.data.date) }]
-      : [];
-  });
-
-  const pages: Array<{ loc: string; lastmod?: string }> = [
-    { loc: absoluteUrl("/") },
-    { loc: absoluteUrl("/timeline/") },
-    ...projectPages,
-    ...writingPages
-  ];
+  const pages: Array<{ loc: string; lastmod?: string }> = [];
+  for (const locale of supportedLocales) {
+    const { listedProjects, writing } = await getContentIndex(locale);
+    pages.push(
+      { loc: absoluteUrl(localizedPath(locale, "/")) },
+      { loc: absoluteUrl(localizedPath(locale, "/timeline/")) },
+      ...listedProjects.flatMap((entry) => {
+        const loc = absoluteUrl(projectHref(contentKey(entry), locale));
+        return ownsCanonical(loc, entry.data.canonicalUrl)
+          ? [{ loc, lastmod: fullDate(entry.data.updated ?? entry.data.date) }]
+          : [];
+      }),
+      ...writing.flatMap((entry) => {
+        const loc = absoluteUrl(writingHref(contentKey(entry), locale));
+        return ownsCanonical(loc, entry.data.canonicalUrl)
+          ? [{ loc, lastmod: fullDate(entry.data.updated ?? entry.data.date) }]
+          : [];
+      })
+    );
+  }
 
   const body = pages.map(({ loc, lastmod }) => [
     "  <url>",

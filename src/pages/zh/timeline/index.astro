@@ -1,0 +1,23 @@
+---
+import SiteLayout from "../../../layouts/SiteLayout.astro";
+import Timeline from "../../../components/Timeline.astro";
+import { siteConfig } from "../../../site.config";
+import { contentKey, getContentIndex, latestWriting, projectTitleMap, timelineItems } from "../../../lib/content";
+
+const { projects, listedProjects, writing } = await getContentIndex("zh");
+const latest = latestWriting(writing, siteConfig.home.latestWriting);
+---
+<SiteLayout
+  locale="zh"
+  title={`時間線 — ${siteConfig.name}`}
+  description="按時間整理的作品與文章。"
+  routeKind="timeline"
+  alternatePaths={{ en: "/timeline/", zh: "/zh/timeline/" }}
+>
+  <Timeline
+    items={timelineItems(listedProjects, writing, "zh")}
+    latestWritingIds={latest.map((entry) => contentKey(entry))}
+    projectTitles={projectTitleMap(projects)}
+    locale="zh"
+  />
+</SiteLayout>

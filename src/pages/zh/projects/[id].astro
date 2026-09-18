@@ -1,35 +1,35 @@
 ---
 import { render, type CollectionEntry } from "astro:content";
-import SiteLayout from "../../layouts/SiteLayout.astro";
-import WritingStream from "../../components/WritingStream.astro";
-import ProjectVisual from "../../components/ProjectVisual.astro";
-import { siteConfig } from "../../site.config";
+import SiteLayout from "../../../layouts/SiteLayout.astro";
+import WritingStream from "../../../components/WritingStream.astro";
+import ProjectVisual from "../../../components/ProjectVisual.astro";
+import { siteConfig } from "../../../site.config";
 import {
-  displayYear,
   contentKey,
+  displayYear,
   getProjects,
   getWriting,
   projectHref,
   projectTitleMap,
   relatedWriting
-} from "../../lib/content";
-import { absoluteUrl, projectStructuredData } from "../../lib/seo";
+} from "../../../lib/content";
+import { absoluteUrl, projectStructuredData } from "../../../lib/seo";
 
 export async function getStaticPaths() {
-  const projects = await getProjects();
+  const projects = await getProjects("zh");
   return projects.map((project) => ({ params: { id: contentKey(project) }, props: { project } }));
 }
 
 interface Props { project: CollectionEntry<"projects">; }
 const { project } = Astro.props;
 const { Content } = await render(project);
-const writing = await getWriting();
-const allProjects = await getProjects();
-const chineseProject = (await getProjects("zh")).find((entry) => contentKey(entry) === contentKey(project));
+const writing = await getWriting("zh");
+const allProjects = await getProjects("zh");
+const englishProject = (await getProjects("en")).find((entry) => contentKey(entry) === contentKey(project));
 const notes = relatedWriting(contentKey(project), writing);
 const projectTitles = projectTitleMap(allProjects);
 const hasVisual = Boolean(project.data.visual);
-const internalUrl = absoluteUrl(projectHref(contentKey(project)));
+const internalUrl = absoluteUrl(projectHref(contentKey(project), "zh"));
 const canonicalUrl = project.data.canonicalUrl ?? internalUrl;
 const structuredData = projectStructuredData({
   title: project.data.title,
@@ -39,10 +39,11 @@ const structuredData = projectStructuredData({
   updated: project.data.updated,
   tags: project.data.tags,
   sourceUrl: project.data.sourceUrl,
-  locale: "en"
+  locale: "zh"
 });
 ---
 <SiteLayout
+  locale="zh"
   title={`${project.data.title} — ${siteConfig.name}`}
   description={project.data.summary}
   routeKind="project"
@@ -50,7 +51,7 @@ const structuredData = projectStructuredData({
   canonicalUrl={canonicalUrl}
   noindex={project.data.visibility === "unlisted"}
   structuredData={structuredData}
-  alternatePaths={chineseProject ? { en: projectHref(contentKey(project)), zh: projectHref(contentKey(project), "zh") } : { en: projectHref(contentKey(project)) }}
+  alternatePaths={englishProject ? { en: projectHref(contentKey(project)), zh: projectHref(contentKey(project), "zh") } : { zh: projectHref(contentKey(project), "zh") }}
 >
   <header
     class:list={[`work-head work-head--${project.data.tone}`, !hasVisual && "work-head--no-visual"]}
@@ -60,37 +61,27 @@ const structuredData = projectStructuredData({
     data-vt-project-destination
   >
     <span class="work-head__transition-surface" data-vt-project-surface aria-hidden="true"></span>
-
     <div class="page work-head__primary">
       {project.data.visual && (
         <div class="work-head__visual-wrap">
           <div class="work-head__visual" data-vt-project-visual>
-            <ProjectVisual
-              tone={project.data.tone}
-              variant={project.data.visual.variant}
-              label={project.data.visual.label}
-              alt={project.data.visual.alt}
-            />
+            <ProjectVisual tone={project.data.tone} variant={project.data.visual.variant} label={project.data.visual.label} alt={project.data.visual.alt} />
           </div>
         </div>
       )}
-
       <div class="work-head__copy" data-vt-project-copy>
-        <p class="eyebrow" data-vt-project-eyebrow>Project / {project.data.status} / {displayYear(project.data.date)}</p>
-        <div class="work-head__title-slot" data-vt-project-title>
-          <h1 class="article-head__title">{project.data.title}</h1>
-        </div>
+        <p class="eyebrow" data-vt-project-eyebrow>作品 / {project.data.status} / {displayYear(project.data.date)}</p>
+        <div class="work-head__title-slot" data-vt-project-title><h1 class="article-head__title">{project.data.title}</h1></div>
         <div class="work-head__supporting" data-vt-project-supporting>
           <p class="article-head__dek">{project.data.summary}</p>
           <div class="work-head__actions">
-            {project.data.externalUrl && <a class="button button--secondary" href={project.data.externalUrl}>Visit ↗</a>}
-            {project.data.sourceUrl && <a class="button button--secondary" href={project.data.sourceUrl}>Source ↗</a>}
-            <a class="button button--quiet" href="/timeline/">Timeline</a>
+            {project.data.externalUrl && <a class="button button--secondary" href={project.data.externalUrl}>前往 ↗</a>}
+            {project.data.sourceUrl && <a class="button button--secondary" href={project.data.sourceUrl}>原始碼 ↗</a>}
+            <a class="button button--quiet" href="/zh/timeline/">時間線</a>
           </div>
         </div>
       </div>
     </div>
-
     {project.data.facts.length > 0 && (
       <div class="page work-head__facts" data-vt-project-facts>
         {project.data.facts.map((fact, index) => <span><b>{String(index + 1).padStart(2, "0")}</b>{fact}</span>)}
@@ -100,19 +91,15 @@ const structuredData = projectStructuredData({
 
   <div class="page work-body" data-vt-project-support>
     <article class="prose reading"><Content /></article>
-    <aside class="article-aside" aria-label="Project metadata">
-      <div>
-        STATUS<br />{project.data.status}<br /><br />
-        VISIBILITY<br />{project.data.visibility}<br /><br />
-        RELATION<br />{notes.length} writing item{notes.length === 1 ? "" : "s"}
-      </div>
+    <aside class="article-aside" aria-label="作品資料">
+      <div>狀態<br />{project.data.status}<br /><br />可見性<br />{project.data.visibility}<br /><br />關聯<br />{notes.length} 篇文章</div>
     </aside>
   </div>
 
   {notes.length > 0 && (
     <section class="section page work-related">
-      <div class="section__head"><h2 class="section-title">Related writing</h2><p>Notes attached to this project</p></div>
-      <WritingStream items={notes} projectTitles={projectTitles} />
+      <div class="section__head"><h2 class="section-title">相關文章</h2><p>與此作品相關的筆記</p></div>
+      <WritingStream items={notes} projectTitles={projectTitles} locale="zh" />
     </section>
   )}
 </SiteLayout>

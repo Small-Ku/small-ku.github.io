@@ -2,6 +2,7 @@
 import type { WritingEntry as WritingContentEntry } from "../lib/content";
 import WritingEntry from "./WritingEntry.astro";
 import ContinuationRow from "./ContinuationRow.astro";
+import type { SiteLocale } from "../lib/i18n";
 
 interface Props {
   items: WritingContentEntry[];
@@ -10,6 +11,7 @@ interface Props {
   continuationLabel?: string;
   markLatest?: boolean;
   emptyLabel?: string;
+  locale?: SiteLocale;
 }
 
 const {
@@ -18,12 +20,13 @@ const {
   continuationHref,
   continuationLabel,
   markLatest = false,
-  emptyLabel = "No writing yet"
+  emptyLabel = "No writing yet",
+  locale = "en"
 } = Astro.props;
 ---
 <div class="writing-stream">
   {items.length > 0 ? items.map((item, index) => (
-    <WritingEntry item={item} projectTitles={projectTitles} latestRank={markLatest ? index + 1 : undefined} />
+    <WritingEntry item={item} projectTitles={projectTitles} latestRank={markLatest ? index + 1 : undefined} locale={locale} />
   )) : (
     <ContinuationRow label={emptyLabel} terminal={true} />
   )}
