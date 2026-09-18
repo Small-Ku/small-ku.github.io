@@ -10,7 +10,7 @@ const external = (href: string) => /^https?:\/\//.test(href);
   <div class="page site-footer__inner">
     <span>{copy.footerNote}</span>
     <span class="site-footer__links">
-      <a class="text-link" href={localizedPath(locale, "timeline")}>{copy.navigation[0]?.label ?? "Timeline"}</a><span aria-hidden="true"> · </span><a class="text-link" href={localizedFilePath(locale, "/rss.xml")} data-no-soft-nav>RSS</a>
+      <a class="text-link" href={localizedPath(locale, "timeline")}>{copy.navigation[0]?.label ?? "Timeline"}</a><span aria-hidden="true"> · </span><a class="text-link" href={localizedFilePath(locale, "/rss.xml")} data-no-soft-nav>{copy.rssLabel}</a>
       {siteConfig.social.map((item) => <><span aria-hidden="true"> · </span><a class="text-link" href={item.href} rel={external(item.href) ? "me noopener noreferrer" : undefined}>{item.label}</a></>)}
     </span>
   </div>

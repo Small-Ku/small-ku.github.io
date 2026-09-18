@@ -1,6 +1,10 @@
 # Content authoring contract
 
-The live collections deliberately contain no sample entries. Entries are intentionally flat (`*.md`, no nested content folders), so each filename maps unambiguously to one route ID. Start by copying `templates/project.md` or `templates/writing.md`; the templates are outside `src/content/` and therefore never publish by accident.
+The live collections deliberately contain no sample entries. English entries use flat `*.md`
+files at the collection root; translated entries use one locale subdirectory, so each locale's
+filename still maps unambiguously to one route ID. Start by copying `templates/project.md` or
+`templates/writing.md`; the templates are outside `src/content/` and therefore never publish by
+accident.
 
 ## Shared rules
 

@@ -17,7 +17,7 @@ const current = (href: string) => href === homeHref ? path === homeHref : path.s
     <a class="site-brand" href={homeHref}>
       <span>{siteConfig.name}</span>
     </a>
-    <nav class="site-nav" aria-label="Primary">
+    <nav class="site-nav" aria-label={copy.primaryNavLabel}>
       {copy.navigation.map((item) => {
         const href = localizedPath(locale, item.path);
         return <a href={href} aria-current={current(href) ? "page" : undefined}>{item.label}</a>;
@@ -27,9 +27,9 @@ const current = (href: string) => href === homeHref ? path === homeHref : path.s
           {localeLabel(alternateLocale as SiteLocale)}
         </a>
       ))}
-      <button class="button button--quiet theme-toggle" type="button" data-theme-toggle aria-label="Toggle color theme">
-        <span class="theme-toggle__label theme-toggle__label--dark" aria-hidden="true">Dark</span>
-        <span class="theme-toggle__label theme-toggle__label--light" aria-hidden="true">Light</span>
+      <button class="button button--quiet theme-toggle" type="button" data-theme-toggle aria-label={copy.themeToggleLabel}>
+        <span class="theme-toggle__label theme-toggle__label--dark" aria-hidden="true">{copy.darkLabel}</span>
+        <span class="theme-toggle__label theme-toggle__label--light" aria-hidden="true">{copy.lightLabel}</span>
       </button>
     </nav>
   </div>

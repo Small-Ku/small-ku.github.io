@@ -95,7 +95,7 @@ const resolvedAlternates = alternatePaths ?? { [locale]: Astro.url.pathname };
     </script>
   </head>
   <body>
-    <a class="skip-link" href="#main-content">Skip to content</a>
+    <a class="skip-link" href="#main-content">{localeConfig.skipLinkLabel}</a>
     <div class="sr-only" aria-live="polite" aria-atomic="true" data-route-announcer></div>
     <div class="site-shell">
       <Header locale={locale} alternatePaths={resolvedAlternates} />

@@ -35,7 +35,7 @@ const filterOptions = [
       <p class="eyebrow">{locale === "zh" ? "時間線／按時間排序" : "Timeline / chronological"}</p>
       <h1 id="timeline-title">{locale === "zh" ? "持續發展中的作品，以及圍繞它們的筆記。" : "Work in motion, and the notes around it."}</h1>
     </div>
-    {items.length > 0 && <FilterSwitch options={filterOptions} active="all" label="Filter timeline" />}
+    {items.length > 0 && <FilterSwitch options={filterOptions} active="all" label={locale === "zh" ? "篩選時間線" : "Filter timeline"} />}
   </div>
 
   {items.length > 0 ? (
