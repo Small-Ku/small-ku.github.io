@@ -1,17 +1,31 @@
 ---
 import { siteConfig } from "../site.config";
+import { localeLabel, localizedPath, type SiteLocale } from "../lib/i18n";
 
+interface Props {
+  locale?: SiteLocale;
+  alternatePaths?: Partial<Record<SiteLocale, string>>;
+}
+const { locale = "en", alternatePaths = {} } = Astro.props;
 const path = Astro.url.pathname;
-const current = (href: string) => href === "/" ? path === "/" : path.startsWith(href);
+const copy = siteConfig.locales[locale];
+const homeHref = localizedPath(locale, "/");
+const current = (href: string) => href === homeHref ? path === homeHref : path.startsWith(href);
 ---
 <header class="site-header" data-vt-site-header>
   <div class="page site-header__inner">
-    <a class="site-brand" href="/">
+    <a class="site-brand" href={homeHref}>
       <span>{siteConfig.name}</span>
     </a>
     <nav class="site-nav" aria-label="Primary">
-      {siteConfig.navigation.map((item) => (
-        <a href={item.href} aria-current={current(item.href) ? "page" : undefined}>{item.label}</a>
+      {copy.navigation.map((item) => {
+        const href = localizedPath(locale, item.path);
+        return <a href={href} aria-current={current(href) ? "page" : undefined}>{item.label}</a>;
+      })}
+      {Object.entries(alternatePaths).map(([alternateLocale, href]) => alternateLocale !== locale && href && (
+        <a class="site-locale-switch" href={href} aria-label={`Switch language: ${localeLabel(alternateLocale as SiteLocale)}`}>
+          {localeLabel(alternateLocale as SiteLocale)}
+        </a>
       ))}
       <button class="button button--quiet theme-toggle" type="button" data-theme-toggle aria-label="Toggle color theme">
         <span class="theme-toggle__label theme-toggle__label--dark" aria-hidden="true">Dark</span>

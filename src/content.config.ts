@@ -18,10 +18,14 @@ function validPartialDate(value: string): boolean {
 
 const partialDate = z.string().refine(validPartialDate, "Use a real date in YYYY, YYYY-MM, or YYYY-MM-DD form");
 const tags = z.array(z.string().trim().min(1)).default([]);
+const locale = z.enum(["en", "zh"]).default("en");
+const translationKey = z.string().trim().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/).optional();
 
 const projects = defineCollection({
-  loader: glob({ base: "./src/content/projects", pattern: "*.md" }),
+  loader: glob({ base: "./src/content/projects", pattern: "**/*.md" }),
   schema: z.object({
+    locale,
+    translationKey,
     title: z.string().trim().min(1),
     kicker: z.string().trim().min(1).default("Project"),
     summary: z.string().trim().min(1),
@@ -47,8 +51,10 @@ const projects = defineCollection({
 });
 
 const writing = defineCollection({
-  loader: glob({ base: "./src/content/writing", pattern: "*.md" }),
+  loader: glob({ base: "./src/content/writing", pattern: "**/*.md" }),
   schema: z.object({
+    locale,
+    translationKey,
     title: z.string().trim().min(1),
     summary: z.string().trim().min(1),
     date: partialDate,

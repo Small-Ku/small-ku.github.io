@@ -1,4 +1,6 @@
 ---
+locale: en
+# translationKey: my-project
 title: My Project
 kicker: Short project category
 summary: One or two sentences used on cards and metadata.

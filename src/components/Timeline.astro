@@ -4,20 +4,22 @@ import ProjectVisual from "./ProjectVisual.astro";
 import WritingEntry from "./WritingEntry.astro";
 import ContinuationRow from "./ContinuationRow.astro";
 import type { TimelineItem } from "../lib/content";
-import { displayDate, htmlDate } from "../lib/content";
+import { contentKey, displayDate, htmlDate } from "../lib/content";
+import type { SiteLocale } from "../lib/i18n";
 
 interface Props {
   items: TimelineItem[];
   latestWritingIds?: string[];
   projectTitles?: Record<string, string>;
+  locale?: SiteLocale;
 }
 
-const { items, latestWritingIds = [], projectTitles = {} } = Astro.props;
+const { items, latestWritingIds = [], projectTitles = {}, locale = "en" } = Astro.props;
 const latestRankById = new Map(latestWritingIds.map((id, index) => [id, index + 1]));
 const filterOptions = [
-  { value: "all", label: "All" },
-  { value: "writing", label: "Writing" },
-  { value: "work", label: "Projects" }
+  { value: "all", label: locale === "zh" ? "全部" : "All" },
+  { value: "writing", label: locale === "zh" ? "文章" : "Writing" },
+  { value: "work", label: locale === "zh" ? "作品" : "Projects" }
 ];
 ---
 <section
@@ -30,8 +32,8 @@ const filterOptions = [
   <span class="timeline-section__transition-surface" data-vt-timeline-surface aria-hidden="true"></span>
   <div class="timeline-head">
     <div>
-      <p class="eyebrow">Timeline / chronological</p>
-      <h1 id="timeline-title">Work in motion, and the notes around it.</h1>
+      <p class="eyebrow">{locale === "zh" ? "時間線／按時間排序" : "Timeline / chronological"}</p>
+      <h1 id="timeline-title">{locale === "zh" ? "持續發展中的作品，以及圍繞它們的筆記。" : "Work in motion, and the notes around it."}</h1>
     </div>
     {items.length > 0 && <FilterSwitch options={filterOptions} active="all" label="Filter timeline" />}
   </div>
@@ -51,7 +53,8 @@ const filterOptions = [
               item={item.writing}
               projectTitles={projectTitles}
               headingLevel={2}
-              latestRank={latestRankById.get(item.writing.id)}
+              latestRank={latestRankById.get(item.id)}
+              locale={locale}
             />
           </div>
         ) : (
@@ -68,7 +71,7 @@ const filterOptions = [
             <a
               class="timeline-entry__content"
               href={item.href}
-              data-work-slug={item.project.id}
+              data-work-slug={contentKey(item.project)}
               data-vt-project-origin
             >
               <span class="timeline-entry__transition-surface" data-vt-project-surface aria-hidden="true"></span>
@@ -98,11 +101,11 @@ const filterOptions = [
         )
       ))}
 
-      <ContinuationRow label="End" terminal={true} />
+      <ContinuationRow label={locale === "zh" ? "結束" : "End"} terminal={true} />
     </div>
   ) : (
     <div class="timeline-empty" role="status">
-      <p>Nothing published yet.</p>
+      <p>{locale === "zh" ? "尚未發布內容。" : "Nothing published yet."}</p>
     </div>
   )}
 </section>

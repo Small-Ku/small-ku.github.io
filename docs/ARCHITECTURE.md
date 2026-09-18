@@ -12,6 +12,24 @@ There is no timeline database, no separate related-writing index, and no route m
 
 `astro.config.ts` imports `siteConfig.url`, so canonical site identity cannot drift between the Astro config and page metadata.
 
+## Locale and translation boundary
+
+The static site exposes English at the default root and Traditional Chinese under `/zh/`:
+
+```text
+/                 document language en
+/zh/              document language zh-Hant
+```
+
+Astro's static i18n routing uses `en` and `zh` as URL locale tokens with an unprefixed default
+locale. The document language and browser-facing `hreflang` remain `en` and `zh-Hant`; this is
+the static equivalent of mapping a custom path to a browser language code. Astro's object-form
+custom locale paths currently require server output, which is incompatible with GitHub Pages.
+
+Content is filtered by locale before any home, timeline, detail, RSS, or sitemap surface is
+derived. `translationKey` connects translated entries without making one locale a fallback for
+another.
+
 ## Content pipeline
 
 `src/lib/content.ts` loads both collections, validates cross-entry invariants, applies draft publication semantics, and exposes normalized views. Public project discovery is separated from direct-route generation so `unlisted` has precise static-site semantics.

@@ -1,4 +1,6 @@
 ---
+locale: en
+# translationKey: my-note
 title: My Note
 summary: Short description shown in writing rows and metadata.
 date: 2026-09-19

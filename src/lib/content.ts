@@ -1,4 +1,5 @@
 import { getCollection, type CollectionEntry } from "astro:content";
+import { localizedPath, type SiteLocale } from "./i18n";
 
 export type ProjectEntry = CollectionEntry<"projects">;
 export type WritingEntry = CollectionEntry<"writing">;
@@ -13,8 +14,13 @@ export interface ContentIndex {
   writing: WritingEntry[];
 }
 
-export const projectHref = (id: string) => `/projects/${id}/`;
-export const writingHref = (id: string) => `/writing/${id}/`;
+export const contentKey = <T extends { id: string; data: { translationKey?: string } }>(entry: T) =>
+  entry.data.translationKey ?? entry.id.split("/").at(-1) ?? entry.id;
+
+export const contentLocale = <T extends { data: { locale: SiteLocale } }>(entry: T): SiteLocale => entry.data.locale;
+
+export const projectHref = (id: string, locale: SiteLocale = "en") => localizedPath(locale, `/projects/${id}/`);
+export const writingHref = (id: string, locale: SiteLocale = "en") => localizedPath(locale, `/writing/${id}/`);
 
 export const displayDate = (value: string) => value.length >= 7 ? value.slice(0, 7) : value.slice(0, 4);
 export const displayYear = (value: string) => value.slice(0, 4);
@@ -24,18 +30,22 @@ const byDateDesc = <T extends { data: { date: string }; id: string }>(a: T, b: T
   b.data.date.localeCompare(a.data.date) || a.id.localeCompare(b.id);
 
 const includeDrafts = !import.meta.env.PROD;
-let indexPromise: Promise<ContentIndex> | undefined;
+const indexPromises = new Map<SiteLocale, Promise<ContentIndex>>();
 
 function fail(message: string): never {
   throw new Error(`[content] ${message}`);
 }
 
 function validateContent(projects: ProjectEntry[], writing: WritingEntry[]): void {
-  const projectById = new Map(projects.map((entry) => [entry.id, entry]));
+  const projectByKey = new Map<string, ProjectEntry>();
+  const writingByKey = new Map<string, WritingEntry>();
   const selectedOrders = new Map<number, string>();
   const canonicalOwners = new Map<string, string>();
 
   for (const project of projects) {
+    const key = contentKey(project);
+    if (projectByKey.has(key)) fail(`Projects in locale "${contentLocale(project)}" share translationKey "${key}".`);
+    projectByKey.set(key, project);
     const { selected, selectedOrder, visibility, draft, canonicalUrl } = project.data;
 
     if (selectedOrder !== undefined && !selected) {
@@ -62,12 +72,15 @@ function validateContent(projects: ProjectEntry[], writing: WritingEntry[]): voi
   }
 
   for (const entry of writing) {
+    const key = contentKey(entry);
+    if (writingByKey.has(key)) fail(`Writing entries in locale "${contentLocale(entry)}" share translationKey "${key}".`);
+    writingByKey.set(key, entry);
     if (new Set(entry.data.relatedProjects).size !== entry.data.relatedProjects.length) {
       fail(`Writing "${entry.id}" contains duplicate relatedProjects IDs.`);
     }
     for (const projectId of entry.data.relatedProjects) {
-      const project = projectById.get(projectId);
-      if (!project) fail(`Writing "${entry.id}" references unknown project "${projectId}".`);
+      const project = projectByKey.get(projectId);
+      if (!project) fail(`Writing "${entry.id}" references unknown project translationKey "${projectId}".`);
       if (!entry.data.draft && project.data.draft) {
         fail(`Published writing "${entry.id}" references draft project "${projectId}".`);
       }
@@ -86,16 +99,18 @@ function validateContent(projects: ProjectEntry[], writing: WritingEntry[]): voi
   }
 }
 
-async function loadContent(): Promise<ContentIndex> {
+async function loadContent(locale: SiteLocale): Promise<ContentIndex> {
   const [allProjects, allWriting] = await Promise.all([
     getCollection("projects"),
     getCollection("writing")
   ]);
 
   const projects = allProjects
+    .filter((entry) => contentLocale(entry) === locale)
     .filter((entry) => includeDrafts || !entry.data.draft)
     .sort(byDateDesc);
   const writing = allWriting
+    .filter((entry) => contentLocale(entry) === locale)
     .filter((entry) => includeDrafts || !entry.data.draft)
     .sort(byDateDesc);
 
@@ -110,21 +125,25 @@ async function loadContent(): Promise<ContentIndex> {
   };
 }
 
-export function getContentIndex(): Promise<ContentIndex> {
-  if (import.meta.env.DEV) return loadContent();
-  return indexPromise ??= loadContent();
+export function getContentIndex(locale: SiteLocale = "en"): Promise<ContentIndex> {
+  if (import.meta.env.DEV) return loadContent(locale);
+  const existing = indexPromises.get(locale);
+  if (existing) return existing;
+  const promise = loadContent(locale);
+  indexPromises.set(locale, promise);
+  return promise;
 }
 
-export async function getProjects(): Promise<ProjectEntry[]> {
-  return (await getContentIndex()).projects;
+export async function getProjects(locale: SiteLocale = "en"): Promise<ProjectEntry[]> {
+  return (await getContentIndex(locale)).projects;
 }
 
-export async function getListedProjects(): Promise<ProjectEntry[]> {
-  return (await getContentIndex()).listedProjects;
+export async function getListedProjects(locale: SiteLocale = "en"): Promise<ProjectEntry[]> {
+  return (await getContentIndex(locale)).listedProjects;
 }
 
-export async function getWriting(): Promise<WritingEntry[]> {
-  return (await getContentIndex()).writing;
+export async function getWriting(locale: SiteLocale = "en"): Promise<WritingEntry[]> {
+  return (await getContentIndex(locale)).writing;
 }
 
 export function selectedProjects(projects: ProjectEntry[], limit: number): ProjectEntry[] {
@@ -141,22 +160,22 @@ export function latestWriting(writing: WritingEntry[], limit: number): WritingEn
   return writing.slice().sort(byDateDesc).slice(0, limit);
 }
 
-export function timelineItems(projects: ProjectEntry[], writing: WritingEntry[]): TimelineItem[] {
+export function timelineItems(projects: ProjectEntry[], writing: WritingEntry[], locale: SiteLocale = "en"): TimelineItem[] {
   const typeOrder: Record<TimelineItem["type"], number> = { writing: 0, project: 1 };
   return [
     ...writing.map((entry) => ({
       type: "writing" as const,
       date: entry.data.date,
-      id: entry.id,
+      id: contentKey(entry),
       writing: entry,
-      href: writingHref(entry.id)
+      href: writingHref(contentKey(entry), locale)
     })),
     ...projects.map((entry) => ({
       type: "project" as const,
       date: entry.data.date,
-      id: entry.id,
+      id: contentKey(entry),
       project: entry,
-      href: projectHref(entry.id)
+      href: projectHref(contentKey(entry), locale)
     }))
   ].sort((a, b) =>
     b.date.localeCompare(a.date)
@@ -166,7 +185,7 @@ export function timelineItems(projects: ProjectEntry[], writing: WritingEntry[])
 }
 
 export function projectTitleMap(projects: ProjectEntry[]): Record<string, string> {
-  return Object.fromEntries(projects.map((entry) => [entry.id, entry.data.title]));
+  return Object.fromEntries(projects.map((entry) => [contentKey(entry), entry.data.title]));
 }
 
 export function relatedWriting(projectId: string, writing: WritingEntry[]): WritingEntry[] {

@@ -1,28 +1,31 @@
 ---
 import type { WritingEntry as WritingContentEntry } from "../lib/content";
 import WritingStream from "./WritingStream.astro";
+import { localizedPath, type SiteLocale } from "../lib/i18n";
 
 interface Props {
   items: WritingContentEntry[];
   projectTitles?: Record<string, string>;
+  locale?: SiteLocale;
 }
 
-const { items, projectTitles = {} } = Astro.props;
+const { items, projectTitles = {}, locale = "en" } = Astro.props;
 ---
 <section class="latest-writing page" id="latest-writing" aria-labelledby="latest-writing-title">
   <div class="latest-writing__head">
     <div>
-      <p class="eyebrow">Latest writing</p>
-      <h2 id="latest-writing-title">Notes, experiments, and ongoing work.</h2>
+      <p class="eyebrow">{locale === "zh" ? "最新文章" : "Latest writing"}</p>
+      <h2 id="latest-writing-title">{locale === "zh" ? "筆記、實驗與持續進行中的工作。" : "Notes, experiments, and ongoing work."}</h2>
     </div>
   </div>
 
   <WritingStream
     items={items}
     projectTitles={projectTitles}
-    continuationHref="/timeline/"
-    continuationLabel="View all in timeline"
+    continuationHref={localizedPath(locale, "timeline")}
+    continuationLabel={locale === "zh" ? "在時間線查看全部" : "View all in timeline"}
     markLatest={true}
-    emptyLabel="No writing published yet"
+    emptyLabel={locale === "zh" ? "尚未發布文章" : "No writing published yet"}
+    locale={locale}
   />
 </section>

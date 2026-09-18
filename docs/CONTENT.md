@@ -6,6 +6,20 @@ The live collections deliberately contain no sample entries. Entries are intenti
 
 `date` and `updated` accept `YYYY`, `YYYY-MM`, or `YYYY-MM-DD`. Chronology sorts by the authored date string, newest first, with explicit stable type/id tie-breakers.
 
+Every entry has a `locale`, defaulting to `en`. English entries may remain directly under
+`src/content/projects/` or `src/content/writing/`. Traditional Chinese entries belong under
+the corresponding `zh/` directory and use `locale: zh`:
+
+```text
+src/content/writing/site-origin.md
+src/content/writing/zh/site-origin.md
+```
+
+Use the same `translationKey` in both entries when they are translations of one another. The
+key is also the stable route slug, so the resulting URLs are `/writing/site-origin/` and
+`/zh/writing/site-origin/`. A locale is never populated from another locale implicitly; an
+untranslated Chinese route is absent rather than silently serving English.
+
 `draft: true` is visible while developing and omitted from production builds. A production writing entry may not reference a draft project.
 
 `canonicalUrl`, when present, declares another URL as canonical. Internal mirrored pages remain navigable, but sitemap output omits entries whose canonical lives elsewhere.
@@ -17,6 +31,8 @@ Create `src/content/projects/my-project.md` from `templates/project.md`.
 Core fields:
 
 ```yaml
+locale: en
+# translationKey: my-project
 title: My Project
 kicker: Systems
 summary: One or two sentences.
@@ -75,6 +91,8 @@ public | unlisted
 Create `src/content/writing/my-note.md` from `templates/writing.md`.
 
 ```yaml
+locale: en
+# translationKey: my-note
 title: My Note
 summary: Short description shown in rows and metadata.
 date: 2026-09-19
