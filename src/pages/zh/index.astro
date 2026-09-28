@@ -1,0 +1,33 @@
+---
+import SiteLayout from "../../layouts/SiteLayout.astro";
+import SelectedWorkFan from "../../components/SelectedWorkFan.astro";
+import LatestWriting from "../../components/LatestWriting.astro";
+import { siteConfig } from "../../site.config";
+import { getContentIndex, latestWriting, projectTitleMap, selectedProjects } from "../../lib/content";
+
+const { projects, listedProjects, writing } = await getContentIndex("zh");
+const selected = selectedProjects(listedProjects, siteConfig.home.selectedProjects);
+const latest = latestWriting(writing, siteConfig.home.latestWriting);
+const projectTitles = projectTitleMap(projects);
+---
+<SiteLayout
+  locale="zh"
+  routeKind="home"
+  alternatePaths={{ en: "/", zh: "/zh/" }}
+>
+  <section class="home-field dot-field dot-field--home" aria-labelledby="hero-title">
+    <div class="page home-field__inner">
+      <div class="home-intro">
+        <h1 id="hero-title" class="display">{siteConfig.locales.zh.hero.title}</h1>
+        <p class="home-intro__lede">{siteConfig.locales.zh.hero.lede}</p>
+        <div class="home-intro__links meta">
+          <a href="/zh/timeline/">時間線 ↗</a>
+        </div>
+      </div>
+      <SelectedWorkFan projects={selected} locale="zh" />
+    </div>
+    <a class="home-field__scroll" href="#latest-writing" aria-label="跳至最新文章">↓</a>
+  </section>
+
+  <LatestWriting items={latest} projectTitles={projectTitles} locale="zh" />
+</SiteLayout>

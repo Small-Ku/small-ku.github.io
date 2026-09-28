@@ -1,20 +1,22 @@
 ---
 import type { ProjectEntry } from "../lib/content";
-import { projectHref } from "../lib/content";
+import { contentKey, projectHref } from "../lib/content";
 import ProjectVisual from "./ProjectVisual.astro";
+import type { SiteLocale } from "../lib/i18n";
 
-interface Props { projects: ProjectEntry[]; }
-const { projects } = Astro.props;
+interface Props { projects: ProjectEntry[]; locale?: SiteLocale; }
+const { projects, locale = "en" } = Astro.props;
+const selectedLabel = locale === "zh" ? "精選作品" : "Selected work";
 ---
-<div class:list={["selected-fan", projects.length === 0 && "selected-fan--empty"]} aria-label="Selected work">
+<div class:list={["selected-fan", projects.length === 0 && "selected-fan--empty"]} aria-label={selectedLabel}>
   {projects.length > 0 ? (
     <div class="selected-fan__viewport">
       <div class="selected-fan__track">
         {projects.map((project, index) => (
           <a
             class:list={["fan-card", `fan-card--${project.data.tone}`]}
-            href={projectHref(project.id)}
-            data-work-slug={project.id}
+            href={projectHref(contentKey(project), locale)}
+            data-work-slug={contentKey(project)}
             data-vt-project-origin
           >
             <span class="fan-card__transition-surface" data-vt-project-surface aria-hidden="true"></span>
@@ -25,7 +27,7 @@ const { projects } = Astro.props;
               {project.data.visual ? (
                 <ProjectVisual tone={project.data.tone} variant={project.data.visual.variant} label={project.data.visual.label} alt={project.data.visual.alt} />
               ) : (
-                <span class="fan-card__visual-placeholder meta">Project</span>
+                <span class="fan-card__visual-placeholder meta">{locale === "zh" ? "作品" : "Project"}</span>
               )}
             </div>
             <div class="fan-card__body">
@@ -42,9 +44,9 @@ const { projects } = Astro.props;
     </div>
   ) : (
     <div class="selected-fan__empty surface">
-      <span class="eyebrow">Selected work</span>
-      <p>No selected work published yet.</p>
-      <small>Selected projects will appear here when they are ready.</small>
+        <span class="eyebrow">{selectedLabel}</span>
+        <p>{locale === "zh" ? "尚未發布精選作品。" : "No selected work published yet."}</p>
+        <small>{locale === "zh" ? "作品準備好後會在這裡出現。" : "Selected projects will appear here when they are ready."}</small>
     </div>
   )}
 </div>

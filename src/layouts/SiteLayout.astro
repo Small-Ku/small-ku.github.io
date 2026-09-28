@@ -2,6 +2,7 @@
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import { siteConfig } from "../site.config";
+import { localeFromPath, type SiteLocale, localizedFilePath } from "../lib/i18n";
 import { absoluteUrl, jsonLd, websiteStructuredData, type StructuredData } from "../lib/seo";
 import "../styles/index.scss";
 
@@ -14,28 +15,38 @@ interface Props {
   noindex?: boolean;
   ogType?: "website" | "article";
   structuredData?: StructuredData;
+  locale?: SiteLocale;
+  alternatePaths?: Partial<Record<SiteLocale, string>>;
 }
 
 const {
-  title = siteConfig.title,
-  description = siteConfig.description,
+  title,
+  description,
   routeKind = "other",
   routeId,
   canonicalUrl: canonicalProp,
   noindex = false,
   ogType = routeKind === "writing" ? "article" : "website",
-  structuredData = routeKind === "home" ? websiteStructuredData() : undefined
+  structuredData,
+  locale: localeProp,
+  alternatePaths
 } = Astro.props;
+const locale = localeProp ?? localeFromPath(Astro.url.pathname);
+const localeConfig = siteConfig.locales[locale];
+const resolvedTitle = title ?? localeConfig.title;
+const resolvedDescription = description ?? localeConfig.description;
+const structured = structuredData ?? (routeKind === "home" ? websiteStructuredData(locale) : undefined);
 const canonicalUrl = canonicalProp === null ? undefined : canonicalProp ?? absoluteUrl(Astro.url.pathname);
-const rssUrl = absoluteUrl("/rss.xml");
+const rssUrl = absoluteUrl(localizedFilePath(locale, "/rss.xml"));
 const ogImage = siteConfig.ogImage ? absoluteUrl(siteConfig.ogImage) : undefined;
+const resolvedAlternates = alternatePaths ?? { [locale]: Astro.url.pathname };
 ---
 <!doctype html>
-<html lang={siteConfig.language} data-route-kind={routeKind} data-route-id={routeId}>
+<html lang={localeConfig.language} data-route-kind={routeKind} data-route-id={routeId} data-locale={locale}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
-    <meta name="description" content={description} />
+    <meta name="description" content={resolvedDescription} />
     <meta name="color-scheme" content="light dark" />
     <meta
       name="theme-color"
@@ -46,6 +57,10 @@ const ogImage = siteConfig.ogImage ? absoluteUrl(siteConfig.ogImage) : undefined
     <meta name="generator" content={Astro.generator} />
     {noindex && <meta name="robots" content="noindex, nofollow" />}
     {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
+    {Object.entries(resolvedAlternates).map(([alternateLocale, path]) => path && (
+      <link rel="alternate" hreflang={siteConfig.locales[alternateLocale as SiteLocale].hreflang} href={absoluteUrl(path)} />
+    ))}
+    {resolvedAlternates.en && <link rel="alternate" hreflang="x-default" href={absoluteUrl(resolvedAlternates.en)} />}
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="icon" href="/favicon.ico" sizes="any" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
@@ -54,18 +69,18 @@ const ogImage = siteConfig.ogImage ? absoluteUrl(siteConfig.ogImage) : undefined
 
     <meta property="og:type" content={ogType} />
     <meta property="og:site_name" content={siteConfig.name} />
-    <meta property="og:locale" content={siteConfig.locale} />
-    <meta property="og:title" content={title} />
-    <meta property="og:description" content={description} />
+    <meta property="og:locale" content={localeConfig.locale} />
+    <meta property="og:title" content={resolvedTitle} />
+    <meta property="og:description" content={resolvedDescription} />
     {canonicalUrl && <meta property="og:url" content={canonicalUrl} />}
     {ogImage && <meta property="og:image" content={ogImage} />}
     <meta name="twitter:card" content={ogImage ? "summary_large_image" : "summary"} />
     {ogImage && <meta name="twitter:image" content={ogImage} />}
-    <meta name="twitter:title" content={title} />
-    <meta name="twitter:description" content={description} />
+    <meta name="twitter:title" content={resolvedTitle} />
+    <meta name="twitter:description" content={resolvedDescription} />
 
-    <title>{title}</title>
-    {structuredData && <script type="application/ld+json" set:html={jsonLd(structuredData)}></script>}
+    <title>{resolvedTitle}</title>
+    {structured && <script type="application/ld+json" set:html={jsonLd(structured)}></script>}
     <script is:inline>
       (() => {
         let value = null;
@@ -80,12 +95,12 @@ const ogImage = siteConfig.ogImage ? absoluteUrl(siteConfig.ogImage) : undefined
     </script>
   </head>
   <body>
-    <a class="skip-link" href="#main-content">Skip to content</a>
+    <a class="skip-link" href="#main-content">{localeConfig.skipLinkLabel}</a>
     <div class="sr-only" aria-live="polite" aria-atomic="true" data-route-announcer></div>
     <div class="site-shell">
-      <Header />
+      <Header locale={locale} alternatePaths={resolvedAlternates} />
       <main id="main-content" tabindex="-1"><slot /></main>
-      <Footer />
+      <Footer locale={locale} />
     </div>
     <script>
       import { bindThemeToggle } from "../scripts/theme";

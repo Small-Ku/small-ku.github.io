@@ -1,4 +1,5 @@
 import { siteConfig } from "../site.config";
+import type { SiteLocale } from "./i18n";
 
 export type StructuredData = Record<string, unknown> | Array<Record<string, unknown>>;
 
@@ -11,16 +12,17 @@ export function jsonLd(value: StructuredData): string {
   return JSON.stringify(value).replace(/</g, "\\u003c");
 }
 
-export function websiteStructuredData(): StructuredData {
+export function websiteStructuredData(locale: SiteLocale = "en"): StructuredData {
+  const localeConfig = siteConfig.locales[locale];
   const sameAs = siteConfig.social.map((item) => item.href);
   return [
     {
       "@context": "https://schema.org",
       "@type": "WebSite",
-      name: siteConfig.title,
+      name: localeConfig.title,
       url: siteConfig.url,
-      description: siteConfig.description,
-      inLanguage: siteConfig.language
+      description: localeConfig.description,
+      inLanguage: localeConfig.language
     },
     {
       "@context": "https://schema.org",
@@ -40,7 +42,9 @@ export function projectStructuredData(input: {
   updated?: string;
   tags: string[];
   sourceUrl?: string;
+  locale?: SiteLocale;
 }): StructuredData {
+  const locale = input.locale ?? "en";
   return {
     "@context": "https://schema.org",
     "@type": "CreativeWork",
@@ -51,6 +55,7 @@ export function projectStructuredData(input: {
     ...(input.updated ? { dateModified: input.updated } : {}),
     ...(input.tags.length > 0 ? { keywords: input.tags.join(", ") } : {}),
     ...(input.sourceUrl ? { sameAs: input.sourceUrl } : {}),
+    inLanguage: siteConfig.locales[locale].language,
     author: { "@type": "Person", name: siteConfig.name, url: siteConfig.url }
   };
 }
@@ -62,7 +67,9 @@ export function articleStructuredData(input: {
   date: string;
   updated?: string;
   tags: string[];
+  locale?: SiteLocale;
 }): StructuredData {
+  const locale = input.locale ?? "en";
   return {
     "@context": "https://schema.org",
     "@type": "Article",
@@ -72,6 +79,7 @@ export function articleStructuredData(input: {
     datePublished: input.date,
     ...(input.updated ? { dateModified: input.updated } : {}),
     ...(input.tags.length > 0 ? { keywords: input.tags.join(", ") } : {}),
+    inLanguage: siteConfig.locales[locale].language,
     author: { "@type": "Person", name: siteConfig.name, url: siteConfig.url }
   };
 }

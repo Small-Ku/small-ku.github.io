@@ -1,19 +1,22 @@
 ---
 import type { WritingEntry as WritingContentEntry } from "../lib/content";
-import { displayDate, htmlDate, writingHref } from "../lib/content";
+import { contentKey, displayDate, htmlDate, writingHref } from "../lib/content";
+import type { SiteLocale } from "../lib/i18n";
 
 interface Props {
   item: WritingContentEntry;
   projectTitles?: Record<string, string>;
   headingLevel?: 2 | 3;
   latestRank?: number;
+  locale?: SiteLocale;
 }
 
 const {
   item,
   projectTitles = {},
   headingLevel = 3,
-  latestRank
+  latestRank,
+  locale = "en"
 } = Astro.props;
 
 const related = item.data.relatedProjects
@@ -22,8 +25,8 @@ const related = item.data.relatedProjects
 ---
 <a
   class="writing-entry"
-  href={writingHref(item.id)}
-  data-writing-slug={item.id}
+  href={writingHref(contentKey(item), locale)}
+  data-writing-slug={contentKey(item)}
   data-latest-rank={latestRank}
 >
   <time class="writing-entry__date meta" datetime={htmlDate(item.data.date)}>{displayDate(item.data.date)}</time>
