@@ -20,6 +20,7 @@
   --ft-ease-exit: cubic-bezier(0.4, 0, 1, 1);
   --ft-ease-emphasized: cubic-bezier(0.2, 0.8, 0.2, 1);
   --ft-ease-container: cubic-bezier(0.18, 0.78, 0.18, 1);
+  --ft-ease-overlay-enter: cubic-bezier(0.4, 0, 0.2, 1);
 
   /* Backwards-compatible aliases for existing component motion. */
   --ft-ease: var(--ft-ease-standard);

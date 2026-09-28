@@ -103,11 +103,11 @@ const resolvedAlternates = alternatePaths ?? { [locale]: Astro.url.pathname };
       <Footer locale={locale} />
     </div>
     <script>
-      import { bindThemeToggle } from "../scripts/theme";
+      import { bindThemeControls } from "../scripts/theme";
       import { bindFilterSwitch } from "../scripts/filter-switch";
       import { bindTimelineFilter } from "../scripts/timeline";
       import { bindNavigation } from "../scripts/navigation";
-      bindThemeToggle();
+      bindThemeControls();
       bindFilterSwitch();
       bindTimelineFilter();
       bindNavigation();

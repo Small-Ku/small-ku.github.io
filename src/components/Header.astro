@@ -1,5 +1,6 @@
 ---
 import { siteConfig } from "../site.config";
+import Icon from "./Icon.astro";
 import { localeLabel, localizedPath, type SiteLocale } from "../lib/i18n";
 
 interface Props {
@@ -17,20 +18,72 @@ const current = (href: string) => href === homeHref ? path === homeHref : path.s
     <a class="site-brand" href={homeHref}>
       <span>{siteConfig.name}</span>
     </a>
-    <nav class="site-nav" aria-label={copy.primaryNavLabel}>
-      {copy.navigation.map((item) => {
-        const href = localizedPath(locale, item.path);
-        return <a href={href} aria-current={current(href) ? "page" : undefined}>{item.label}</a>;
-      })}
-      {Object.entries(alternatePaths).map(([alternateLocale, href]) => alternateLocale !== locale && href && (
-        <a class="site-locale-switch" href={href} aria-label={`Switch language: ${localeLabel(alternateLocale as SiteLocale)}`}>
-          {localeLabel(alternateLocale as SiteLocale)}
-        </a>
-      ))}
-      <button class="button button--quiet theme-toggle" type="button" data-theme-toggle aria-label={copy.themeToggleLabel}>
-        <span class="theme-toggle__label theme-toggle__label--dark" aria-hidden="true">{copy.darkLabel}</span>
-        <span class="theme-toggle__label theme-toggle__label--light" aria-hidden="true">{copy.lightLabel}</span>
-      </button>
-    </nav>
+    <div class="site-header__end">
+      <nav class="site-nav" aria-label={copy.primaryNavLabel}>
+        {copy.navigation.map((item) => {
+          const href = localizedPath(locale, item.path);
+          return <a href={href} aria-current={current(href) ? "page" : undefined}>{item.label}</a>;
+        })}
+      </nav>
+      <div class="site-tools" role="group" aria-label={copy.siteToolsLabel}>
+        <button
+          class="site-tool__trigger"
+          type="button"
+          popovertarget="language-popover"
+          aria-controls="language-popover"
+          aria-label={`${copy.languageControlLabel}: ${localeLabel(locale)}`}
+        >
+          <Icon name="language" />
+        </button>
+        <div id="language-popover" class="site-menu" popover role="group" aria-label={copy.languageControlLabel}>
+          <ul class="site-menu__list">
+            {Object.entries(alternatePaths).map(([alternateLocale, href]) => href && (
+              <li>
+                {alternateLocale === locale ? (
+                  <span class="site-menu__choice is-current" aria-current="true">
+                    <span>{localeLabel(alternateLocale as SiteLocale)}</span>
+                    <span class="site-menu__mark" aria-hidden="true">✓</span>
+                  </span>
+                ) : (
+                  <a class="site-menu__choice" href={href}>
+                    <span>{localeLabel(alternateLocale as SiteLocale)}</span>
+                    <span class="site-menu__mark" aria-hidden="true"></span>
+                  </a>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <button
+          class="site-tool__trigger"
+          type="button"
+          popovertarget="theme-popover"
+          aria-controls="theme-popover"
+          aria-label={copy.appearanceControlLabel}
+          data-theme-trigger
+          data-theme-control-label={copy.appearanceControlLabel}
+          data-theme-light-label={copy.lightLabel}
+          data-theme-dark-label={copy.darkLabel}
+        >
+          <Icon name="appearance" />
+        </button>
+        <div id="theme-popover" class="site-menu" popover>
+          <fieldset class="site-menu__fieldset">
+            <legend class="sr-only">{copy.appearanceControlLabel}</legend>
+            <label class="site-menu__choice site-menu__radio-choice">
+              <input type="radio" name="site-theme" value="light" data-theme-option />
+              <span>{copy.lightLabel}</span>
+              <span class="site-menu__mark" aria-hidden="true">✓</span>
+            </label>
+            <label class="site-menu__choice site-menu__radio-choice">
+              <input type="radio" name="site-theme" value="dark" data-theme-option />
+              <span>{copy.darkLabel}</span>
+              <span class="site-menu__mark" aria-hidden="true">✓</span>
+            </label>
+          </fieldset>
+        </div>
+      </div>
+    </div>
   </div>
 </header>

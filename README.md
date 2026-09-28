@@ -118,9 +118,9 @@ The content layer fails the build for structural mistakes that should not be sil
 
 The static links are authoritative. JavaScript upgrades navigation to same-document View Transitions when supported; unsupported browsers and JavaScript-disabled browsing keep normal page navigation. `prefers-reduced-motion` suppresses displacement-heavy choreography.
 
-The soft-navigation coordinator also synchronizes route-sensitive head metadata (description, canonical, robots, Open Graph, Twitter card, and JSON-LD) when swapping documents.
+The soft-navigation coordinator also synchronizes locale-sensitive site chrome, root route/locale state, and route-sensitive head metadata when swapping documents.
 
-See `docs/ARCHITECTURE.md` and `MOTION.md`.
+See `docs/ARCHITECTURE.md` and `docs/MOTION.md`.
 
 ## Deployment
 

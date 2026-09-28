@@ -1,0 +1,27 @@
+---
+interface Props {
+  name: "language" | "appearance";
+  class?: string;
+}
+
+const { name, class: className } = Astro.props;
+---
+<svg
+  class={className}
+  viewBox="0 0 24 24"
+  aria-hidden="true"
+  focusable="false"
+  data-icon={name}
+>
+  {name === "language" ? (
+    <>
+      <circle cx="12" cy="12" r="9"></circle>
+      <path d="M3.6 9h16.8M3.6 15h16.8M12 3c2.2 2.45 3.3 5.45 3.3 9S14.2 18.55 12 21M12 3C9.8 5.45 8.7 8.45 8.7 12S9.8 18.55 12 21"></path>
+    </>
+  ) : (
+    <>
+      <circle cx="12" cy="12" r="9"></circle>
+      <path class="icon__fill" d="M12 3a9 9 0 0 0 0 18V3Z"></path>
+    </>
+  )}
+</svg>

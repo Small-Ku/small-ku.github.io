@@ -1,5 +1,6 @@
 import { bindFilterSwitch } from "./filter-switch";
 import { bindTimelineFilter } from "./timeline";
+import { bindThemeControls } from "./theme";
 
 type RouteKind = "home" | "timeline" | "project" | "writing" | "other";
 interface RouteMeta { kind: RouteKind; id: string | null; }
@@ -397,20 +398,13 @@ async function fetchDocument(url: URL): Promise<Document> {
   return pending;
 }
 
-function updateHeader(url: URL): void {
-  document.querySelectorAll<HTMLAnchorElement>(".site-nav a[href]").forEach((link) => {
-    const href = new URL(link.href, location.href);
-    const exact = href.pathname === "/" ? url.pathname === "/" : url.pathname.startsWith(href.pathname);
-    if (exact) link.setAttribute("aria-current", "page");
-    else link.removeAttribute("aria-current");
-  });
-}
-
 function syncDocumentHead(nextDocument: Document): void {
   const selectors = [
     'meta[name="description"]',
     'meta[name="robots"]',
     'link[rel="canonical"]',
+    'link[rel="alternate"][hreflang]',
+    'link[rel="alternate"][type="application/rss+xml"]',
     'meta[property^="og:"]',
     'meta[name^="twitter:"]',
     'script[type="application/ld+json"]'
@@ -424,24 +418,46 @@ function syncDocumentHead(nextDocument: Document): void {
   }
 }
 
-function installDocument(nextDocument: Document, url: URL): void {
+function replaceSiteChrome(selector: string, nextDocument: Document): void {
+  const current = document.querySelector(selector);
+  const next = nextDocument.querySelector(selector);
+  if (!current || !next) throw new Error(`Missing site chrome element: ${selector}`);
+  current.replaceWith(document.importNode(next, true));
+}
+
+function syncDocumentRoot(nextDocument: Document): void {
+  const root = document.documentElement;
+  const nextRoot = nextDocument.documentElement;
+  root.lang = nextRoot.lang;
+
+  const nextLocale = nextRoot.dataset.locale;
+  if (nextLocale) root.dataset.locale = nextLocale;
+  else delete root.dataset.locale;
+
+  const nextMeta = routeMeta(nextDocument);
+  root.dataset.routeKind = nextMeta.kind;
+  if (nextMeta.id) root.dataset.routeId = nextMeta.id;
+  else delete root.dataset.routeId;
+}
+
+function installDocument(nextDocument: Document): void {
   const currentMain = document.querySelector("main");
   const nextMain = nextDocument.querySelector("main");
   if (!currentMain || !nextMain) throw new Error("Missing main element in navigation document");
 
   nextMain.querySelectorAll("script").forEach((script) => script.remove());
   currentMain.replaceChildren(...Array.from(nextMain.childNodes).map((node) => document.importNode(node, true)));
+  replaceSiteChrome(".site-header", nextDocument);
+  replaceSiteChrome(".site-footer", nextDocument);
+  replaceSiteChrome(".skip-link", nextDocument);
 
   document.title = nextDocument.title;
   syncDocumentHead(nextDocument);
+  syncDocumentRoot(nextDocument);
   const announcer = document.querySelector<HTMLElement>("[data-route-announcer]");
   if (announcer) announcer.textContent = nextDocument.title;
 
-  const nextMeta = routeMeta(nextDocument);
-  document.documentElement.dataset.routeKind = nextMeta.kind;
-  if (nextMeta.id) document.documentElement.dataset.routeId = nextMeta.id;
-  else delete document.documentElement.dataset.routeId;
-  updateHeader(url);
+  bindThemeControls();
   bindFilterSwitch(currentMain);
   bindTimelineFilter();
 }
@@ -471,6 +487,33 @@ function scrollInstant(top: number): void {
 function clampDocumentScroll(top: number): number {
   const max = Math.max(0, (document.scrollingElement?.scrollHeight ?? document.documentElement.scrollHeight) - innerHeight);
   return Math.min(max, Math.max(0, top));
+}
+
+function fragmentTarget(hash: string): HTMLElement | null {
+  if (!hash || hash === "#") return null;
+  let id: string;
+  try { id = decodeURIComponent(hash.slice(1)); }
+  catch { id = hash.slice(1); }
+  return document.getElementById(id);
+}
+
+function fragmentScrollTop(hash: string): number | null {
+  const target = fragmentTarget(hash);
+  if (!target) return null;
+  return clampDocumentScroll(window.scrollY + target.getBoundingClientRect().top);
+}
+
+function scrollToFragment(hash: string, smooth: boolean): boolean {
+  const target = fragmentTarget(hash);
+  if (!target) return false;
+
+  if (!smooth || reduceMotion()) {
+    const top = fragmentScrollTop(hash);
+    if (top !== null) scrollInstant(top);
+  } else {
+    target.scrollIntoView({ block: "start", behavior: "smooth" });
+  }
+  return true;
 }
 
 function alignedLatestWritingScroll(context: MotionContext): number | null {
@@ -546,12 +589,17 @@ async function performNavigation(url: URL, anchor: HTMLAnchorElement | null, pus
   nameOutgoing(context);
 
   const update = async () => {
-    installDocument(nextDocument, url);
+    installDocument(nextDocument);
     scrollInstant(targetScroll);
 
-    const alignedScroll = alignedTimelineTargetScroll(context, to, push);
-    if (alignedScroll !== null && Math.abs(alignedScroll - window.scrollY) > 1) {
-      scrollInstant(alignedScroll);
+    const hashScroll = fragmentScrollTop(url.hash);
+    if (hashScroll !== null && Math.abs(hashScroll - window.scrollY) > 1) {
+      scrollInstant(hashScroll);
+    } else if (hashScroll === null) {
+      const alignedScroll = alignedTimelineTargetScroll(context, to, push);
+      if (alignedScroll !== null && Math.abs(alignedScroll - window.scrollY) > 1) {
+        scrollInstant(alignedScroll);
+      }
     }
 
     if (push) history.pushState({ ftNav: true, scrollY: window.scrollY } satisfies HistoryMotionState, "", url.href);
@@ -614,6 +662,26 @@ export function bindNavigation(): void {
   }
 
   document.addEventListener("click", (event) => {
+    const rawAnchor = (event.target as Element | null)?.closest?.("a[href]") as HTMLAnchorElement | null;
+    if (rawAnchor && !event.defaultPrevented && event.button === 0 && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey) {
+      const rawUrl = toUrl(rawAnchor.href);
+      const sameDocumentFragment = rawUrl.origin === location.origin
+        && rawUrl.pathname === location.pathname
+        && rawUrl.search === location.search
+        && Boolean(rawUrl.hash);
+
+      if (sameDocumentFragment && fragmentTarget(rawUrl.hash)) {
+        event.preventDefault();
+        if (rawUrl.hash !== location.hash) {
+          saveCurrentScroll();
+          const targetScroll = fragmentScrollTop(rawUrl.hash) ?? window.scrollY;
+          history.pushState({ ftNav: true, scrollY: targetScroll } satisfies HistoryMotionState, "", rawUrl.href);
+        }
+        scrollToFragment(rawUrl.hash, true);
+        return;
+      }
+    }
+
     const anchor = eligibleAnchor(event);
     if (!anchor) return;
     const url = toUrl(anchor.href);
@@ -627,6 +695,17 @@ export function bindNavigation(): void {
     const url = toUrl(anchor.href);
     if (url.origin === location.origin) void fetchDocument(url).catch(() => {});
   }, { passive: true });
+
+  addEventListener("hashchange", () => {
+    scrollToFragment(location.hash, true);
+  });
+
+  // Fragment restoration is browser-dependent once scrollRestoration is manual.
+  // Re-assert the fragment after initial layout so direct /#fragment URLs work
+  // consistently without relying on browser-specific timing.
+  if (location.hash) {
+    requestAnimationFrame(() => requestAnimationFrame(() => scrollToFragment(location.hash, false)));
+  }
 
   addEventListener("popstate", (event) => {
     const url = new URL(location.href);

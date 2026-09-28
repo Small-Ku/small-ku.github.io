@@ -44,8 +44,10 @@ export interface LocaleConfig {
   navigation: Array<{ label: string; path: string }>;
   footerNote: string;
   primaryNavLabel: string;
+  siteToolsLabel: string;
+  languageControlLabel: string;
+  appearanceControlLabel: string;
   skipLinkLabel: string;
-  themeToggleLabel: string;
   darkLabel: string;
   lightLabel: string;
   rssLabel: string;
@@ -74,8 +76,10 @@ export const siteConfig: SiteConfig = {
       navigation: [{ label: "Timeline", path: "timeline" }],
       footerNote: "Personal work and writing of KU Chun Hei, @Small-Ku.",
       primaryNavLabel: "Primary",
+      siteToolsLabel: "Site preferences",
+      languageControlLabel: "Language",
+      appearanceControlLabel: "Appearance",
       skipLinkLabel: "Skip to content",
-      themeToggleLabel: "Toggle color theme",
       darkLabel: "Dark",
       lightLabel: "Light",
       rssLabel: "RSS"
@@ -95,8 +99,10 @@ export const siteConfig: SiteConfig = {
       navigation: [{ label: "時間線", path: "timeline" }],
       footerNote: "KU Chun Hei（@Small-Ku）的個人作品與文章。",
       primaryNavLabel: "主要導覽",
+      siteToolsLabel: "網站偏好",
+      languageControlLabel: "語言",
+      appearanceControlLabel: "外觀",
       skipLinkLabel: "跳至內容",
-      themeToggleLabel: "切換色彩主題",
       darkLabel: "深色",
       lightLabel: "淺色",
       rssLabel: "RSS"
