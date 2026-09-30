@@ -1,4 +1,6 @@
 ---
+import Icon from "./Icon.astro";
+
 interface Props {
   label: string;
   href?: string;
@@ -24,9 +26,12 @@ const {
     {transitionTarget && <span class="continuation-row__transition-surface" data-vt-timeline-surface aria-hidden="true"></span>}
     <span class="continuation-row__date" aria-hidden="true"></span>
     <span class="continuation-row__rail" aria-hidden="true"></span>
+    <svg class="continuation-row__connector" viewBox="0 0 100 100" preserveAspectRatio="none" shape-rendering="crispEdges" aria-hidden="true" focusable="false">
+      <path class="chronology-stroke" d="M 0 0 V 100 H 100"></path>
+    </svg>
     <span class="continuation-row__content">
       <span class="continuation-row__label">{label}</span>
-      {!terminal && <span class="continuation-row__arrow" aria-hidden="true">{direction === "down" ? "↓" : "↗"}</span>}
+      {!terminal && <span class="continuation-row__arrow" aria-hidden="true">{direction === "down" ? <Icon name="arrow-down" /> : <Icon name="arrow-up-right" />}</span>}
     </span>
   </a>
 ) : (
@@ -38,6 +43,9 @@ const {
     {transitionTarget && <span class="continuation-row__transition-surface" data-vt-timeline-surface aria-hidden="true"></span>}
     <span class="continuation-row__date" aria-hidden="true"></span>
     <span class="continuation-row__rail" aria-hidden="true"></span>
+    <svg class="continuation-row__connector" viewBox="0 0 100 100" preserveAspectRatio="none" shape-rendering="crispEdges" aria-hidden="true" focusable="false">
+      <path class="chronology-stroke" d="M 0 0 V 100 H 100"></path>
+    </svg>
     <span class="continuation-row__content">
       <span class="continuation-row__label">{label}</span>
     </span>

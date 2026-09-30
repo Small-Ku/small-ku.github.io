@@ -1,10 +1,12 @@
 .continuation-row {
-  --continuation-branch-offset: 1.05rem;
+  --continuation-branch-offset: 1rem;
+  --continuation-grid-gap: var(--ft-chrono-gap);
+  --continuation-rail-center: calc(var(--ft-chrono-date) + var(--continuation-grid-gap) + (var(--ft-chrono-rail) / 2));
   position: relative;
   isolation: isolate;
   display: grid;
   grid-template-columns: var(--ft-chrono-date) var(--ft-chrono-rail) minmax(0, 1fr);
-  gap: var(--ft-chrono-gap);
+  gap: var(--continuation-grid-gap);
   align-items: stretch;
   min-height: 6rem;
   color: inherit;
@@ -20,44 +22,35 @@
 }
 .continuation-row__date,
 .continuation-row__rail,
-.continuation-row__content { position: relative; z-index: 1; }
+.continuation-row__content { position: relative; z-index: 2; }
 .continuation-row__rail {
   position: relative;
   align-self: stretch;
 }
-.continuation-row__rail::before {
-  content: "";
+.continuation-row__connector {
   position: absolute;
+  z-index: 1;
   top: 0;
-  /* Overlap the horizontal branch by half a device-independent pixel so the T
-   * junction stays closed regardless of the row's subpixel phase. */
-  bottom: calc(var(--continuation-branch-offset) - 0.5px);
-  left: 50%;
-  width: 1px;
-  background: var(--ft-rule-strong);
+  left: var(--continuation-rail-center);
+  width: calc(100% - var(--continuation-rail-center));
+  height: calc(100% - var(--continuation-branch-offset));
+  overflow: visible;
+  pointer-events: none;
 }
 .continuation-row__content {
   align-self: end;
+  justify-self: end;
   display: flex;
   align-items: center;
-  justify-content: flex-end;
   gap: var(--ft-s3);
+  width: fit-content;
+  max-width: 100%;
   min-width: 0;
-  padding-bottom: calc(var(--continuation-branch-offset) - 0.5em);
+  padding-bottom: calc(var(--continuation-branch-offset) - 0.5rem);
+  padding-left: var(--ft-s2);
+  background: var(--ft-canvas);
   color: var(--ft-ink-soft);
-  line-height: 1;
-}
-.continuation-row__content::before {
-  content: "";
-  flex: 1 1 auto;
-  min-width: var(--ft-s6);
-  height: 1px;
-  /* One continuous rule owns the whole branch. It starts at the rail
-   * centerline, crossing half the rail plus the grid gap, so there is no
-   * second 1px segment whose raster phase can disagree on Timeline. */
-  margin-left: calc(-1 * (var(--ft-chrono-gap) + (var(--ft-chrono-rail) / 2)));
-  margin-right: var(--ft-s2);
-  background: var(--ft-rule-strong);
+  line-height: 1rem;
 }
 .continuation-row__label {
   flex: 0 0 auto;
@@ -68,15 +61,18 @@
   margin-right: var(--ft-chrono-arrow-inset);
   color: var(--ft-ink-muted);
 }
-a.continuation-row:hover .continuation-row__content { color: var(--ft-ink); }
-a.continuation-row:hover .continuation-row__label { text-decoration: underline; text-underline-offset: 0.2em; }
-a.continuation-row:hover .continuation-row__arrow { color: var(--ft-ink); }
+.continuation-row__arrow .icon { inline-size: 0.9rem; block-size: 0.9rem; }
+a.continuation-row:hover .continuation-row__content, a.continuation-row[data-nav-pressed] .continuation-row__content, a.continuation-row[data-nav-pending] .continuation-row__content { color: var(--ft-ink); }
+a.continuation-row:hover .continuation-row__label, a.continuation-row[data-nav-pressed] .continuation-row__label, a.continuation-row[data-nav-pending] .continuation-row__label { text-decoration: underline; text-underline-offset: 0.2em; }
+a.continuation-row:hover .continuation-row__arrow, a.continuation-row[data-nav-pressed] .continuation-row__arrow, a.continuation-row[data-nav-pending] .continuation-row__arrow { color: var(--ft-ink); }
 .continuation-row--terminal .continuation-row__content { color: var(--ft-ink-muted); }
 
 @media (max-width: 48rem) {
   .continuation-row {
+    --continuation-grid-gap: var(--ft-s3);
+    --continuation-rail-center: calc(var(--ft-chrono-rail) / 2);
     grid-template-columns: var(--ft-chrono-rail) minmax(0, 1fr);
-    column-gap: var(--ft-s3);
+    column-gap: var(--continuation-grid-gap);
   }
   .continuation-row__date { display: none; }
 }

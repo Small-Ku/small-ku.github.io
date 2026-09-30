@@ -20,6 +20,13 @@ function currentTheme(): Theme {
   return value === "light" || value === "dark" ? value : storedTheme() ?? systemTheme();
 }
 
+function motionDurationMs(customProperty: string): number {
+  const raw = getComputedStyle(document.documentElement).getPropertyValue(customProperty).trim();
+  const value = Number.parseFloat(raw);
+  if (!Number.isFinite(value)) return 0;
+  return raw.endsWith("ms") ? value : raw.endsWith("s") ? value * 1000 : 0;
+}
+
 function syncThemeColor(theme: Theme): void {
   const meta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
   const color = meta?.dataset[theme === "dark" ? "themeColorDark" : "themeColorLight"];
@@ -46,7 +53,10 @@ function applyTheme(theme: Theme, persist: boolean): void {
   if (persist) {
     try { localStorage.setItem(STORAGE_KEY, theme); } catch { /* storage may be blocked */ }
   }
-  window.setTimeout(() => document.documentElement.classList.remove("theme-transition"), 220);
+  window.setTimeout(
+    () => document.documentElement.classList.remove("theme-transition"),
+    motionDurationMs("--ft-motion-effect-slow")
+  );
 }
 
 export function applyInitialTheme(): void {

@@ -6,9 +6,21 @@ body {
   color: var(--ft-ink);
   font-family: var(--ft-font-sans);
   text-rendering: optimizeLegibility;
-  transition: background var(--ft-normal) var(--ft-ease), color var(--ft-normal) var(--ft-ease);
+  transition: background var(--ft-motion-effect-slow) var(--ft-ease-standard), color var(--ft-motion-effect-slow) var(--ft-ease-standard);
 }
 ::selection { background: var(--ft-selected); color: var(--ft-ink); }
+.icon {
+  inline-size: 1em;
+  block-size: 1em;
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.icon__fill { fill: currentColor; stroke: none; }
+a[data-nav-pending][aria-busy="true"] { cursor: progress; }
 .site-shell { min-height: 100vh; overflow: clip; }
 .page { width: min(100% - (2 * var(--ft-gutter)), var(--ft-page)); margin-inline: auto; }
 .reading { width: min(100%, var(--ft-reading)); }

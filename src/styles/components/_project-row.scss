@@ -10,5 +10,9 @@
 .project-row__title { margin: 0 0 var(--ft-s2); font-size: var(--ft-text-lg); letter-spacing: -0.02em; font-weight: 600; }
 .project-row__summary { margin: 0; max-width: 52ch; color: var(--ft-ink-soft); line-height: 1.55; }
 .project-row__meta { display: flex; justify-content: space-between; gap: var(--ft-s4); align-items: start; }
-.project-row:hover .project-row__title { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.18em; }
+.project-row:hover .project-row__title,
+.project-row[data-nav-pressed] .project-row__title,
+.project-row[data-nav-pending] .project-row__title { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.18em; }
+.project-row[data-nav-pressed] .project-row__title,
+.project-row[data-nav-pending] .project-row__title { text-decoration-thickness: 2px; }
 @media (max-width: 42rem) { .project-row { grid-template-columns: 1fr; gap: var(--ft-s3); } }

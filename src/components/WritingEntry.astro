@@ -2,12 +2,15 @@
 import type { WritingEntry as WritingContentEntry } from "../lib/content";
 import { contentKey, displayDate, htmlDate, writingHref } from "../lib/content";
 import type { SiteLocale } from "../lib/i18n";
+import Icon from "./Icon.astro";
+import ChronologyRail from "./ChronologyRail.astro";
 
 interface Props {
   item: WritingContentEntry;
   projectTitles?: Record<string, string>;
   headingLevel?: 2 | 3;
   latestRank?: number;
+  sequenceEnd?: boolean;
   locale?: SiteLocale;
 }
 
@@ -16,6 +19,7 @@ const {
   projectTitles = {},
   headingLevel = 3,
   latestRank,
+  sequenceEnd = false,
   locale = "en"
 } = Astro.props;
 
@@ -24,18 +28,18 @@ const related = item.data.relatedProjects
   .join(" / ");
 ---
 <a
-  class="writing-entry"
+  class:list={["writing-entry", sequenceEnd && "writing-entry--sequence-end"]}
   href={writingHref(contentKey(item), locale)}
   data-writing-slug={contentKey(item)}
   data-latest-rank={latestRank}
 >
   <time class="writing-entry__date meta" datetime={htmlDate(item.data.date)}>{displayDate(item.data.date)}</time>
-  <span class="writing-entry__rail" aria-hidden="true"></span>
+  <span class="writing-entry__rail" aria-hidden="true"><ChronologyRail class="writing-entry__rail-line" /></span>
   <div class="writing-entry__copy">
     <span class="writing-entry__kicker meta">{item.data.kind}</span>
     <div class="writing-entry__title-row">
       {headingLevel === 2 ? <h2 data-vt-writing-title>{item.data.title}</h2> : <h3 data-vt-writing-title>{item.data.title}</h3>}
-      <span aria-hidden="true">↗</span>
+      <span class="writing-entry__arrow" aria-hidden="true"><Icon name="arrow-up-right" /></span>
     </div>
     <p>{item.data.summary}</p>
     {related && <span class="writing-entry__meta meta">Related / {related}</span>}

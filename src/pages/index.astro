@@ -2,6 +2,7 @@
 import SiteLayout from "../layouts/SiteLayout.astro";
 import SelectedWorkFan from "../components/SelectedWorkFan.astro";
 import LatestWriting from "../components/LatestWriting.astro";
+import Icon from "../components/Icon.astro";
 import { siteConfig } from "../site.config";
 import { getContentIndex, latestWriting, projectTitleMap, selectedProjects } from "../lib/content";
 
@@ -18,12 +19,15 @@ const copy = siteConfig.locales.en;
         <h1 id="hero-title" class="display">{copy.hero.title}</h1>
         <p class="home-intro__lede">{copy.hero.lede}</p>
         <div class="home-intro__links meta">
-          <a href="/timeline/">Timeline ↗</a>
+          <a class="home-intro__timeline-link" href="/timeline/" aria-label="Timeline">
+            <span class="home-intro__link-label">Timeline</span>
+            <span class="home-intro__link-arrow" aria-hidden="true"><Icon name="arrow-up-right" /></span>
+          </a>
         </div>
       </div>
       <SelectedWorkFan projects={selected} locale="en" />
     </div>
-    <a class="home-field__scroll" href="#latest-writing" aria-label="Scroll to latest writing">↓</a>
+    <a class="home-field__scroll" href="#latest-writing" aria-label="Scroll to latest writing"><Icon name="arrow-down" /></a>
   </section>
 
   <LatestWriting items={latest} projectTitles={projectTitles} locale="en" />

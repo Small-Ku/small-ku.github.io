@@ -3,6 +3,7 @@ import { render, type CollectionEntry } from "astro:content";
 import SiteLayout from "../../layouts/SiteLayout.astro";
 import WritingStream from "../../components/WritingStream.astro";
 import ProjectVisual from "../../components/ProjectVisual.astro";
+import Icon from "../../components/Icon.astro";
 import { siteConfig } from "../../site.config";
 import {
   displayYear,
@@ -83,8 +84,8 @@ const structuredData = projectStructuredData({
         <div class="work-head__supporting" data-vt-project-supporting>
           <p class="article-head__dek">{project.data.summary}</p>
           <div class="work-head__actions">
-            {project.data.externalUrl && <a class="button button--secondary" href={project.data.externalUrl}>Visit ↗</a>}
-            {project.data.sourceUrl && <a class="button button--secondary" href={project.data.sourceUrl}>Source ↗</a>}
+            {project.data.externalUrl && <a class="button button--secondary" href={project.data.externalUrl}>Visit <Icon name="arrow-up-right" class="button__icon" /></a>}
+            {project.data.sourceUrl && <a class="button button--secondary" href={project.data.sourceUrl}>Source <Icon name="arrow-up-right" class="button__icon" /></a>}
             <a class="button button--quiet" href="/timeline/">Timeline</a>
           </div>
         </div>

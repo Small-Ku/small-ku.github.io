@@ -91,6 +91,25 @@ const resolvedAlternates = alternatePaths ?? { [locale]: Astro.url.pathname };
         const themeMeta = document.querySelector('meta[name="theme-color"]');
         const themeColor = themeMeta?.getAttribute(`data-theme-color-${theme}`);
         if (themeMeta && themeColor) themeMeta.setAttribute('content', themeColor);
+
+        const syncDeviceHairline = () => {
+          const dpr = window.devicePixelRatio || 1;
+          document.documentElement.style.setProperty('--ft-device-hairline', `${Math.max(1, Math.ceil(dpr)) / dpr}px`);
+          return dpr;
+        };
+        let hairlineDpr = syncDeviceHairline();
+        let resolutionQuery = window.matchMedia(`(resolution: ${hairlineDpr}dppx)`);
+        const handleResolutionChange = () => {
+          resolutionQuery.removeEventListener('change', handleResolutionChange);
+          hairlineDpr = syncDeviceHairline();
+          resolutionQuery = window.matchMedia(`(resolution: ${hairlineDpr}dppx)`);
+          resolutionQuery.addEventListener('change', handleResolutionChange);
+        };
+        resolutionQuery.addEventListener('change', handleResolutionChange);
+        window.addEventListener('resize', () => {
+          const nextDpr = window.devicePixelRatio || 1;
+          if (nextDpr !== hairlineDpr) handleResolutionChange();
+        }, { passive: true });
       })();
     </script>
   </head>

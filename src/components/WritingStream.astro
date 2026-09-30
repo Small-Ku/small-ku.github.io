@@ -24,9 +24,15 @@ const {
   locale = "en"
 } = Astro.props;
 ---
-<div class="writing-stream">
+<div class:list={["writing-stream", continuationLabel && "writing-stream--continued"]}>
   {items.length > 0 ? items.map((item, index) => (
-    <WritingEntry item={item} projectTitles={projectTitles} latestRank={markLatest ? index + 1 : undefined} locale={locale} />
+    <WritingEntry
+      item={item}
+      projectTitles={projectTitles}
+      latestRank={markLatest ? index + 1 : undefined}
+      sequenceEnd={index === items.length - 1}
+      locale={locale}
+    />
   )) : (
     <ContinuationRow label={emptyLabel} terminal={true} />
   )}

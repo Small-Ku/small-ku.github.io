@@ -11,10 +11,16 @@
   min-block-size: clamp(41rem, 96cqi, 44rem);
 }
 .selected-fan__track {
+  --fan-inline-size: clamp(27rem, 78cqi, 34rem);
+  --fan-block-size: clamp(13.25rem, 32cqi, 14.25rem);
+  --fan-center-step: 14.6rem;
   position: absolute;
   inset: 0;
-  display: grid;
-  place-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: calc(var(--fan-center-step) - var(--fan-block-size));
   perspective: 1200px;
 }
 
@@ -24,9 +30,12 @@
   --fan-r: 0deg;
   --fan-scale: 1;
   --fan-z: 1;
-  position: absolute;
-  inline-size: clamp(27rem, 78cqi, 34rem);
-  block-size: clamp(13.25rem, 32cqi, 14.25rem);
+  position: relative;
+  flex: 0 0 auto;
+  left: var(--fan-x);
+  top: var(--fan-y);
+  inline-size: var(--fan-inline-size);
+  block-size: var(--fan-block-size);
   display: grid;
   grid-template-columns: minmax(0, 1.7fr) minmax(11rem, 0.82fr);
   grid-template-rows: 1fr;
@@ -37,7 +46,7 @@
   color: var(--ft-ink);
   text-decoration: none;
   box-shadow: var(--ft-shadow-card);
-  transform: translate(var(--fan-x), var(--fan-y)) rotate(var(--fan-r)) scale(var(--fan-scale));
+  transform: rotate(var(--fan-r)) scale(var(--fan-scale));
   transform-origin: 50% 50%;
   z-index: var(--fan-z);
   transition: transform var(--ft-normal) var(--ft-ease), box-shadow var(--ft-normal) var(--ft-ease), opacity var(--ft-normal) var(--ft-ease);
@@ -48,9 +57,9 @@
  * spread far enough vertically that no card body can be obscured by a sibling.
  * Overlap, when rotation creates any, is limited to the visual edge.
  */
-.fan-card:nth-child(1) { --fan-x: 2.4rem; --fan-y: -14.6rem; --fan-r: 1.8deg; --fan-z: 2; }
+.fan-card:nth-child(1) { --fan-x: 2.4rem; --fan-y: 0rem; --fan-r: 1.8deg; --fan-z: 2; }
 .fan-card:nth-child(2) { --fan-x: -3.2rem; --fan-y: 0rem; --fan-r: 0deg; --fan-z: 3; }
-.fan-card:nth-child(3) { --fan-x: 2.8rem; --fan-y: 14.6rem; --fan-r: -1.8deg; --fan-z: 2; }
+.fan-card:nth-child(3) { --fan-x: 2.8rem; --fan-y: 0rem; --fan-r: -1.8deg; --fan-z: 2; }
 
 .fan-card__transition-surface {
   position: absolute;
@@ -102,7 +111,8 @@
   line-height: 1.42;
 }
 .fan-card__index { padding-top: 0.18rem; }
-.fan-card__arrow { color: var(--ft-ink-muted); }
+.fan-card__arrow { display: inline-flex; align-self: center; color: var(--ft-ink-muted); }
+.fan-card__arrow .icon { inline-size: 0.95rem; block-size: 0.95rem; }
 
 /*
  * When selected work owns a genuinely wide row, spend that width on three portrait
@@ -111,15 +121,23 @@
  */
 @container (min-width: 56rem) {
   .selected-fan__viewport { min-block-size: clamp(27rem, 39cqi, 31rem); }
+  .selected-fan__track {
+    --fan-inline-size: clamp(17.5rem, 29cqi, 21.5rem);
+    --fan-block-size: clamp(23.5rem, 37cqi, 28rem);
+    --fan-center-step: 28cqi;
+    flex-direction: row;
+    gap: 0;
+  }
+  .fan-card:not(:last-child) {
+    margin-inline-end: calc(var(--fan-center-step) - var(--fan-inline-size));
+  }
   .fan-card {
-    inline-size: clamp(17.5rem, 29cqi, 21.5rem);
-    block-size: clamp(23.5rem, 37cqi, 28rem);
     grid-template-columns: 1fr;
     grid-template-rows: minmax(0, 1fr) auto;
   }
-  .fan-card:nth-child(1) { --fan-x: -28cqi; --fan-y: 0.45rem; --fan-r: -2.4deg; --fan-z: 1; }
+  .fan-card:nth-child(1) { --fan-x: 0rem; --fan-y: 0.45rem; --fan-r: -2.4deg; --fan-z: 1; }
   .fan-card:nth-child(2) { --fan-x: 0rem; --fan-y: 0rem; --fan-r: 0deg; --fan-z: 3; }
-  .fan-card:nth-child(3) { --fan-x: 28cqi; --fan-y: 0.45rem; --fan-r: 2.4deg; --fan-z: 2; }
+  .fan-card:nth-child(3) { --fan-x: 0rem; --fan-y: 0.45rem; --fan-r: 2.4deg; --fan-z: 2; }
   .fan-card__visual {
     border-right: 0;
     border-bottom: 1px solid color-mix(in srgb, var(--ft-rule) 68%, transparent);
@@ -154,6 +172,8 @@
   .fan-card:hover,
   .fan-card:focus-visible {
     position: relative;
+    left: 0;
+    top: 0;
     flex: 0 0 min(82vw, 20.5rem);
     inline-size: min(82vw, 20.5rem);
     block-size: clamp(24rem, 112vw, 28rem);

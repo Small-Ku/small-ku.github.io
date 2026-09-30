@@ -43,7 +43,41 @@
 }
 .home-intro__links { display: flex; flex-wrap: wrap; gap: var(--ft-s5); margin-top: var(--ft-s6); }
 .home-intro__links a { color: var(--ft-ink-soft); text-decoration: none; }
-.home-intro__links a:hover { color: var(--ft-ink); text-decoration: underline; text-underline-offset: 0.2em; }
+.home-intro__timeline-link {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.34em;
+  transition: color var(--ft-motion-effect-fast) var(--ft-ease-standard);
+}
+.home-intro__link-label {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 0 1px;
+  transition: background-size var(--ft-motion-effect) var(--ft-ease-standard);
+}
+.home-intro__link-arrow {
+  inline-size: 0.9rem;
+  block-size: 0.9rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+  transition: transform var(--ft-motion-spatial-fast) var(--ft-ease-enter);
+}
+.home-intro__link-arrow .icon { inline-size: 100%; block-size: 100%; }
+.home-intro__timeline-link:hover,
+.home-intro__timeline-link[data-nav-pressed],
+.home-intro__timeline-link[data-nav-pending] { color: var(--ft-ink); }
+.home-intro__timeline-link:hover .home-intro__link-label { background-size: 100% 1px; }
+.home-intro__timeline-link[data-nav-pressed] .home-intro__link-label,
+.home-intro__timeline-link[data-nav-pending] .home-intro__link-label { background-size: 100% 2px; }
+.home-intro__timeline-link[data-nav-pressed] .home-intro__link-arrow,
+.home-intro__timeline-link[data-nav-pending] .home-intro__link-arrow { transform: translate(0.2rem, -0.2rem); }
+@media (prefers-reduced-motion: reduce) {
+  .home-intro__timeline-link[data-nav-pressed] .home-intro__link-arrow,
+  .home-intro__timeline-link[data-nav-pending] .home-intro__link-arrow { transform: none; }
+}
 
 .home-field__scroll {
   align-self: center;
@@ -56,6 +90,7 @@
   text-decoration: none;
   animation: home-scroll-cue 1.8s ease-in-out infinite;
 }
+.home-field__scroll .icon { inline-size: 1rem; block-size: 1rem; }
 @keyframes home-scroll-cue {
   0%, 100% { transform: translateY(0); opacity: 0.55; }
   50% { transform: translateY(0.24rem); opacity: 0.9; }

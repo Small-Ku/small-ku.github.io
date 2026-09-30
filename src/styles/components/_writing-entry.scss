@@ -20,36 +20,43 @@
   text-align: right;
 }
 .writing-entry__rail {
+  --writing-marker-top: 0.52rem;
+  --writing-marker-size: 0.68rem;
   position: relative;
   align-self: stretch;
   min-height: 100%;
 }
-.writing-entry__rail::before {
-  content: "";
+.writing-entry__rail-line {
   position: absolute;
   inset-block: calc(var(--ft-s5) * -1);
-  left: 50%;
-  width: 1px;
-  background: var(--ft-rule-strong);
+  inset-inline: 0;
 }
 .writing-entry__rail::after {
   content: "";
   position: absolute;
-  top: 0.52rem;
+  top: var(--writing-marker-top);
   left: 50%;
-  width: 0.68rem;
-  height: 0.68rem;
+  width: var(--writing-marker-size);
+  height: var(--writing-marker-size);
   transform: translateX(-50%);
   border: 1px solid var(--ft-rule-strong);
   border-radius: 50%;
   background: var(--ft-canvas);
 }
-.writing-stream > .writing-entry:first-child .writing-entry__rail::before { top: 0.52rem; }
+.writing-stream > .writing-entry:first-child .writing-entry__rail-line { top: var(--writing-marker-top); }
 
 .writing-entry__copy {
   min-width: 0;
   padding-bottom: var(--ft-s5);
   border-bottom: 1px solid var(--ft-rule);
+}
+
+.writing-entry--sequence-end .writing-entry__copy { border-bottom: 0; }
+.writing-stream--continued > .writing-entry--sequence-end { padding-bottom: var(--ft-s3); }
+.writing-stream--continued > .writing-entry--sequence-end .writing-entry__copy { padding-bottom: 0; }
+.writing-stream--continued > .continuation-row { min-height: calc(var(--ft-s7) + var(--ft-s5)); }
+.writing-stream:not(.writing-stream--continued) > .writing-entry--sequence-end .writing-entry__rail-line {
+  bottom: calc(100% - var(--writing-marker-top) - var(--writing-marker-size));
 }
 .writing-entry__kicker {
   display: block;
@@ -74,6 +81,8 @@
   margin-right: var(--ft-chrono-arrow-inset);
   color: var(--ft-ink-muted);
 }
+.writing-entry__arrow { display: inline-flex; align-self: center; }
+.writing-entry__arrow .icon { inline-size: 0.95rem; block-size: 0.95rem; }
 .writing-entry p {
   max-width: 64ch;
   margin: var(--ft-s2) 0 var(--ft-s3);
@@ -82,12 +91,18 @@
 }
 .writing-entry__meta { color: var(--ft-ink-muted); }
 .writing-entry:hover .writing-entry__title-row h2,
-.writing-entry:hover .writing-entry__title-row h3 {
+.writing-entry:hover .writing-entry__title-row h3,
+.writing-entry[data-nav-pressed] .writing-entry__title-row h2,
+.writing-entry[data-nav-pressed] .writing-entry__title-row h3,
+.writing-entry[data-nav-pending] .writing-entry__title-row h2,
+.writing-entry[data-nav-pending] .writing-entry__title-row h3 {
   text-decoration: underline;
   text-decoration-thickness: 1px;
   text-underline-offset: 0.22em;
 }
-.writing-entry:hover .writing-entry__title-row > span { color: var(--ft-ink); }
+.writing-entry:hover .writing-entry__title-row > span,
+.writing-entry[data-nav-pressed] .writing-entry__title-row > span,
+.writing-entry[data-nav-pending] .writing-entry__title-row > span { color: var(--ft-ink); }
 
 /* Timeline owns date/rail columns; only the shared content grammar remains. */
 .writing-entry--embedded {

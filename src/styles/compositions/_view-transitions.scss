@@ -23,14 +23,101 @@
 ::view-transition-old(root) { opacity: 0; }
 ::view-transition-new(root) { opacity: 1; }
 
-/* Stable chrome. */
-::view-transition-group(site-header) {
+/* Stable chrome owns no route geometry. Brand/nav/tools remain spatially fixed.
+ * The Header shell also owns a route-dependent surface state: Home uses the field
+ * tint while other routes use the canvas tint. That paint change is effect-only. */
+::view-transition-group(site-header),
+::view-transition-group(site-header-brand),
+::view-transition-group(site-header-nav),
+::view-transition-group(site-header-tools) {
   z-index: 60;
-  animation-duration: var(--ft-motion-spatial-fast);
-  animation-timing-function: var(--ft-ease-standard);
+  animation: none;
 }
 ::view-transition-old(site-header),
-::view-transition-new(site-header) { mix-blend-mode: normal; }
+::view-transition-old(site-header-brand),
+::view-transition-old(site-header-nav),
+::view-transition-old(site-header-tools),
+::view-transition-new(site-header),
+::view-transition-new(site-header-brand),
+::view-transition-new(site-header-nav),
+::view-transition-new(site-header-tools) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+::view-transition-old(site-header),
+::view-transition-old(site-header-brand),
+::view-transition-old(site-header-nav),
+::view-transition-old(site-header-tools) { opacity: 0; }
+::view-transition-new(site-header),
+::view-transition-new(site-header-brand),
+::view-transition-new(site-header-nav),
+::view-transition-new(site-header-tools) { opacity: 1; }
+
+/* During authored route motion, only the Header surface hands route paint state
+ * across. Its child identities stay fixed above it. */
+html[data-motion-type="project-enter"],
+html[data-motion-type="project-exit"],
+html[data-motion-type="timeline-expand"],
+html[data-motion-type="timeline-collapse"],
+html[data-motion-type="writing-identity"] {
+  &::view-transition-group(site-header) {
+    animation-duration: var(--ft-motion-effect-slow);
+    animation-timing-function: var(--ft-ease-standard);
+  }
+  &::view-transition-old(site-header) {
+    animation: ft-header-surface-old var(--ft-motion-effect-slow) var(--ft-ease-standard) both;
+    mix-blend-mode: plus-lighter;
+  }
+  &::view-transition-new(site-header) {
+    animation: ft-header-surface-new var(--ft-motion-effect-slow) var(--ft-ease-standard) both;
+    mix-blend-mode: plus-lighter;
+  }
+}
+
+/* Locale changes preserve route and geometry. They hand content representation
+ * across without directional movement or container travel. */
+html[data-motion-type="representation-change"] {
+  &::view-transition-group(root),
+  &::view-transition-group(site-header-nav) {
+    animation-duration: var(--ft-motion-representation);
+    animation-timing-function: var(--ft-ease-representation);
+  }
+
+  &::view-transition-old(root) {
+    animation: ft-representation-old var(--ft-motion-representation) var(--ft-ease-representation) both;
+    mix-blend-mode: plus-lighter;
+  }
+  &::view-transition-new(root) {
+    animation: ft-representation-new var(--ft-motion-representation) var(--ft-ease-representation) both;
+    mix-blend-mode: plus-lighter;
+  }
+  &::view-transition-old(site-header-nav) {
+    animation: ft-representation-old var(--ft-motion-representation) var(--ft-ease-representation) both;
+    mix-blend-mode: normal;
+  }
+  &::view-transition-new(site-header-nav) {
+    animation: ft-representation-new var(--ft-motion-representation) var(--ft-ease-representation) both;
+    mix-blend-mode: normal;
+  }
+}
+
+@keyframes ft-representation-old {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+@keyframes ft-representation-new {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes ft-header-surface-old {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+@keyframes ft-header-surface-new {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
 
 /* Writing: a title is genuinely the same object across overview/detail. */
 ::view-transition-group(writing-title) {
@@ -40,6 +127,32 @@
 }
 ::view-transition-old(writing-title),
 ::view-transition-new(writing-title) { mix-blend-mode: normal; }
+
+@for $i from 1 through 8 {
+  ::view-transition-group(writing-line-#{$i}) {
+    z-index: 35;
+    animation-duration: var(--ft-motion-route);
+    animation-timing-function: var(--ft-ease-emphasized);
+  }
+  ::view-transition-old(writing-line-#{$i}),
+  ::view-transition-new(writing-line-#{$i}) {
+    mix-blend-mode: normal;
+    animation-duration: var(--ft-motion-route);
+    animation-timing-function: linear;
+    animation-fill-mode: both;
+  }
+  ::view-transition-old(writing-line-#{$i}) { animation-name: ft-writing-line-old; }
+  ::view-transition-new(writing-line-#{$i}) { animation-name: ft-writing-line-new; }
+}
+
+@keyframes ft-writing-line-old {
+  0%, 38% { opacity: 1; }
+  68%, 100% { opacity: 0; }
+}
+@keyframes ft-writing-line-new {
+  0%, 32% { opacity: 0; }
+  48%, 100% { opacity: 1; }
+}
 
 /* -------------------------------------------------------------------------- */
 /* Project container transform                                                */

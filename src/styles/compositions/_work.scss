@@ -85,14 +85,23 @@
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 0;
-  border-top: 1px solid var(--ft-rule-strong);
 }
+.work-head__facts::before,
+.work-head__facts::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  height: var(--ft-device-hairline);
+  background: var(--ft-rule-strong);
+  pointer-events: none;
+}
+.work-head__facts::before { inset-block-start: 0; }
+.work-head__facts::after { inset-block-end: 0; }
 .work-head__facts span {
   display: grid;
   grid-template-columns: 2rem 1fr;
   gap: var(--ft-s3);
   padding: var(--ft-s3) var(--ft-s3) var(--ft-s3) 0;
-  border-bottom: 1px solid var(--ft-rule);
   color: var(--ft-ink-soft);
   font-size: var(--ft-text-sm);
 }

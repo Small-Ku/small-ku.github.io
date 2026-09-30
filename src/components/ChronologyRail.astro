@@ -1,0 +1,12 @@
+---
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+<span class:list={["chronology-rail", className]} aria-hidden="true">
+  <svg viewBox="0 0 100 100" preserveAspectRatio="none" shape-rendering="crispEdges" focusable="false">
+    <path class="chronology-stroke" d="M 50 0 V 100"></path>
+  </svg>
+</span>

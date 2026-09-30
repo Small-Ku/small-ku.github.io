@@ -45,7 +45,7 @@ const current = (href: string) => href === homeHref ? path === homeHref : path.s
                     <span class="site-menu__mark" aria-hidden="true">✓</span>
                   </span>
                 ) : (
-                  <a class="site-menu__choice" href={href}>
+                  <a class="site-menu__choice" href={href} data-motion-intent="representation">
                     <span>{localeLabel(alternateLocale as SiteLocale)}</span>
                     <span class="site-menu__mark" aria-hidden="true"></span>
                   </a>

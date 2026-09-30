@@ -3,6 +3,7 @@
   --ft-motion-effect-fast: 90ms;
   --ft-motion-effect: 150ms;
   --ft-motion-effect-slow: 220ms;
+  --ft-motion-representation: var(--ft-motion-effect-slow);
 
   /* Spatial motion changes geometry inside the current composition. */
   --ft-motion-spatial-fast: 180ms;
@@ -21,6 +22,7 @@
   --ft-ease-emphasized: cubic-bezier(0.2, 0.8, 0.2, 1);
   --ft-ease-container: cubic-bezier(0.18, 0.78, 0.18, 1);
   --ft-ease-overlay-enter: cubic-bezier(0.4, 0, 0.2, 1);
+  --ft-ease-representation: cubic-bezier(0.4, 0, 0.2, 1);
 
   /* Backwards-compatible aliases for existing component motion. */
   --ft-ease: var(--ft-ease-standard);
@@ -33,6 +35,7 @@
     --ft-motion-effect-fast: 0ms;
     --ft-motion-effect: 0ms;
     --ft-motion-effect-slow: 0ms;
+    --ft-motion-representation: 0ms;
     --ft-motion-spatial-fast: 0ms;
     --ft-motion-spatial: 0ms;
     --ft-motion-spatial-slow: 0ms;

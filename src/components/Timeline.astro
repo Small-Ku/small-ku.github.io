@@ -3,6 +3,8 @@ import FilterSwitch from "./FilterSwitch.astro";
 import ProjectVisual from "./ProjectVisual.astro";
 import WritingEntry from "./WritingEntry.astro";
 import ContinuationRow from "./ContinuationRow.astro";
+import Icon from "./Icon.astro";
+import ChronologyRail from "./ChronologyRail.astro";
 import type { TimelineItem } from "../lib/content";
 import { contentKey, displayDate, htmlDate } from "../lib/content";
 import type { SiteLocale } from "../lib/i18n";
@@ -42,7 +44,7 @@ const filterOptions = [
     <div class="timeline-list" data-timeline-list>
       <span class="timeline-origin" data-vt-timeline-start aria-hidden="true"></span>
 
-      {items.map((item) => (
+      {items.map((item, index) => (
         item.type === "writing" ? (
           <div
             class="timeline-entry timeline-entry--writing"
@@ -54,6 +56,7 @@ const filterOptions = [
               projectTitles={projectTitles}
               headingLevel={2}
               latestRank={latestRankById.get(item.id)}
+              sequenceEnd={index === items.length - 1}
               locale={locale}
             />
           </div>
@@ -67,6 +70,7 @@ const filterOptions = [
             ]}
             data-timeline-type="work"
           >
+            <ChronologyRail class="timeline-entry__rail-line" />
             <time class="timeline-entry__date meta" datetime={htmlDate(item.date)}>{displayDate(item.date)}</time>
             <a
               class="timeline-entry__content"
@@ -91,7 +95,7 @@ const filterOptions = [
                 <span class="timeline-entry__kicker meta">Project / {item.project.data.kicker} · {item.project.data.status}</span>
                 <div class="timeline-entry__title-row">
                   <div class="timeline-entry__title-slot" data-vt-project-title><h2>{item.project.data.title}</h2></div>
-                  <span aria-hidden="true">↗</span>
+                  <span class="timeline-entry__arrow" aria-hidden="true"><Icon name="arrow-up-right" /></span>
                 </div>
                 <p>{item.project.data.summary}</p>
                 <span class="timeline-entry__meta meta">{item.project.data.visibility}</span>

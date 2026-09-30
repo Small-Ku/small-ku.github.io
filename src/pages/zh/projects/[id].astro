@@ -3,6 +3,7 @@ import { render, type CollectionEntry } from "astro:content";
 import SiteLayout from "../../../layouts/SiteLayout.astro";
 import WritingStream from "../../../components/WritingStream.astro";
 import ProjectVisual from "../../../components/ProjectVisual.astro";
+import Icon from "../../../components/Icon.astro";
 import { siteConfig } from "../../../site.config";
 import {
   contentKey,
@@ -75,8 +76,8 @@ const structuredData = projectStructuredData({
         <div class="work-head__supporting" data-vt-project-supporting>
           <p class="article-head__dek">{project.data.summary}</p>
           <div class="work-head__actions">
-            {project.data.externalUrl && <a class="button button--secondary" href={project.data.externalUrl}>前往 ↗</a>}
-            {project.data.sourceUrl && <a class="button button--secondary" href={project.data.sourceUrl}>原始碼 ↗</a>}
+            {project.data.externalUrl && <a class="button button--secondary" href={project.data.externalUrl}>前往 <Icon name="arrow-up-right" class="button__icon" /></a>}
+            {project.data.sourceUrl && <a class="button button--secondary" href={project.data.sourceUrl}>原始碼 <Icon name="arrow-up-right" class="button__icon" /></a>}
             <a class="button button--quiet" href="/zh/timeline/">時間線</a>
           </div>
         </div>
