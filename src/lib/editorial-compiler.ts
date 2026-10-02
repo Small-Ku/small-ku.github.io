@@ -246,8 +246,8 @@ export function compileEditorialText(
       continue;
     }
 
-    // One compression point per CJK punctuation glyph, directed toward text.
-    // Opening punctuation compresses after itself; closing punctuation compresses before itself.
+    // Candidate text-facing boundaries. Runtime resolves glyph ownership so an
+    // ambiguous quote cannot spend both its opening and closing budgets.
     if (OPENING.has(current.text) || CLOSING.has(next.text)) {
       adjustments.push({ offset: current.end, kind: "punctuation" });
       continue;

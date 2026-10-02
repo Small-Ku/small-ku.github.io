@@ -1,5 +1,4 @@
 import type { EditorialIRV1, EditorialLayoutPlan } from "../lib/editorial-ir";
-import { isResidualCjkPunctuationAdjustmentBoundary } from "../lib/editorial-punctuation";
 import { appendEditorialInline } from "./editorial-composer-inline";
 
 const composed = new WeakSet<HTMLElement>();
@@ -42,10 +41,14 @@ export function applyEditorialPlan(root: HTMLElement, text: string, ir: Editoria
 
     const deltas = new Map<number, number>();
     for (const adjustment of line.adjustments) {
+      if (adjustment.kind === "punctuation") {
+        for (const glyph of adjustment.glyphs) {
+          deltas.set(glyph.offset, (deltas.get(glyph.offset) ?? 0) + glyph.deltaPx);
+        }
+        continue;
+      }
       const points = ir.adjustments.filter((point) =>
         point.offset > line.start && point.offset < line.end && point.kind === adjustment.kind
-        && (adjustment.kind !== "punctuation" || isResidualCjkPunctuationAdjustmentBoundary(text, point.offset))
-        && (adjustment.kind !== "punctuation" || !line.punctuationHalts.some(range => point.offset >= range.start && point.offset <= range.end))
       );
       if (!points.length) continue;
       for (const point of points) {

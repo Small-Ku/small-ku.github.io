@@ -30,6 +30,46 @@ export function isResidualCjkPunctuationAdjustmentBoundary(text: string, offset:
   return isolatedOpening || isolatedClosing;
 }
 
+export interface ResidualPunctuationOpportunity {
+  offset: number;
+  glyphStart: number;
+  glyphEnd: number;
+  direction: "opening" | "closing";
+  ambiguous: boolean;
+}
+
+/** Assign one directional resource to each isolated glyph. Boundary candidates
+ * are not glyph budgets: U+0022 can otherwise be counted on both sides. Quote
+ * pairing is canonical-text-wide so a line break cannot change its direction. */
+export function residualCjkPunctuationOpportunities(
+  text: string,
+  points: ReadonlyArray<{ offset: number; kind: string }>,
+  start: number,
+  end: number,
+  halts: ReadonlyArray<{ start: number; end: number }> = []
+): ResidualPunctuationOpportunity[] {
+  const boundaries = new Set(points.filter(point => point.kind === "punctuation").map(point => point.offset));
+  const opportunities: ResidualPunctuationOpportunity[] = [];
+  let cursor = 0;
+  let quoteOpen = true;
+  for (const glyph of text) {
+    const glyphStart = cursor;
+    cursor += glyph.length;
+    const opening = isOpeningCjkPunctuation(glyph);
+    const closing = isClosingCjkPunctuation(glyph);
+    const ambiguous = opening && closing;
+    const direction = opening && (!closing || quoteOpen) ? "opening" : "closing";
+    if (ambiguous) quoteOpen = !quoteOpen;
+    if ((!opening && !closing) || glyphStart < start || cursor > end) continue;
+    const offset = direction === "opening" ? cursor : glyphStart;
+    if (offset <= start || offset >= end || !boundaries.has(offset)) continue;
+    if (!isResidualCjkPunctuationAdjustmentBoundary(text, offset)) continue;
+    if (halts.some(halt => glyphStart < halt.end && cursor > halt.start)) continue;
+    opportunities.push({ offset, glyphStart, glyphEnd: cursor, direction, ambiguous });
+  }
+  return opportunities;
+}
+
 /** Full-width CJK punctuation with Zhudou's discrete half-width alternate.
  * ASCII hyphens, Latin quotation marks, and ordinary Latin are never eligible. */
 export function isHaltPunctuation(value: string): boolean {

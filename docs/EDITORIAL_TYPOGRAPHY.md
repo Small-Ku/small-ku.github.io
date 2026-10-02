@@ -148,7 +148,7 @@ Punctuation has distinct concepts:
 - compression: advance-width reduction toward adjacent text;
 - hanging: optical overhang beyond the nominal line edge.
 
-Traditional Chinese punctuation compression is capped at **0.5em per punctuation glyph**. Opening punctuation compresses toward following text; closing punctuation compresses toward preceding text.
+Traditional Chinese punctuation compression is capped at **0.5em per punctuation glyph**. Opening punctuation compresses toward following text; closing punctuation compresses toward preceding text. Runtime resolves candidate boundaries to one canonical glyph owner and records its directional allocation in `LinePlan`; the renderer applies those allocations directly. Ambiguous ASCII double quotes pair across canonical text, independently of selected line breaks, so their opening and closing classifications cannot grant two budgets. Their capacity is additionally bounded by the measured glyph advance to avoid a negative logical advance. Unambiguous punctuation retains its existing half-em budget.
 
 Hanging has separate `LinePlan` fields and budget. It is now a real fitting resource after punctuation compression and before CJK tracking shrink. Start hanging shifts the whole materialized line run toward inline-start while preserving internal glyph advances; end hanging leaves the line run in normal flow and permits only the plan-owned terminal optical overflow. Selected discretionary hyphens may use the same bounded end-hang resource. Compression and hanging therefore remain separate both in the plan and in presentation.
 

@@ -64,11 +64,26 @@ export interface CompiledEditorialText {
   ir: EditorialIRV1;
 }
 
-export interface EditorialLineAdjustment {
-  kind: EditorialAdjustmentKind;
+export interface EditorialPunctuationCompression {
+  /** The owning canonical glyph and its text-facing boundary. */
+  glyphStart: number;
+  glyphEnd: number;
+  offset: number;
+  direction: "opening" | "closing";
+  deltaPx: number;
+}
+
+export type EditorialLineAdjustment = {
+  kind: Exclude<EditorialAdjustmentKind, "punctuation">;
   deltaPx: number;
   count: number;
-}
+} | {
+  kind: "punctuation";
+  deltaPx: number;
+  /** Unique glyph count, not the number of candidate boundaries. */
+  count: number;
+  glyphs: EditorialPunctuationCompression[];
+};
 
 export interface EditorialLinePlan {
   /** UTF-16 range in canonical text. */

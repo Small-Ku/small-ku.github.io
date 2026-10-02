@@ -1,5 +1,5 @@
 import { EDITORIAL_FIT_PROFILES, editorialFitMode, type EditorialFitProfile } from "../lib/editorial-constraints";
-import { isHaltPunctuation, isResidualCjkPunctuationAdjustmentBoundary, isClosingCjkPunctuation, isOpeningCjkPunctuation } from "../lib/editorial-punctuation";
+import { isHaltPunctuation, residualCjkPunctuationOpportunities, isClosingCjkPunctuation, isOpeningCjkPunctuation } from "../lib/editorial-punctuation";
 import type {
   EditorialAdjustmentKind,
   EditorialIRV1,
@@ -39,12 +39,11 @@ function adjustmentCount(
   kind: EditorialAdjustmentKind,
   halts: PunctuationHalts = []
 ): number {
+  if (kind === "punctuation") return residualCjkPunctuationOpportunities(text, ir.adjustments, start, end, halts).length;
   return ir.adjustments.filter((point) =>
     point.kind === kind
     && point.offset > start
     && point.offset < end
-    && (kind !== "punctuation" || isResidualCjkPunctuationAdjustmentBoundary(text, point.offset))
-    && (kind !== "punctuation" || !halts.some(range => point.offset >= range.start && point.offset <= range.end))
   ).length;
 }
 
@@ -248,9 +247,17 @@ function fitCjkLine(
 ): EditorialLinePlan | null {
   const em = parseFloat(style.fontSize) || 16;
   const budget = profile.cjk;
-  const punctuationCount = adjustmentCount(text, ir, start, end, "punctuation", halts);
+  const punctuation = residualCjkPunctuationOpportunities(text, ir.adjustments, start, end, halts).map(point => ({
+    ...point,
+    // An ambiguous, narrow quote must not acquire a negative logical advance.
+    // Ordinary punctuation retains its existing half-em capacity.
+    capacity: point.ambiguous
+      ? Math.max(0, Math.min(budget.maxPunctuationCompressionEm * em, measure(point.glyphStart, point.glyphEnd)))
+      : budget.maxPunctuationCompressionEm * em
+  }));
+  const punctuationCount = punctuation.length;
   const hanGapCount = adjustmentCount(text, ir, start, end, "han-gap");
-  const punctuationCapacity = punctuationCount * budget.maxPunctuationCompressionEm * em;
+  const punctuationCapacity = punctuation.reduce((total, point) => total + point.capacity, 0);
   const trackingExpandCapacity = hanGapCount * budget.maxTrackingExpandEm * em;
   const trackingShrinkCapacity = hanGapCount * budget.maxTrackingShrinkEm * em;
   const glyphs = Array.from(text.slice(start, end));
@@ -279,7 +286,13 @@ function fitCjkLine(
     punctuationCompressionPx = Math.min(overflow, punctuationCapacity);
     overflow -= punctuationCompressionPx;
     if (punctuationCompressionPx > 0) {
-      adjustments.push({ kind: "punctuation", deltaPx: -punctuationCompressionPx, count: punctuationCount });
+      adjustments.push({
+        kind: "punctuation", deltaPx: -punctuationCompressionPx, count: punctuationCount,
+        glyphs: punctuation.map(point => ({
+          glyphStart: point.glyphStart, glyphEnd: point.glyphEnd, offset: point.offset, direction: point.direction,
+          deltaPx: -punctuationCompressionPx * point.capacity / punctuationCapacity
+        }))
+      });
       punctuationUtilisation = punctuationCapacity > 0 ? punctuationCompressionPx / punctuationCapacity : 0;
     }
 
