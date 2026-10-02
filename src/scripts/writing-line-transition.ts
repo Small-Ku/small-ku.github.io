@@ -146,23 +146,12 @@ function cloneInlineRange(title: HTMLElement, start: number, end: number): Docum
 }
 
 function graphemeOffsets(text: string): Array<{ start: number; end: number; text: string }> {
-  if (typeof Intl.Segmenter === "function") {
-    const segmenter = new Intl.Segmenter(undefined, { granularity: "grapheme" });
-    return Array.from(segmenter.segment(text), (segment) => ({
-      start: segment.index,
-      end: segment.index + segment.segment.length,
-      text: segment.segment
-    }));
-  }
-
-  const result: Array<{ start: number; end: number; text: string }> = [];
-  let offset = 0;
-  for (const value of Array.from(text)) {
-    const start = offset;
-    offset += value.length;
-    result.push({ start, end: offset, text: value });
-  }
-  return result;
+  const segmenter = new Intl.Segmenter(undefined, { granularity: "grapheme" });
+  return Array.from(segmenter.segment(text), (segment) => ({
+    start: segment.index,
+    end: segment.index + segment.segment.length,
+    text: segment.segment
+  }));
 }
 
 function validLinePlan(lines: LineSegment[], textLength: number): boolean {
@@ -229,12 +218,11 @@ function titleLineSegments(title: HTMLElement): LineSegment[] {
   const unique = [...new Set(boundaries)].sort((a, b) => a - b);
   const lines = unique.slice(0, -1).map((start, index) => {
     const end = unique[index + 1];
-    const trimmed = text.slice(start, end).replace(/\s+$/u, "");
     const hanging = presentationHanging.get(start + ":" + end);
     return {
       start,
       end,
-      hyphen: presentationHyphens.has(end) || trimmed.charCodeAt(trimmed.length - 1) === 0x00ad,
+      hyphen: presentationHyphens.has(end),
       ...(hanging?.start ? { hangingStartPx: hanging.start } : {}),
       ...(hanging?.end ? { hangingEndPx: hanging.end } : {})
     };
@@ -408,7 +396,6 @@ export function prepareWritingLineMorph(
   sourceRoot: Element | null,
   slug: string | null,
   nextDocument: Document,
-  _destinationIsWriting: boolean,
   reducedMotion: boolean
 ): WritingLineMorph | null {
   if (!slug || reducedMotion) return null;

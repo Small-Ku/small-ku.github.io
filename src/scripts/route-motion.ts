@@ -327,7 +327,6 @@ export function prepareOutgoingRouteMotion(context: MotionContext, nextDocument:
       context.sourceRoot,
       context.slug,
       nextDocument,
-      routeMeta(nextDocument).kind === "writing",
       reduceMotion()
     );
     if (!context.writingLineMorph) {

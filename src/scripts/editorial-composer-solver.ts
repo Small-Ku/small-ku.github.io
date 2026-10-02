@@ -19,7 +19,6 @@ interface Candidate {
 }
 
 interface PathState {
-  at: number;
   lines: EditorialLinePlan[];
   maxUtil: number;
   totalResidual: number;
@@ -640,7 +639,7 @@ function solveAtTarget(text: string, ir: EditorialIRV1, host: HTMLElement, targe
     { offset: text.length, semanticPenalty: 0, hyphen: false, artDirected: false, unsafe: false }
   ];
   const buckets = new Map<number, PathState[]>();
-  buckets.set(0, [{ at: 0, lines: [], maxUtil: 0, totalResidual: 0, totalFitPenalty: 0, semantic: 0, unsafeBreaks: 0, artDirectedBreaks: 0, hyphens: 0, finalShort: 0 }]);
+  buckets.set(0, [{ lines: [], maxUtil: 0, totalResidual: 0, totalFitPenalty: 0, semantic: 0, unsafeBreaks: 0, artDirectedBreaks: 0, hyphens: 0, finalShort: 0 }]);
   for (const from of candidates) {
     const states = buckets.get(from.offset) ?? [];
     if (!states.length || from.offset === text.length) continue;
@@ -679,7 +678,6 @@ function solveAtTarget(text: string, ir: EditorialIRV1, host: HTMLElement, targe
       for (const state of states) {
         if (state.lines.length >= 8) continue;
         const next: PathState = {
-          at: to.offset,
           lines: [...state.lines, line],
           maxUtil: Math.max(state.maxUtil, utilization),
           totalResidual: state.totalResidual + residual,
