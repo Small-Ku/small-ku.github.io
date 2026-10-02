@@ -3,6 +3,7 @@ import type { EditorialIRV1 } from "../lib/editorial-ir";
 import { shareVisualLine } from "../lib/visual-line-geometry";
 import { appendEditorialInline, type PunctuationHalts } from "./editorial-composer-inline";
 
+const MEASUREMENT_CACHE_LIMIT = 32_000;
 const measurementCache = new Map<string, number>();
 
 export function invalidateEditorialMeasurements(): void {
@@ -40,7 +41,7 @@ function measuredWidth(box: HTMLElement, key: string, valid?: (box: HTMLElement)
   box.remove();
   // Discrete alternatives add cache entries. Evict one oldest measurement
   // rather than dropping every still-useful width during an active solve.
-  if (measurementCache.size >= 8000) {
+  if (measurementCache.size >= MEASUREMENT_CACHE_LIMIT) {
     const oldest = measurementCache.keys().next().value;
     if (oldest !== undefined) measurementCache.delete(oldest);
   }
