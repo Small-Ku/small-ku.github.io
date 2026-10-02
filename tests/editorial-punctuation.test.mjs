@@ -1,8 +1,10 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { residualCjkPunctuationOpportunities } from "../src/lib/editorial-punctuation.ts";
+import { compileResidualCjkPunctuationOpportunities, filterResidualCjkPunctuationOpportunities } from "../src/lib/editorial-punctuation.ts";
 
 const points = (...offsets) => offsets.map(offset => ({ offset, kind: "punctuation" }));
+const residualCjkPunctuationOpportunities = (text, points, start, end, halts) =>
+  filterResidualCjkPunctuationOpportunities(compileResidualCjkPunctuationOpportunities(text, points), start, end, halts);
 
 test("an ambiguous quote owns one budget despite both boundary candidates", () => {
   assert.deepEqual(residualCjkPunctuationOpportunities('甲"乙丙丁戊己', points(1, 2, 2), 0, 7), [
@@ -46,4 +48,37 @@ test("ownership uses canonical UTF-16 offsets across astral Han", () => {
   assert.deepEqual(residualCjkPunctuationOpportunities('𠮷"乙', points(2, 3), 0, 4), [
     { glyphStart: 2, glyphEnd: 3, offset: 3, direction: "opening", ambiguous: true }
   ]);
+});
+
+test("one compiled table preserves quote direction across every line slice", () => {
+  const text = '甲"乙"丙', boundaries = points(1, 2, 3, 4);
+  const compiled = compileResidualCjkPunctuationOpportunities(text, boundaries);
+  assert.equal(compiled.length, 2);
+  for (let start = 0; start <= text.length; start++) for (let end = start; end <= text.length; end++) {
+    const expected = [];
+    if (start <= 1 && end > 2) expected.push(compiled[0]);
+    if (start < 3 && end >= 4) expected.push(compiled[1]);
+    assert.deepEqual(filterResidualCjkPunctuationOpportunities(compiled, start, end), expected);
+  }
+  assert.equal(compiled[1].direction, "closing");
+});
+
+test("repeated halt filtering excludes only the owning glyph without changing the compiled table", () => {
+  const compiled = compileResidualCjkPunctuationOpportunities('甲"乙"丙，丁', points(1, 2, 3, 4, 5));
+  const original = structuredClone(compiled);
+  assert.equal(compiled.length, 3);
+  const ranges = [
+    [{ start: 1, end: 2 }],
+    [{ start: 3, end: 4 }],
+    [{ start: 5, end: 6 }],
+    [{ start: 2, end: 3 }],
+    [{ start: 1, end: 2 }, { start: 5, end: 6 }]
+  ];
+  for (const halts of ranges) {
+    const owned = new Set(halts.map(halt => halt.start));
+    assert.deepEqual(filterResidualCjkPunctuationOpportunities(compiled, 0, 7, halts),
+      original.filter(point => !owned.has(point.glyphStart)));
+  }
+  assert.deepEqual(compiled, original);
+  assert.deepEqual(filterResidualCjkPunctuationOpportunities(compiled, 0, 7), original);
 });

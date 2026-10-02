@@ -1,5 +1,5 @@
 import { EDITORIAL_FIT_PROFILES, editorialFitMode, type EditorialFitMode, type EditorialFitProfile } from "../lib/editorial-constraints";
-import { isHaltPunctuation, residualCjkPunctuationOpportunities, isClosingCjkPunctuation, isOpeningCjkPunctuation } from "../lib/editorial-punctuation";
+import { compileResidualCjkPunctuationOpportunities, filterResidualCjkPunctuationOpportunities, isHaltPunctuation, isClosingCjkPunctuation, isOpeningCjkPunctuation, type ResidualPunctuationOpportunity } from "../lib/editorial-punctuation";
 import type {
   EditorialAdjustmentKind,
   EditorialIRV1,
@@ -31,14 +31,11 @@ interface PathState {
 }
 const punctuationSegmenter = new Intl.Segmenter("zh-HK", { granularity: "grapheme" });
 function adjustmentCount(
-  text: string,
   ir: EditorialIRV1,
   start: number,
   end: number,
-  kind: EditorialAdjustmentKind,
-  halts: PunctuationHalts = []
+  kind: Exclude<EditorialAdjustmentKind, "punctuation">
 ): number {
-  if (kind === "punctuation") return residualCjkPunctuationOpportunities(text, ir.adjustments, start, end, halts).length;
   return ir.adjustments.filter((point) =>
     point.kind === kind
     && point.offset > start
@@ -131,7 +128,7 @@ function fitEnglishLine(
   measure: (start: number, end: number) => number
 ): EditorialLinePlan | null {
   const em = parseFloat(style.fontSize) || 16;
-  const wordSpaces = adjustmentCount(text, ir, start, end, "word-space");
+  const wordSpaces = adjustmentCount(ir, start, end, "word-space");
   const budget = profile.english;
   const spaceWidth = wordSpaces
     ? measureEditorialText(host, " ", "en", editorialStyleSignature(style, "en", "space"), style)
@@ -232,6 +229,7 @@ function fitEnglishLine(
 function fitCjkLine(
   text: string,
   ir: EditorialIRV1,
+  punctuationOpportunities: ReadonlyArray<ResidualPunctuationOpportunity>,
   start: number,
   end: number,
   hyphen: boolean,
@@ -246,7 +244,7 @@ function fitCjkLine(
 ): EditorialLinePlan | null {
   const em = parseFloat(style.fontSize) || 16;
   const budget = profile.cjk;
-  const punctuation = residualCjkPunctuationOpportunities(text, ir.adjustments, start, end, halts).map(point => ({
+  const punctuation = filterResidualCjkPunctuationOpportunities(punctuationOpportunities, start, end, halts).map(point => ({
     ...point,
     // An ambiguous, narrow quote must not acquire a negative logical advance.
     // Ordinary punctuation retains its existing half-em capacity.
@@ -255,7 +253,7 @@ function fitCjkLine(
       : budget.maxPunctuationCompressionEm * em
   }));
   const punctuationCount = punctuation.length;
-  const hanGapCount = adjustmentCount(text, ir, start, end, "han-gap");
+  const hanGapCount = adjustmentCount(ir, start, end, "han-gap");
   const punctuationCapacity = punctuation.reduce((total, point) => total + point.capacity, 0);
   const trackingExpandCapacity = hanGapCount * budget.maxTrackingExpandEm * em;
   const trackingShrinkCapacity = hanGapCount * budget.maxTrackingShrinkEm * em;
@@ -345,13 +343,13 @@ function fitCjkLine(
 /** Search a bounded set of on/off punctuation clusters. Every alternative is
  * measured with native kern/locl still enabled; no 0.5em savings are summed. */
 function fitCjkWithHalt(
-  text: string, ir: EditorialIRV1, start: number, end: number,
+  text: string, ir: EditorialIRV1, punctuationOpportunities: ReadonlyArray<ResidualPunctuationOpportunity>, start: number, end: number,
   hyphen: boolean, final: boolean, target: number, naturalAdvance: number, hyphenWidth: number,
   style: CSSStyleDeclaration, profile: EditorialFitProfile,
   measure: (start: number, end: number) => number,
   measureInline: (start: number, end: number, halts?: PunctuationHalts) => number
 ): EditorialLinePlan | null {
-  let best = fitCjkLine(text, ir, start, end, hyphen, final, target, naturalAdvance, hyphenWidth, style, profile, measure);
+  let best = fitCjkLine(text, ir, punctuationOpportunities, start, end, hyphen, final, target, naturalAdvance, hyphenWidth, style, profile, measure);
   // Halt never changes a final line or an already-short candidate. Native
   // shaping remains the cheapest choice when discrete compression cannot help.
   if (final || naturalAdvance <= target || !style.fontFamily.includes("Zhudou Sans")) return best;
@@ -370,8 +368,8 @@ function fitCjkWithHalt(
   }
   const boundedGroups = groups.slice(0, 8);
   const haltCapacity = boundedGroups.reduce((sum, range) => sum + (range.end - range.start) * 0.5 * em, 0);
-  const residualCapacity = adjustmentCount(text, ir, start, end, "punctuation") * profile.cjk.maxPunctuationCompressionEm * em
-    + adjustmentCount(text, ir, start, end, "han-gap") * profile.cjk.maxTrackingShrinkEm * em
+  const residualCapacity = filterResidualCjkPunctuationOpportunities(punctuationOpportunities, start, end).length * profile.cjk.maxPunctuationCompressionEm * em
+    + adjustmentCount(ir, start, end, "han-gap") * profile.cjk.maxTrackingShrinkEm * em
     + 2 * profile.cjk.maxPunctuationHangEm * em;
   // Optimistic upper bound only prunes impossible candidates; actual savings
   // and the selected plan still come from whole-sequence browser measurement.
@@ -388,7 +386,7 @@ function fitCjkWithHalt(
     // interpreting halt as a continuously adjustable advance reduction.
     if (reduction <= 0.25 || reduction > glyphCount * 0.5 * em + 0.5) return;
     const shapedMeasure = (from: number, to: number) => measureInline(from, to, halts);
-    const fitted = fitCjkLine(text, ir, start, end, hyphen, final, target, advance, hyphenWidth, style, profile, shapedMeasure, halts);
+    const fitted = fitCjkLine(text, ir, punctuationOpportunities, start, end, hyphen, final, target, advance, hyphenWidth, style, profile, shapedMeasure, halts);
     if (!fitted) return;
     const fitPenalty = fitted.fitPenalty + 0.08 * glyphCount;
     if (best && fitPenalty >= best.fitPenalty - 0.0001) return;
@@ -417,6 +415,7 @@ function fitCjkWithHalt(
 function fitLine(
   text: string,
   ir: EditorialIRV1,
+  punctuationOpportunities: ReadonlyArray<ResidualPunctuationOpportunity>,
   start: number,
   end: number,
   hyphen: boolean,
@@ -438,8 +437,8 @@ function fitLine(
       host, style, profile, measure
     );
   }
-  if (!enableHalt) return fitCjkLine(text, ir, start, end, hyphen, final, target, naturalAdvance, hyphenWidth, style, profile, measure);
-  return fitCjkWithHalt(text, ir, start, end, hyphen, final, target, naturalAdvance, hyphenWidth, style, profile, measure, measureInline);
+  if (!enableHalt) return fitCjkLine(text, ir, punctuationOpportunities, start, end, hyphen, final, target, naturalAdvance, hyphenWidth, style, profile, measure);
+  return fitCjkWithHalt(text, ir, punctuationOpportunities, start, end, hyphen, final, target, naturalAdvance, hyphenWidth, style, profile, measure, measureInline);
 }
 function semanticTier(state: PathState): number {
   return state.unsafeBreaks > 0 ? 1 : 0;
@@ -616,6 +615,9 @@ function solveAtTarget(text: string, ir: EditorialIRV1, host: HTMLElement, targe
   const role = ir.role as EditorialRole;
   const mode = editorialFitMode(role, ir.locale);
   if (mode === "native") return null;
+  const punctuationOpportunities = mode === "cjk-optical"
+    ? compileResidualCjkPunctuationOpportunities(text, ir.adjustments)
+    : [];
   const profile = EDITORIAL_FIT_PROFILES[role];
   const context = editorialMeasurementContext(host, ir);
   const { style, language, signature } = context;
@@ -655,6 +657,7 @@ function solveAtTarget(text: string, ir: EditorialIRV1, host: HTMLElement, targe
       const fittedLine = fitLine(
         text,
         ir,
+        punctuationOpportunities,
         widthStart,
         widthEnd,
         to.hyphen,

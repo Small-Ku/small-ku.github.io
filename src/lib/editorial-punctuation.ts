@@ -41,12 +41,9 @@ export interface ResidualPunctuationOpportunity {
 /** Assign one directional resource to each isolated glyph. Boundary candidates
  * are not glyph budgets: U+0022 can otherwise be counted on both sides. Quote
  * pairing is canonical-text-wide so a line break cannot change its direction. */
-export function residualCjkPunctuationOpportunities(
+export function compileResidualCjkPunctuationOpportunities(
   text: string,
-  points: ReadonlyArray<{ offset: number; kind: string }>,
-  start: number,
-  end: number,
-  halts: ReadonlyArray<{ start: number; end: number }> = []
+  points: ReadonlyArray<{ offset: number; kind: string }>
 ): ResidualPunctuationOpportunity[] {
   const boundaries = new Set(points.filter(point => point.kind === "punctuation").map(point => point.offset));
   const opportunities: ResidualPunctuationOpportunity[] = [];
@@ -60,14 +57,28 @@ export function residualCjkPunctuationOpportunities(
     const ambiguous = opening && closing;
     const direction = opening && (!closing || quoteOpen) ? "opening" : "closing";
     if (ambiguous) quoteOpen = !quoteOpen;
-    if ((!opening && !closing) || glyphStart < start || cursor > end) continue;
+    if (!opening && !closing) continue;
     const offset = direction === "opening" ? cursor : glyphStart;
-    if (offset <= start || offset >= end || !boundaries.has(offset)) continue;
+    if (offset <= 0 || offset >= text.length || !boundaries.has(offset)) continue;
     if (!isResidualCjkPunctuationAdjustmentBoundary(text, offset)) continue;
-    if (halts.some(halt => glyphStart < halt.end && cursor > halt.start)) continue;
     opportunities.push({ offset, glyphStart, glyphEnd: cursor, direction, ambiguous });
   }
   return opportunities;
+}
+
+/** Candidate filtering uses canonical ownership without reclassifying text.
+ * Halt removes only opportunities whose owning glyph overlaps a selected range. */
+export function filterResidualCjkPunctuationOpportunities(
+  opportunities: ReadonlyArray<ResidualPunctuationOpportunity>,
+  start: number,
+  end: number,
+  halts: ReadonlyArray<{ start: number; end: number }> = []
+): ResidualPunctuationOpportunity[] {
+  return opportunities.filter(point =>
+    point.glyphStart >= start && point.glyphEnd <= end
+    && point.offset > start && point.offset < end
+    && !halts.some(halt => point.glyphStart < halt.end && point.glyphEnd > halt.start)
+  );
 }
 
 /** Full-width CJK punctuation with Zhudou's discrete half-width alternate.
