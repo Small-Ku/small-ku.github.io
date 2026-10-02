@@ -69,15 +69,14 @@ export function bindEditorialComposer(scope: ParentNode = document): void {
   if (typeof ResizeObserver !== "undefined") {
     editorialResizeObserver?.disconnect();
     editorialResizeObserver = new ResizeObserver((entries) => {
-      const meaningful = entries.some(({ target, contentRect }) => {
+      let meaningful = false;
+      for (const { target, contentRect } of entries) {
         const width = contentRect.width;
         const previous = observedWidths.get(target) ?? 0;
         observedWidths.set(target, width);
-        return width > 0 && Math.abs(width - previous) >= 0.5;
-      });
-      if (meaningful) {
-        scheduleResize();
+        if (width > 0 && Math.abs(width - previous) >= 0.5) meaningful = true;
       }
+      if (meaningful) scheduleResize();
     });
     scope.querySelectorAll<HTMLElement>("[data-editorial-root]").forEach((root) => {
       if (composableEditorialRoot(root)) editorialResizeObserver?.observe(root.parentElement ?? root);
