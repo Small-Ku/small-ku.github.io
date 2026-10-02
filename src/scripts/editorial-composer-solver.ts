@@ -1,4 +1,4 @@
-import { EDITORIAL_FIT_PROFILES, editorialFitMode, type EditorialFitProfile } from "../lib/editorial-constraints";
+import { EDITORIAL_FIT_PROFILES, editorialFitMode, type EditorialFitMode, type EditorialFitProfile } from "../lib/editorial-constraints";
 import { isHaltPunctuation, residualCjkPunctuationOpportunities, isClosingCjkPunctuation, isOpeningCjkPunctuation } from "../lib/editorial-punctuation";
 import type {
   EditorialAdjustmentKind,
@@ -429,21 +429,17 @@ function fitLine(
   profile: EditorialFitProfile,
   measure: (start: number, end: number) => number,
   measureInline: (start: number, end: number, halts?: PunctuationHalts) => number,
+  mode: Exclude<EditorialFitMode, "native">,
   enableHalt: boolean
 ): EditorialLinePlan | null {
-  const mode = editorialFitMode(ir.role as EditorialRole, ir.locale);
   if (mode === "english-rag") {
     return fitEnglishLine(
       text, ir, start, end, hyphen, final, target, naturalAdvance, hyphenWidth,
       host, style, profile, measure
     );
   }
-  if (mode === "cjk-optical") {
-    if (!enableHalt) return fitCjkLine(text, ir, start, end, hyphen, final, target, naturalAdvance, hyphenWidth, style, profile, measure);
-    return fitCjkWithHalt(text, ir, start, end, hyphen, final, target, naturalAdvance, hyphenWidth, style, profile, measure, measureInline);
-  }
-  if (naturalAdvance > target + 0.25) return null;
-  return makeLinePlan(start, end, hyphen, final, target, naturalAdvance, 0, 0, 0, 0, 0, 0, 0, 0, []);
+  if (!enableHalt) return fitCjkLine(text, ir, start, end, hyphen, final, target, naturalAdvance, hyphenWidth, style, profile, measure);
+  return fitCjkWithHalt(text, ir, start, end, hyphen, final, target, naturalAdvance, hyphenWidth, style, profile, measure, measureInline);
 }
 function semanticTier(state: PathState): number {
   return state.unsafeBreaks > 0 ? 1 : 0;
@@ -618,6 +614,8 @@ function compareFinalStates(a: PathState, b: PathState, target: number, role: Ed
 
 function solveAtTarget(text: string, ir: EditorialIRV1, host: HTMLElement, target: number, enableHalt: boolean): SolveResult | null {
   const role = ir.role as EditorialRole;
+  const mode = editorialFitMode(role, ir.locale);
+  if (mode === "native") return null;
   const profile = EDITORIAL_FIT_PROFILES[role];
   const context = editorialMeasurementContext(host, ir);
   const { style, language, signature } = context;
@@ -669,6 +667,7 @@ function solveAtTarget(text: string, ir: EditorialIRV1, host: HTMLElement, targe
         profile,
         measure,
         measureInline,
+        mode,
         enableHalt
       );
       if (!fittedLine) continue;
