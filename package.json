@@ -12,10 +12,13 @@
   },
   "dependencies": {
     "astro": "7.3.3",
+    "budoux": "0.9.3",
     "sass": "1.104.1"
   },
   "devDependencies": {
     "@astrojs/check": "0.9.10",
+    "@astrojs/markdown-remark": "7.3.1",
+    "hyphen": "1.14.1",
     "typescript": "6.0.3"
   },
   "engines": {

@@ -1,6 +1,7 @@
 import { bindFilterSwitch } from "./filter-switch";
 import { bindTimelineFilter } from "./timeline";
 import { bindThemeControls } from "./theme";
+import { bindEditorialComposer } from "./editorial-composer";
 import {
   fetchNavigationDocument,
   installNavigationDocument
@@ -118,6 +119,7 @@ async function performNavigation(url: URL, anchor: HTMLAnchorElement | null, pus
 
   const update = async () => {
     const currentMain = installNavigationDocument(nextDocument);
+    bindEditorialComposer(currentMain);
     bindThemeControls();
     bindFilterSwitch(currentMain);
     bindTimelineFilter();

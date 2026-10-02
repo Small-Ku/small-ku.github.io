@@ -4,6 +4,7 @@ import SiteLayout from "../../../layouts/SiteLayout.astro";
 import { siteConfig } from "../../../site.config";
 import { contentKey, displayDate, getProjects, getWriting, htmlDate, projectHref, writingHref } from "../../../lib/content";
 import { absoluteUrl, articleStructuredData } from "../../../lib/seo";
+import EditorialText from "../../../components/EditorialText.astro";
 
 export async function getStaticPaths() {
   const writing = await getWriting("zh");
@@ -46,8 +47,8 @@ const structuredData = articleStructuredData({
       <span class="eyebrow">{entry.data.kind}</span>
       <time class="meta" datetime={htmlDate(entry.data.date)}>{displayDate(entry.data.date)}</time>
     </div>
-    <div class="article-head__title-slot" data-vt-writing-title><h1 class="article-head__title">{entry.data.title}</h1></div>
-    <p class="article-head__dek">{entry.data.summary}</p>
+    <div class="article-head__title-slot" data-vt-writing-title><h1 class="article-head__title" data-editorial-role="display"><EditorialText text={entry.data.title} locale="zh" role="display" breakHints={entry.data.displayBreakHints} /></h1></div>
+    <p class="article-head__dek" data-editorial-role="intro"><EditorialText text={entry.data.summary} locale="zh" role="intro" /></p>
     {relatedProjects.length > 0 && (
       <div class="article-head__relations meta">
         關聯 /

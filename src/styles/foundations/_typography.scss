@@ -1,6 +1,146 @@
+@font-face {
+  font-family: "Zhudou Sans";
+  src: url("/fonts/zhudou/ZhudouSansVF.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+}
 h1, h2, h3, p { margin-top: 0; }
-h1, h2, h3 { text-wrap: balance; }
-p { text-wrap: pretty; }
+.prose { text-wrap: pretty; }
+
+:lang(en) .prose {
+  text-align: start;
+  hyphens: auto;
+  hyphenate-limit-chars: 8 3 3;
+}
+
+[data-editorial-role="display"] {
+  text-wrap: balance;
+  line-break: normal;
+  hyphens: manual;
+  overflow-wrap: normal;
+}
+
+[data-editorial-role="intro"] {
+  text-wrap: pretty;
+  hyphens: none;
+  word-break: normal;
+  overflow-wrap: normal;
+}
+
+[data-editorial-role="compact"] {
+  text-wrap: pretty;
+  hyphens: none;
+  word-break: normal;
+  overflow-wrap: normal;
+}
+
+[data-editorial-role="technical"] {
+  hyphens: none;
+  overflow-wrap: anywhere;
+}
+
+[lang="en"] {
+  hyphens: auto;
+  hyphenate-limit-chars: 8 3 3;
+}
+
+[data-editorial-role="display"] [lang="en"] {
+  hyphens: manual;
+}
+
+[data-editorial-role="intro"] [lang="en"] {
+  hyphens: none;
+}
+
+[data-editorial-role="compact"] [lang="en"] {
+  hyphens: none;
+}
+
+.editorial-keep-together {
+  white-space: nowrap;
+}
+
+.editorial-text {
+  white-space: inherit;
+  letter-spacing: inherit;
+}
+
+/* English editorial runs keep the component-authored tracking. Line-fit adjustment is
+ * applied at surrounding break/space boundaries, never as per-line Latin tracking. */
+.editorial-text [lang="en"],
+.writing-line-fragment,
+.writing-line-fragment [lang="en"] { letter-spacing: inherit; }
+.editorial-composed-line {
+  display: inline;
+  white-space: nowrap;
+  /* Native CJK punctuation trimming is useful on native layout. Once a
+   * LinePlan is materialized, punctuation width is owned by the plan instead. */
+  text-spacing-trim: space-all;
+}
+.editorial-composed-line:not(:last-child)::after {
+  /* Force the selected LinePlan without making line wrappers block boxes.
+   * Generated content is presentation-only and does not enter canonical DOM,
+   * selection text, or clipboard text. Zero metrics preserve the real line box. */
+  content: "\A";
+  white-space: pre;
+  font-size: 0;
+  line-height: 0;
+}
+.editorial-composed-hyphen::after { content: "‐"; display: inline; }
+html[data-editorial-js="true"] [data-editorial-pending="true"] { visibility: hidden; }
+
+/* Selected binary alternate widths retain kerning and HK-localized glyphs. */
+.editorial-punctuation-halt {
+  font-feature-settings: "kern" 1, "locl" 1, "halt" 1;
+}
+
+[data-editorial-root]:lang(zh-HK),
+.prose:lang(zh-HK) {
+  font-family: "Zhudou Sans", var(--ft-font-sans);
+  font-kerning: normal;
+  font-feature-settings: "kern" 1, "locl" 1;
+}
+
+.writing-line-fragment:lang(zh-HK) {
+  font-family: "Zhudou Sans", var(--ft-font-sans);
+  font-kerning: normal;
+  font-feature-settings: "kern" 1, "locl" 1;
+}
+
+[data-editorial-root]:lang(zh-HK) [lang="en"],
+:lang(zh-HK) .prose [lang="en"],
+:lang(zh-HK) .writing-line-fragment [lang="en"] {
+  font-family: var(--ft-font-sans);
+}
+:lang(zh-HK) {
+  line-break: normal;
+  text-autospace: normal;
+}
+
+:lang(zh-HK) [data-editorial-role="display"] {
+  line-break: strict;
+}
+
+:lang(zh-HK) .prose {
+  max-inline-size: 36ic;
+  text-align: start;
+  word-break: normal;
+  overflow-wrap: normal;
+}
+
+:lang(zh-HK) .prose [lang="en"] {
+  hyphens: auto;
+}
+
+@supports (text-spacing-trim: trim-start) {
+  :lang(zh-HK) [data-editorial-role="display"],
+  :lang(zh-HK) [data-editorial-role="intro"],
+  :lang(zh-HK) .prose {
+    text-spacing-trim: trim-start;
+  }
+}
+
 .eyebrow,
 .meta {
   font-family: var(--ft-font-mono);

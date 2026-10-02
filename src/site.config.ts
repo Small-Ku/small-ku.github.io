@@ -1,3 +1,5 @@
+import type { DisplayBreakHint } from "./lib/editorial-ir";
+
 export interface SiteConfig {
   name: string;
   title: string;
@@ -17,6 +19,7 @@ export interface SiteConfig {
   hero: {
     title: string;
     lede: string;
+    displayBreakHints?: DisplayBreakHint[];
   };
   navigation: Array<{ label: string; href: string }>;
   social: Array<{ label: string; href: string }>;
@@ -40,6 +43,7 @@ export interface LocaleConfig {
   hero: {
     title: string;
     lede: string;
+    displayBreakHints?: DisplayBreakHint[];
   };
   navigation: Array<{ label: string; path: string }>;
   footerNote: string;
@@ -71,7 +75,11 @@ export const siteConfig: SiteConfig = {
       description: "A personal site of Small-Ku for selected work and writing.",
       hero: {
         title: "Designing interfaces for the real world.",
-        lede: "I work across software engineering and interface design: interfaces for people, and interfaces between systems."
+        lede: "I work across software engineering and interface design: interfaces for people, and interfaces between systems.",
+        displayBreakHints: [
+          { afterText: "Designing" },
+          { afterText: "interfaces for" }
+        ]
       },
       navigation: [{ label: "Timeline", path: "timeline" }],
       footerNote: "Personal work and writing of KU Chun Hei, @Small-Ku.",
@@ -85,9 +93,9 @@ export const siteConfig: SiteConfig = {
       rssLabel: "RSS"
     },
     zh: {
-      language: "zh-Hant",
-      locale: "zh_TW",
-      hreflang: "zh-Hant",
+      language: "zh-HK",
+      locale: "zh_HK",
+      hreflang: "zh-HK",
       path: "zh",
       label: "中文",
       title: "Chun Hei Ku — 設計與工程",
@@ -112,7 +120,11 @@ export const siteConfig: SiteConfig = {
   ogImage: null,
   hero: {
     title: "Designing interfaces for the real world.",
-    lede: "I work across software engineering and interface design: interfaces for people, and interfaces between systems."
+    lede: "I work across software engineering and interface design: interfaces for people, and interfaces between systems.",
+    displayBreakHints: [
+      { afterText: "Designing" },
+      { afterText: "interfaces for" }
+    ]
   },
   navigation: [{ label: "Timeline", href: "/timeline/" }],
   social: [],

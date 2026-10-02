@@ -18,6 +18,13 @@ function validPartialDate(value: string): boolean {
 
 const partialDate = z.string().refine(validPartialDate, "Use a real date in YYYY, YYYY-MM, or YYYY-MM-DD form");
 const tags = z.array(z.string().trim().min(1)).default([]);
+const displayBreakHints = z.array(z.union([
+  z.object({
+    word: z.string().trim().min(1),
+    after: z.string().trim().min(1)
+  }),
+  z.object({ afterText: z.string().trim().min(1) })
+])).default([]);
 const locale = z.enum(["en", "zh"]).default("en");
 const translationKey = z.string().trim().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/).optional();
 
@@ -27,6 +34,7 @@ const projects = defineCollection({
     locale,
     translationKey,
     title: z.string().trim().min(1),
+    displayBreakHints,
     kicker: z.string().trim().min(1).default("Project"),
     summary: z.string().trim().min(1),
     date: partialDate,
@@ -56,6 +64,7 @@ const writing = defineCollection({
     locale,
     translationKey,
     title: z.string().trim().min(1),
+    displayBreakHints,
     summary: z.string().trim().min(1),
     date: partialDate,
     updated: partialDate.optional(),

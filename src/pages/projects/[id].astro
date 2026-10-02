@@ -15,6 +15,7 @@ import {
   relatedWriting
 } from "../../lib/content";
 import { absoluteUrl, projectStructuredData } from "../../lib/seo";
+import EditorialText from "../../components/EditorialText.astro";
 
 export async function getStaticPaths() {
   const projects = await getProjects();
@@ -79,10 +80,10 @@ const structuredData = projectStructuredData({
       <div class="work-head__copy" data-vt-project-copy>
         <p class="eyebrow" data-vt-project-eyebrow>Project / {project.data.status} / {displayYear(project.data.date)}</p>
         <div class="work-head__title-slot" data-vt-project-title>
-          <h1 class="article-head__title">{project.data.title}</h1>
+          <h1 class="article-head__title" data-editorial-role="display"><EditorialText text={project.data.title} locale="en" role="display" breakHints={project.data.displayBreakHints} /></h1>
         </div>
         <div class="work-head__supporting" data-vt-project-supporting>
-          <p class="article-head__dek">{project.data.summary}</p>
+          <p class="article-head__dek" data-editorial-role="intro"><EditorialText text={project.data.summary} locale="en" role="intro" /></p>
           <div class="work-head__actions">
             {project.data.externalUrl && <a class="button button--secondary" href={project.data.externalUrl}>Visit <Icon name="arrow-up-right" class="button__icon" /></a>}
             {project.data.sourceUrl && <a class="button button--secondary" href={project.data.sourceUrl}>Source <Icon name="arrow-up-right" class="button__icon" /></a>}

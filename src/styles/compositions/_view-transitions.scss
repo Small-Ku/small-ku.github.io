@@ -128,7 +128,7 @@ html[data-motion-type="representation-change"] {
 ::view-transition-old(writing-title),
 ::view-transition-new(writing-title) { mix-blend-mode: normal; }
 
-@for $i from 1 through 8 {
+@for $i from 1 through 16 {
   ::view-transition-group(writing-line-#{$i}) {
     z-index: 35;
     animation-duration: var(--ft-motion-route);
