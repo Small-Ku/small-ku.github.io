@@ -15,7 +15,6 @@ export type EditorialBreakReason =
 
 export type EditorialAdjustmentKind =
   | "han-gap"
-  | "han-latin-gap"
   | "word-space"
   | "punctuation";
 

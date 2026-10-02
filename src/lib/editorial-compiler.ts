@@ -254,7 +254,6 @@ export function compileEditorialText(
     }
 
     if (left === "han" && right === "han") adjustments.push({ offset: current.end, kind: "han-gap" });
-    else if ((left === "han" && right === "latin") || (left === "latin" && right === "han")) adjustments.push({ offset: current.end, kind: "han-latin-gap" });
   }
 
   return {
