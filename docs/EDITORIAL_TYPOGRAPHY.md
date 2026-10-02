@@ -181,7 +181,7 @@ Token measurement depends on computed typography, not on a precompiled platform 
 
 Container inline size is not part of token measurement. It selects and solves a plan from measured token advances.
 
-Resize and font settlement may trigger re-solving. Coalesce resize work and restore canonical DOM before re-materializing so the composer never measures its own old presentation structure as source content.
+Resize and actual font-load completion (`loadingdone`) may trigger re-solving. The already-resolved `document.fonts.ready` promise is not used as a second settlement signal: on an already-settled document it only repeats the same expensive solve. Coalesce resize work and restore canonical DOM before re-materializing so the composer never measures its own old presentation structure as source content.
 
 ## DOM and serialization
 

@@ -65,7 +65,6 @@ export function bindEditorialComposer(scope: ParentNode = document): void {
       scheduleResize();
     };
     document.fonts.addEventListener("loadingdone", fontSettled);
-    void document.fonts.ready.then(fontSettled);
   }
   if (typeof ResizeObserver !== "undefined") {
     editorialResizeObserver?.disconnect();
