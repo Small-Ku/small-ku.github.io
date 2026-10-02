@@ -195,7 +195,7 @@ The current renderer still materializes inline line wrappers plus language/adjus
 
 Typography owns final live geometry; motion does not own or trust typography wrappers.
 
-Writing transitions re-derive actual visual lines from the live DOM using grapheme-safe `Range.getClientRects()`. `LinePlan` may explain why the renderer produced those lines, but transition segmentation uses measured visual geometry.
+Writing transitions re-derive actual visual lines from the live DOM using grapheme-safe `Range.getClientRects()`. `LinePlan` may explain why the renderer produced those lines, but transition segmentation uses measured visual geometry. Hidden destination premeasurement keeps the complete destination shell/body in layout to preserve scrollbar and container geometry, but composes only the matched writing title; surrounding editorial roots are irrelevant to the predicted title line plan.
 
 Visual-line detection compares the central vertical bands of glyph Range boxes rather than requiring identical tops: multilingual fallback fonts can have different ascents on the same baseline. Typography's native acceptance and motion use the same geometric rule. Temporary fragments retain component-authored tracking; tracking is never normalized to compensate for segmentation.
 

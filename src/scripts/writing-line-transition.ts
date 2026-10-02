@@ -284,10 +284,12 @@ function measureIncomingWritingLines(
   if (cloneSiteShell) shell.append(cloneSiteShell);
   else shell.append(cloneMain);
   document.body.append(shell);
-  composeEditorialTree(cloneMain);
-
   const cloneRoot = writingRoot(cloneMain, slug);
   const slot = cloneRoot?.querySelector<HTMLElement>("[data-vt-writing-title]") ?? null;
+  // The full destination shell stays in layout so scrollbar/container geometry is real,
+  // but only the matched title needs editorial composition for line prediction.
+  if (slot) composeEditorialTree(slot);
+
   const title = titleTextElement(slot);
   const result = title
     ? { text: titleCanonicalText(title), lines: titleLineSegments(title) }
