@@ -10,7 +10,8 @@
     "preview": "astro preview",
     "check": "astro check",
     "test:punctuation": "node --experimental-strip-types --test tests/editorial-punctuation.test.mjs",
-    "test:punctuation:browser": "node --experimental-strip-types tests/editorial-punctuation-browser.mjs"
+    "test:punctuation:browser": "node --experimental-strip-types tests/editorial-punctuation-browser.mjs",
+    "test:transition-ownership:browser": "node tests/editorial-transition-ownership-browser.mjs"
   },
   "dependencies": {
     "astro": "7.3.3",

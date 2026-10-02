@@ -213,7 +213,7 @@ canonical DOM
 
 If measured geometry disagrees with the expected layout, motion falls back to measured ranges or opacity/translation handoff rather than distorting glyphs. Scroll intent still wins and skips the transition.
 
-Presentation hyphens are temporary, aria-hidden, and excluded from canonical copy. Cleanup must restore the canonical DOM exactly.
+Presentation hyphens are temporary, aria-hidden, and excluded from canonical copy. Cleanup must restore the canonical DOM exactly. Motion may clone disposable Range fragments for animation, but source/target title cleanup retains and reinstalls the original child node identities because renderer canonical/composed ownership is identity-keyed.
 
 ## Acceptance and browser review
 

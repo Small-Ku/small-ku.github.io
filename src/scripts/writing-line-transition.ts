@@ -383,9 +383,11 @@ function fragmentWritingTitle(
   return true;
 }
 
+// Preserve the original child nodes themselves: renderer canonical/composed ownership
+// is keyed by node identity, so cloning here would orphan its WeakMap/WeakSet state.
 function restoreWritingTitle(title: HTMLElement | null, children: Node[] | null): void {
   if (!title?.querySelector(".writing-line-fragment")) return;
-  if (children) title.replaceChildren(...children.map((node) => node.cloneNode(true)));
+  if (children) title.replaceChildren(...children);
   else title.textContent = "";
 }
 
@@ -428,7 +430,7 @@ export function prepareWritingLineMorph(
     text,
     sourceTitle,
     targetTitle: null,
-    sourceChildren: Array.from(sourceTitle.childNodes, (node) => node.cloneNode(true)),
+    sourceChildren: Array.from(sourceTitle.childNodes),
     targetChildren: null,
     sourceLines,
     targetLines,
@@ -450,7 +452,7 @@ export function retargetWritingLineMorph(morph: WritingLineMorph, targetSlot: HT
   const actualLines = titleLineSegments(target);
   if (!sameLinePlan(actualLines, morph.targetLines)) return false;
 
-  morph.targetChildren = Array.from(target.childNodes, (node) => node.cloneNode(true));
+  morph.targetChildren = Array.from(target.childNodes);
   if (!fragmentWritingTitle(target, morph, morph.targetLines)) {
     morph.targetChildren = null;
     return false;
