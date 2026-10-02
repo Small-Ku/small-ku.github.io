@@ -1,6 +1,6 @@
 import { EDITORIAL_FIT_PROFILES } from "../lib/editorial-constraints";
 import { editorialInlineTarget, invalidateEditorialMeasurements, nativeEditorialLayoutAcceptable } from "./editorial-composer-geometry";
-import { composableEditorialRoot, validEditorialIR } from "./editorial-composer-policy";
+import { composableEditorialRoot, editorialIRForRoot } from "./editorial-composer-policy";
 import {
   applyEditorialPlan,
   canonicalEditorialText,
@@ -19,10 +19,9 @@ function composeRoot(root: HTMLElement): void {
   if (!policy) { delete root.dataset.editorialPending; return; }
   rememberEditorialCanonicalChildren(root);
   const { role, locale } = policy;
-  let ir: unknown;
-  try { ir = JSON.parse(root.dataset.editorialIr ?? "null"); } catch { delete root.dataset.editorialPending; return; }
   const text = canonicalEditorialText(root);
-  if (!validEditorialIR(ir, text.length, role, locale)) { delete root.dataset.editorialPending; return; }
+  const ir = editorialIRForRoot(root, text, role, locale);
+  if (!ir) { delete root.dataset.editorialPending; return; }
   const target = editorialInlineTarget(root);
   if (target <= 0) { delete root.dataset.editorialPending; return; }
   const profile = EDITORIAL_FIT_PROFILES[role];

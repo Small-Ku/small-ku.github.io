@@ -8,6 +8,16 @@ export function composableEditorialRoot(root: HTMLElement): { role: EditorialRol
   if (locale !== "en" && locale !== "zh") return null;
   return editorialFitMode(role, locale) === "native" ? null : { role, locale };
 }
+interface CachedEditorialIR {
+  source: string;
+  text: string;
+  role: EditorialRole;
+  locale: "en" | "zh";
+  ir: EditorialIRV1 | null;
+}
+
+const editorialIrCache = new WeakMap<HTMLElement, CachedEditorialIR>();
+
 export function validEditorialIR(value: unknown, canonicalLength: number, role: EditorialRole, locale: "en" | "zh"): value is EditorialIRV1 {
   if (!value || typeof value !== "object") return false;
   const ir = value as Partial<EditorialIRV1>;
@@ -20,4 +30,23 @@ export function validEditorialIR(value: unknown, canonicalLength: number, role: 
   }
   if (cursor !== canonicalLength) return false;
   return ir.breaks.every((candidate) => Number.isInteger(candidate.offset) && candidate.offset > 0 && candidate.offset < canonicalLength && Array.isArray(candidate.reasons));
+}
+
+export function editorialIRForRoot(
+  root: HTMLElement,
+  text: string,
+  role: EditorialRole,
+  locale: "en" | "zh"
+): EditorialIRV1 | null {
+  const source = root.dataset.editorialIr ?? "";
+  const cached = editorialIrCache.get(root);
+  if (cached && cached.source === source && cached.text === text && cached.role === role && cached.locale === locale) {
+    return cached.ir;
+  }
+
+  let value: unknown;
+  try { value = JSON.parse(source || "null"); } catch { value = null; }
+  const ir = validEditorialIR(value, text.length, role, locale) ? value : null;
+  editorialIrCache.set(root, { source, text, role, locale, ir });
+  return ir;
 }
