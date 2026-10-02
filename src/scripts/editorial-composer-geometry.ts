@@ -10,25 +10,37 @@ export function invalidateEditorialMeasurements(): void {
   measurementCache.clear();
 }
 
+export interface EditorialMeasurementContext {
+  language: string;
+  signature: string;
+  style: CSSStyleDeclaration;
+}
+
 export function editorialStyleSignature(style: CSSStyleDeclaration, lang: string, role: string): string {
   return [style.fontFamily, style.fontSize, style.fontWeight, style.fontStretch, style.fontStyle,
     style.letterSpacing, style.fontKerning, style.fontFeatureSettings, style.fontVariant,
     style.fontVariationSettings, style.textAutospace, lang, role].join("|");
 }
 
-function measurementBox(host: HTMLElement, lang: string): HTMLElement {
-  const box = document.createElement("span");
+export function editorialMeasurementContext(host: HTMLElement, ir: EditorialIRV1): EditorialMeasurementContext {
   const style = getComputedStyle(host);
+  const language = editorialLanguage(host, ir);
+  return { language, signature: editorialStyleSignature(style, language, ir.role), style };
+}
+
+function measurementBox(host: HTMLElement, lang: string, style?: CSSStyleDeclaration): HTMLElement {
+  const box = document.createElement("span");
+  const measuredStyle = style ?? getComputedStyle(host);
   Object.assign(box.style, {
     position: "fixed", insetInlineStart: "-100000px", insetBlockStart: "0", display: "inline-block",
     whiteSpace: "pre", inlineSize: "max-content", blockSize: "auto", visibility: "hidden", pointerEvents: "none",
-    font: style.font, fontFamily: style.fontFamily, fontSize: style.fontSize, fontWeight: style.fontWeight,
-    fontStretch: style.fontStretch, fontStyle: style.fontStyle, letterSpacing: style.letterSpacing,
-    fontKerning: style.fontKerning, fontFeatureSettings: style.fontFeatureSettings,
-    fontVariationSettings: style.fontVariationSettings, fontVariant: style.fontVariant,
+    font: measuredStyle.font, fontFamily: measuredStyle.fontFamily, fontSize: measuredStyle.fontSize, fontWeight: measuredStyle.fontWeight,
+    fontStretch: measuredStyle.fontStretch, fontStyle: measuredStyle.fontStyle, letterSpacing: measuredStyle.letterSpacing,
+    fontKerning: measuredStyle.fontKerning, fontFeatureSettings: measuredStyle.fontFeatureSettings,
+    fontVariationSettings: measuredStyle.fontVariationSettings, fontVariant: measuredStyle.fontVariant,
     // Match the custom renderer's untrimmed baseline. Native trim must not
     // silently shrink the measurement and then disappear on materialization.
-    textSpacingTrim: "space-all", textAutospace: style.textAutospace
+    textSpacingTrim: "space-all", textAutospace: measuredStyle.textAutospace
   });
   box.lang = lang;
   box.dataset.editorialRoot = "";
@@ -49,11 +61,11 @@ function measuredWidth(box: HTMLElement, key: string, valid?: (box: HTMLElement)
   return width;
 }
 
-export function measureEditorialText(host: HTMLElement, text: string, lang: string, signature: string): number {
+export function measureEditorialText(host: HTMLElement, text: string, lang: string, signature: string, style?: CSSStyleDeclaration): number {
   const key = `${signature}\u0000${text}`;
   const cached = measurementCache.get(key);
   if (cached !== undefined) return cached;
-  const box = measurementBox(host, lang);
+  const box = measurementBox(host, lang, style);
   box.textContent = text;
   return measuredWidth(box, key);
 }
@@ -65,17 +77,19 @@ export function editorialLanguage(host: HTMLElement, ir: EditorialIRV1): string 
 /** Measure native kern/locl and optional discrete halt on the entire candidate,
  * preserving language runs. Kerning savings are never inferred additively. */
 export function measureEditorialInline(
-  host: HTMLElement, text: string, ir: EditorialIRV1, start: number, end: number, halts: PunctuationHalts = []
+  host: HTMLElement, text: string, ir: EditorialIRV1, start: number, end: number, halts: PunctuationHalts = [],
+  context?: EditorialMeasurementContext
 ): number {
-  const lang = editorialLanguage(host, ir);
+  const lang = context?.language ?? editorialLanguage(host, ir);
   const runs = ir.atoms.filter(atom => atom.end > start && atom.start < end)
     .map(atom => `${Math.max(start, atom.start) - start}:${Math.min(end, atom.end) - start}:${atom.lang ?? ""}`).join(",");
   const features = halts.filter(range => range.end > start && range.start < end)
     .map(range => `${Math.max(start, range.start) - start}:${Math.min(end, range.end) - start}`).join(",");
-  const key = `${editorialStyleSignature(getComputedStyle(host), lang, ir.role)}|inline:${runs}|halt:${features}\u0000${text.slice(start, end)}`;
+  const signature = context?.signature ?? editorialStyleSignature(getComputedStyle(host), lang, ir.role);
+  const key = `${signature}|inline:${runs}|halt:${features}\u0000${text.slice(start, end)}`;
   const cached = measurementCache.get(key);
   if (cached !== undefined) return cached;
-  const box = measurementBox(host, lang);
+  const box = measurementBox(host, lang, context?.style);
   appendEditorialInline(box, text, ir, start, end, halts);
   return measuredWidth(box, key, halts.length ? candidate => {
     const nodes = rangesFromTextNodes(candidate);

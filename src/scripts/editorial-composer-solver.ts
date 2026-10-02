@@ -7,7 +7,7 @@ import type {
   EditorialLayoutPlan,
   EditorialRole
 } from "../lib/editorial-ir";
-import { editorialLanguage, editorialStyleSignature, measureEditorialInline, measureEditorialText } from "./editorial-composer-geometry";
+import { editorialMeasurementContext, editorialStyleSignature, measureEditorialInline, measureEditorialText } from "./editorial-composer-geometry";
 import type { PunctuationHalts } from "./editorial-composer-inline";
 
 interface Candidate {
@@ -135,7 +135,7 @@ function fitEnglishLine(
   const wordSpaces = adjustmentCount(text, ir, start, end, "word-space");
   const budget = profile.english;
   const spaceWidth = wordSpaces
-    ? measureEditorialText(host, " ", "en", editorialStyleSignature(style, "en", "space"))
+    ? measureEditorialText(host, " ", "en", editorialStyleSignature(style, "en", "space"), style)
     : 0;
   const rawOverflow = Math.max(0, naturalAdvance - target);
   const hyphenHangCapacity = hyphen
@@ -348,8 +348,9 @@ function fitCjkLine(
 function fitCjkWithHalt(
   text: string, ir: EditorialIRV1, start: number, end: number,
   hyphen: boolean, final: boolean, target: number, naturalAdvance: number, hyphenWidth: number,
-  host: HTMLElement, style: CSSStyleDeclaration, profile: EditorialFitProfile,
-  measure: (start: number, end: number) => number
+  style: CSSStyleDeclaration, profile: EditorialFitProfile,
+  measure: (start: number, end: number) => number,
+  measureInline: (start: number, end: number, halts?: PunctuationHalts) => number
 ): EditorialLinePlan | null {
   let best = fitCjkLine(text, ir, start, end, hyphen, final, target, naturalAdvance, hyphenWidth, style, profile, measure);
   // Halt never changes a final line or an already-short candidate. Native
@@ -378,7 +379,7 @@ function fitCjkWithHalt(
   if (naturalAdvance - target > haltCapacity + residualCapacity + 0.25) return best;
   const alternatives = boundedGroups.map(group => ({
     group,
-    advance: measureEditorialInline(host, text, ir, start, end, [group]) + (hyphen ? hyphenWidth : 0)
+    advance: measureInline(start, end, [group]) + (hyphen ? hyphenWidth : 0)
   })).filter(choice => choice.advance < naturalAdvance - 0.25);
 
   const consider = (halts: PunctuationHalts, advance: number) => {
@@ -387,7 +388,7 @@ function fitCjkWithHalt(
     // Feature selection is binary. Reject unexpected metrics instead of
     // interpreting halt as a continuously adjustable advance reduction.
     if (reduction <= 0.25 || reduction > glyphCount * 0.5 * em + 0.5) return;
-    const shapedMeasure = (from: number, to: number) => measureEditorialInline(host, text, ir, from, to, halts);
+    const shapedMeasure = (from: number, to: number) => measureInline(from, to, halts);
     const fitted = fitCjkLine(text, ir, start, end, hyphen, final, target, advance, hyphenWidth, style, profile, shapedMeasure, halts);
     if (!fitted) return;
     const fitPenalty = fitted.fitPenalty + 0.08 * glyphCount;
@@ -409,7 +410,7 @@ function fitCjkWithHalt(
   alternatives.sort((a, b) => a.advance - b.advance);
   for (let count = 2; count <= alternatives.length; count += 1) {
     const halts = alternatives.slice(0, count).map(choice => choice.group).sort((a, b) => a.start - b.start);
-    consider(halts, measureEditorialInline(host, text, ir, start, end, halts) + (hyphen ? hyphenWidth : 0));
+    consider(halts, measureInline(start, end, halts) + (hyphen ? hyphenWidth : 0));
   }
   return best;
 }
@@ -428,6 +429,7 @@ function fitLine(
   style: CSSStyleDeclaration,
   profile: EditorialFitProfile,
   measure: (start: number, end: number) => number,
+  measureInline: (start: number, end: number, halts?: PunctuationHalts) => number,
   enableHalt: boolean
 ): EditorialLinePlan | null {
   const mode = editorialFitMode(ir.role as EditorialRole, ir.locale);
@@ -439,7 +441,7 @@ function fitLine(
   }
   if (mode === "cjk-optical") {
     if (!enableHalt) return fitCjkLine(text, ir, start, end, hyphen, final, target, naturalAdvance, hyphenWidth, style, profile, measure);
-    return fitCjkWithHalt(text, ir, start, end, hyphen, final, target, naturalAdvance, hyphenWidth, host, style, profile, measure);
+    return fitCjkWithHalt(text, ir, start, end, hyphen, final, target, naturalAdvance, hyphenWidth, style, profile, measure, measureInline);
   }
   if (naturalAdvance > target + 0.25) return null;
   return makeLinePlan(start, end, hyphen, final, target, naturalAdvance, 0, 0, 0, 0, 0, 0, 0, 0, []);
@@ -618,13 +620,14 @@ function compareFinalStates(a: PathState, b: PathState, target: number, role: Ed
 function solveAtTarget(text: string, ir: EditorialIRV1, host: HTMLElement, target: number, enableHalt: boolean): SolveResult | null {
   const role = ir.role as EditorialRole;
   const profile = EDITORIAL_FIT_PROFILES[role];
-  const style = getComputedStyle(host);
-  const language = editorialLanguage(host, ir);
-  const signature = editorialStyleSignature(style, language, role);
+  const context = editorialMeasurementContext(host, ir);
+  const { style, language, signature } = context;
+  const measureInline = (start: number, end: number, halts: PunctuationHalts = []) =>
+    measureEditorialInline(host, text, ir, start, end, halts, context);
   const measure = (start: number, end: number) => ir.locale === "zh"
-    ? measureEditorialInline(host, text, ir, start, end)
-    : measureEditorialText(host, text.slice(start, end), language, signature);
-  const hyphenWidth = measureEditorialText(host, "\u2010", "en", signature);
+    ? measureInline(start, end)
+    : measureEditorialText(host, text.slice(start, end), language, signature, style);
+  const hyphenWidth = measureEditorialText(host, "\u2010", "en", signature, style);
   const candidates: Candidate[] = [
     { offset: 0, semanticPenalty: 0, hyphen: false, artDirected: false, unsafe: false },
     ...ir.breaks.map((item) => ({
@@ -666,6 +669,7 @@ function solveAtTarget(text: string, ir: EditorialIRV1, host: HTMLElement, targe
         style,
         profile,
         measure,
+        measureInline,
         enableHalt
       );
       if (!fittedLine) continue;
