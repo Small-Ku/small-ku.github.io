@@ -54,7 +54,6 @@ const resolvedAlternates = alternatePaths ?? { [locale]: Astro.url.pathname };
       data-theme-color-light={siteConfig.themeColor.light}
       data-theme-color-dark={siteConfig.themeColor.dark}
     />
-    <meta name="generator" content={Astro.generator} />
     {noindex && <meta name="robots" content="noindex, nofollow" />}
     {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
     {Object.entries(resolvedAlternates).map(([alternateLocale, path]) => path && (
