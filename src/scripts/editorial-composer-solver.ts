@@ -360,10 +360,19 @@ function fitCjkWithHalt(
   if (best && best.fitPenalty < 0.08) return best;
   const em = parseFloat(style.fontSize) || 16;
   const groups: PunctuationHalts = [];
+  // validEditorialIR guarantees contiguous canonical-order atoms. Walk the
+  // ranges once instead of rescanning every atom for each grapheme.
+  let atomIndex = 0;
+  while (atomIndex < ir.atoms.length && ir.atoms[atomIndex].end <= start) {
+    atomIndex += 1;
+  }
   for (const part of punctuationSegmenter.segment(text.slice(start, end))) {
     const glyph = part.segment;
     const offset = start + part.index;
-    const atom = ir.atoms.find(candidate => offset >= candidate.start && offset < candidate.end);
+    while (atomIndex < ir.atoms.length && ir.atoms[atomIndex].end <= offset) {
+      atomIndex += 1;
+    }
+    const atom = ir.atoms[atomIndex];
     if (isHaltPunctuation(glyph) && !atom?.lang) {
       const previous = groups.at(-1);
       if (previous?.end === offset) previous.end += glyph.length;
