@@ -20,6 +20,10 @@ interface Candidate {
 
 interface PathState {
   lines: EditorialLinePlan[];
+  widthCount: number;
+  widthSum: number;
+  widthMin: number;
+  widthMax: number;
   maxUtil: number;
   totalResidual: number;
   totalFitPenalty: number;
@@ -482,8 +486,7 @@ function compareShapePartial(a: PathState, b: PathState): number {
     || a.lines.length - b.lines.length;
 }
 function partialMinWidth(state: PathState): number {
-  if (!state.lines.length) return Number.POSITIVE_INFINITY;
-  return Math.min(...state.lines.map((line) => line.finalOpticalWidthPx));
+  return state.widthMin;
 }
 
 function shapeDominates(a: PathState, b: PathState): boolean {
@@ -530,7 +533,11 @@ interface SolveResult {
 }
 
 function stateBalanceRatio(state: PathState, includeFinal = false): number {
-  const lines = includeFinal ? state.lines : state.lines.slice(0, -1);
+  if (includeFinal) {
+    if (state.widthCount <= 1) return 0;
+    return (state.widthMax - state.widthMin) / Math.max(1, state.widthSum / state.widthCount);
+  }
+  const lines = state.lines.slice(0, -1);
   const widths = lines.map((line) => line.finalOpticalWidthPx);
   if (widths.length <= 1) return 0;
   const mean = widths.reduce((total, width) => total + width, 0) / widths.length;
@@ -639,7 +646,7 @@ function solveAtTarget(text: string, ir: EditorialIRV1, host: HTMLElement, targe
     { offset: text.length, semanticPenalty: 0, hyphen: false, artDirected: false, unsafe: false }
   ];
   const buckets = new Map<number, PathState[]>();
-  buckets.set(0, [{ lines: [], maxUtil: 0, totalResidual: 0, totalFitPenalty: 0, semantic: 0, unsafeBreaks: 0, artDirectedBreaks: 0, hyphens: 0, finalShort: 0 }]);
+  buckets.set(0, [{ lines: [], widthCount: 0, widthSum: 0, widthMin: Number.POSITIVE_INFINITY, widthMax: Number.NEGATIVE_INFINITY, maxUtil: 0, totalResidual: 0, totalFitPenalty: 0, semantic: 0, unsafeBreaks: 0, artDirectedBreaks: 0, hyphens: 0, finalShort: 0 }]);
   for (const from of candidates) {
     const states = buckets.get(from.offset) ?? [];
     if (!states.length || from.offset === text.length) continue;
@@ -679,8 +686,13 @@ function solveAtTarget(text: string, ir: EditorialIRV1, host: HTMLElement, targe
       const residual = final ? 0 : Math.abs(line.residualOpticalPx);
       for (const state of states) {
         if (state.lines.length >= 8) continue;
+        const lineWidth = line.finalOpticalWidthPx;
         const next: PathState = {
           lines: [...state.lines, line],
+          widthCount: state.widthCount + 1,
+          widthSum: state.widthSum + lineWidth,
+          widthMin: Math.min(state.widthMin, lineWidth),
+          widthMax: Math.max(state.widthMax, lineWidth),
           maxUtil: Math.max(state.maxUtil, utilization),
           totalResidual: state.totalResidual + residual,
           totalFitPenalty: state.totalFitPenalty + line.fitPenalty,
