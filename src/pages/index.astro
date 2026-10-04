@@ -5,6 +5,7 @@ import LatestWriting from "../components/LatestWriting.astro";
 import Icon from "../components/Icon.astro";
 import { siteConfig } from "../site.config";
 import { getContentIndex, latestWriting, projectTitleMap, selectedProjects } from "../lib/content";
+import EditorialText from "../components/EditorialText.astro";
 
 const { projects, listedProjects, writing } = await getContentIndex();
 const selected = selectedProjects(listedProjects, siteConfig.home.selectedProjects);
@@ -16,8 +17,8 @@ const copy = siteConfig.locales.en;
   <section class="home-field dot-field dot-field--home" aria-labelledby="hero-title">
     <div class="page home-field__inner">
       <div class="home-intro">
-        <h1 id="hero-title" class="display">{copy.hero.title}</h1>
-        <p class="home-intro__lede">{copy.hero.lede}</p>
+        <h1 id="hero-title" class="display" data-editorial-role="display"><EditorialText text={copy.hero.title} locale="en" role="display" breakHints={copy.hero.displayBreakHints} /></h1>
+        <p class="home-intro__lede" data-editorial-role="intro"><EditorialText text={copy.hero.lede} locale="en" role="intro" /></p>
         <div class="home-intro__links meta">
           <a class="home-intro__timeline-link" href="/timeline/" aria-label="Timeline">
             <span class="home-intro__link-label">Timeline</span>

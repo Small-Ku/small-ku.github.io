@@ -9,6 +9,10 @@
     "build": "astro check && astro build",
     "preview": "astro preview",
     "check": "astro check",
+    "test:punctuation": "node --experimental-strip-types --test tests/editorial-punctuation.test.mjs",
+    "test:punctuation:browser": "node --experimental-strip-types tests/editorial-punctuation-browser.mjs",
+    "test:transition-ownership:browser": "node tests/editorial-transition-ownership-browser.mjs",
+    "test:font-settlement:browser": "node tests/editorial-font-settlement-browser.mjs",
     "test:mangling": "node --test tests/name-mangling.test.mjs",
     "test:browser": "node scripts/test-browser.mjs",
     "build:integrity": "astro build --config tests/integrity.config.mjs",
@@ -16,12 +20,15 @@
   },
   "dependencies": {
     "astro": "7.3.3",
+    "budoux": "0.9.3",
     "sass": "1.104.1"
   },
   "devDependencies": {
     "@astrojs/compiler-rs": "0.4.1",
     "@astrojs/check": "0.9.10",
+    "@astrojs/markdown-remark": "7.3.1",
     "@playwright/test": "1.58.2",
+    "hyphen": "1.14.1",
     "lightningcss": "1.33.0",
     "parse5": "8.0.0",
     "typescript": "6.0.3",

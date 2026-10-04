@@ -63,6 +63,9 @@ const resolvedAlternates = alternatePaths ?? { [locale]: Astro.url.pathname };
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="icon" href="/favicon.ico" sizes="any" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    {locale === "zh" && (
+      <link rel="preload" href="/fonts/zhudou/ZhudouSansVF.woff2" as="font" type="font/woff2" crossorigin />
+    )}
     <link rel="manifest" href="/site.webmanifest" />
     <link rel="alternate" type="application/rss+xml" title={`${siteConfig.name} writing`} href={rssUrl} />
 
@@ -81,6 +84,7 @@ const resolvedAlternates = alternatePaths ?? { [locale]: Astro.url.pathname };
     <title>{resolvedTitle}</title>
     {structured && <script type="application/ld+json" set:html={jsonLd(structured)}></script>}
     <script is:inline>
+      document.documentElement.dataset.editorialJs = 'true';
       (() => {
         let value = null;
         try { value = localStorage.getItem('personal-site-theme'); } catch { /* storage may be blocked */ }
@@ -125,10 +129,12 @@ const resolvedAlternates = alternatePaths ?? { [locale]: Astro.url.pathname };
       import { bindFilterSwitch } from "../scripts/filter-switch";
       import { bindTimelineFilter } from "../scripts/timeline";
       import { bindNavigation } from "../scripts/navigation";
+      import { bindEditorialComposer } from "../scripts/editorial-composer";
       bindThemeControls();
       bindFilterSwitch();
       bindTimelineFilter();
       bindNavigation();
+      bindEditorialComposer();
     </script>
   </body>
 </html>

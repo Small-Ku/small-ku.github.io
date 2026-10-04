@@ -18,11 +18,12 @@ The static site exposes English at the default root and Traditional Chinese unde
 
 ```text
 /                 document language en
-/zh/              document language zh-Hant
+/zh/              document language zh-HK
 ```
 
 Astro's static i18n routing uses `en` and `zh` as URL locale tokens with an unprefixed default
-locale. The document language and browser-facing `hreflang` remain `en` and `zh-Hant`; this is
+locale. The document language and browser-facing `hreflang` are `en` and `zh-HK` (Hong Kong
+Traditional Chinese); Open Graph uses `zh_HK`. This is
 the static equivalent of mapping a custom path to a browser language code. Astro's object-form
 custom locale paths currently require server output, which is incompatible with GitHub Pages.
 

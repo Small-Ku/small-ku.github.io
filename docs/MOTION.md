@@ -121,6 +121,8 @@ Fan → Project entry uses the browser-generated shared-element animation unchan
 
 Visual snapshots deliberately allow geometry squeeze plus crossfade when source and destination aspect ratios differ. Typography uses a crisper handoff rather than intentionally distorting glyphs.
 
+When a Project card and its detail title render different line plans, their canonical text is segmented at the union of both grapheme-safe line boundaries. Those fragments share transition names while the Project surface and visual retain their existing groups. Matching line plans or a destination layout that changes after measurement uses the whole-title snapshot fallback. Writing identity uses the same title-line mechanism.
+
 ## Timeline portal
 
 When latest writing exists, `View all in timeline` can pair the latest rows above the expanding timeline surface. Destination scroll is positioned before the new snapshot is captured so scrolling and shared-element movement do not race.

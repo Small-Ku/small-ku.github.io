@@ -1,11 +1,11 @@
 import { clampDocumentScroll } from "./soft-navigation-scroll";
 import {
-  cleanupActiveWritingLineMorph,
-  cleanupWritingLineMorph,
-  prepareWritingLineMorph,
-  retargetWritingLineMorph,
-  type WritingLineMorph
-} from "./writing-line-transition";
+  cleanupActiveTitleLineMorph,
+  cleanupTitleLineMorph,
+  prepareTitleLineMorph,
+  retargetTitleLineMorph,
+  type TitleLineMorph
+} from "./title-line-transition";
 import {
   applyViewTransitionTiming,
   calculateViewTransitionTiming,
@@ -32,7 +32,7 @@ export interface MotionContext {
   sourceRoot: Element | null;
   sourcePrimaryRect: RectLike | null;
   sourceSharedRects?: RectMap;
-  writingLineMorph?: WritingLineMorph | null;
+  titleLineMorph?: TitleLineMorph | null;
 }
 
 interface MotionMeasurements {
@@ -191,7 +191,7 @@ function projectFanRotation(root: Element | null): number {
   return Number.isFinite(parsed) ? parsed : 0;
 }
 
-function nameProject(root: Element | null, includeExtras = false): boolean {
+function nameProject(root: Element | null, includeExtras = false, includeTitle = true): boolean {
   if (!root) return false;
   const surface = root.querySelector("[data-vt-project-surface]");
   const visual = root.querySelector("[data-vt-project-visual]");
@@ -200,7 +200,7 @@ function nameProject(root: Element | null, includeExtras = false): boolean {
 
   nameTransitionElement(surface, "project-surface");
   if (visual) nameTransitionElement(visual, "project-visual");
-  nameTransitionElement(title, "project-title");
+  if (includeTitle) nameTransitionElement(title, "project-title");
 
   if (includeExtras) {
     nameTransitionElement(root.querySelector("[data-vt-project-eyebrow]"), "project-eyebrow");
@@ -310,8 +310,21 @@ export function prepareOutgoingRouteMotion(context: MotionContext, nextDocument:
   clearTransitionNames();
   document.documentElement.dataset.motionType = context.type ?? "none";
 
-  if (context.type === "project-enter") nameProject(context.sourceRoot, false);
-  if (context.type === "project-exit") nameProject(context.sourceRoot, true);
+  if (context.type === "project-enter" || context.type === "project-exit") {
+    const slug = context.slug ? CSS.escape(context.slug) : null;
+    context.titleLineMorph = slug ? prepareTitleLineMorph(
+      context.sourceRoot,
+      nextDocument,
+      reduceMotion(),
+      {
+        sourceTitle: "[data-vt-project-title]",
+        targetRoot: `[data-vt-project-${context.type === "project-enter" ? "destination" : "origin"}][data-work-slug="${slug}"]`,
+        targetTitle: "[data-vt-project-title]"
+      }
+    ) : null;
+    if (context.type === "project-enter") nameProject(context.sourceRoot, false, !context.titleLineMorph);
+    if (context.type === "project-exit") nameProject(context.sourceRoot, true, !context.titleLineMorph);
+  }
   if (context.type === "timeline-expand") {
     nameTransitionElement(context.sourceRoot, "timeline-origin-content");
     nameTransitionElement(context.sourceRoot?.querySelector("[data-vt-timeline-surface]") ?? null, "timeline-surface");
@@ -323,14 +336,17 @@ export function prepareOutgoingRouteMotion(context: MotionContext, nextDocument:
     nameLatestWritingRows("timeline");
   }
   if (context.type === "writing-identity") {
-    context.writingLineMorph = prepareWritingLineMorph(
+    context.titleLineMorph = prepareTitleLineMorph(
       context.sourceRoot,
-      context.slug,
       nextDocument,
-      routeMeta(nextDocument).kind === "writing",
-      reduceMotion()
+      reduceMotion(),
+      {
+        sourceTitle: "[data-vt-writing-title]",
+        targetRoot: `[data-writing-slug="${CSS.escape(context.slug ?? "")}"]`,
+        targetTitle: "[data-vt-writing-title]"
+      }
     );
-    if (!context.writingLineMorph) {
+    if (!context.titleLineMorph) {
       nameTransitionElement(context.sourceRoot?.querySelector("[data-vt-writing-title]") ?? null, "writing-title");
     }
   }
@@ -339,7 +355,14 @@ export function prepareOutgoingRouteMotion(context: MotionContext, nextDocument:
 export function prepareIncomingRouteMotion(context: MotionContext): MotionMeasurements {
   if (context.type === "project-enter" && context.slug) {
     const target = projectRoot(document, context.slug, true);
-    nameProject(target, true);
+    const title = target?.querySelector<HTMLElement>("[data-vt-project-title]") ?? null;
+    if (title && context.titleLineMorph) {
+      if (!retargetTitleLineMorph(context.titleLineMorph, title)) {
+        cleanupTitleLineMorph(context.titleLineMorph);
+        context.titleLineMorph = null;
+      }
+    }
+    nameProject(target, true, !context.titleLineMorph);
     return {
       primaryRect: rect(target?.querySelector("[data-vt-project-surface]") ?? null),
       sharedRects: projectSharedRects(target)
@@ -349,8 +372,19 @@ export function prepareIncomingRouteMotion(context: MotionContext): MotionMeasur
   if (context.type === "project-exit" && context.slug) {
     const target = projectRoot(document, context.slug, false);
     // Shared transforms only make sense when the restored/aligned destination is painted.
-    if (!visible(target)) return { primaryRect: null, sharedRects: {} };
-    nameProject(target, false);
+    if (!visible(target)) {
+      cleanupTitleLineMorph(context.titleLineMorph ?? null);
+      context.titleLineMorph = null;
+      return { primaryRect: null, sharedRects: {} };
+    }
+    const title = target?.querySelector<HTMLElement>("[data-vt-project-title]") ?? null;
+    if (title && context.titleLineMorph) {
+      if (!retargetTitleLineMorph(context.titleLineMorph, title)) {
+        cleanupTitleLineMorph(context.titleLineMorph);
+        context.titleLineMorph = null;
+      }
+    }
+    nameProject(target, false, !context.titleLineMorph);
     return {
       primaryRect: rect(target?.querySelector("[data-vt-project-surface]") ?? null),
       sharedRects: projectSharedRects(target)
@@ -384,10 +418,10 @@ export function prepareIncomingRouteMotion(context: MotionContext): MotionMeasur
   if (context.type === "writing-identity" && context.slug) {
     const root = document.querySelector(`[data-writing-slug="${CSS.escape(context.slug)}"]`);
     const target = root?.querySelector<HTMLElement>("[data-vt-writing-title]") ?? null;
-    if (target && context.writingLineMorph) {
-      if (!retargetWritingLineMorph(context.writingLineMorph, target)) {
-        cleanupWritingLineMorph(context.writingLineMorph);
-        context.writingLineMorph = null;
+    if (target && context.titleLineMorph) {
+      if (!retargetTitleLineMorph(context.titleLineMorph, target)) {
+        cleanupTitleLineMorph(context.titleLineMorph);
+        context.titleLineMorph = null;
         nameTransitionElement(target, "writing-title");
       }
     } else {
@@ -526,11 +560,11 @@ export function onRouteMotionReady(context: MotionContext): void {
 }
 
 export function cleanupActiveRouteMotion(): void {
-  cleanupActiveWritingLineMorph();
+  cleanupActiveTitleLineMorph();
 }
 
 export function cleanupRouteMotion(context: MotionContext): void {
-  cleanupWritingLineMorph(context.writingLineMorph ?? null);
+  cleanupTitleLineMorph(context.titleLineMorph ?? null);
   clearTransitionNames();
   document.documentElement.dataset.motionType = "none";
 }

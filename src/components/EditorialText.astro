@@ -1,0 +1,40 @@
+---
+import { compileEditorialText } from "../lib/editorial-compiler";
+import type { DisplayBreakHint, EditorialRole } from "../lib/editorial-ir";
+import type { SiteLocale } from "../lib/i18n";
+
+interface Props {
+  text: string;
+  locale: SiteLocale;
+  role: EditorialRole;
+  breakHints?: DisplayBreakHint[];
+}
+
+const { text, locale, role, breakHints = [] } = Astro.props;
+const compiled = compileEditorialText(text, locale, role, breakHints);
+const protectedRanges: Array<{ start: number; end: number }> = [];
+if (role === "compact") {
+  for (const match of text.matchAll(/[\p{L}\p{N}]+(?:-[\p{L}\p{N}]+)+/gu)) {
+    const start = match.index ?? 0;
+    protectedRanges.push({ start, end: start + match[0].length });
+  }
+}
+
+const boundaries = new Set<number>([0, text.length]);
+for (const atom of compiled.ir.atoms) { boundaries.add(atom.start); boundaries.add(atom.end); }
+for (const range of protectedRanges) { boundaries.add(range.start); boundaries.add(range.end); }
+const offsets = [...boundaries].sort((a, b) => a - b);
+const spans = offsets.slice(0, -1).map((start, index) => {
+  const end = offsets[index + 1];
+  const atom = compiled.ir.atoms.find((candidate) => start >= candidate.start && start < candidate.end);
+  const protectedCompound = protectedRanges.some((range) => start >= range.start && end <= range.end);
+  return { text: text.slice(start, end), lang: atom?.lang, protectedCompound };
+}).filter((span) => span.text.length > 0);
+
+const serializedIr = role === "display" || role === "intro" ? JSON.stringify(compiled.ir) : undefined;
+---
+<span class="editorial-text" data-editorial-root data-editorial-role={role} data-editorial-locale={locale} data-editorial-ir={serializedIr} data-editorial-pending={(role === "display" || role === "intro") ? "true" : undefined}>
+  {spans.map((span) => span.lang || span.protectedCompound
+    ? <span lang={span.lang} class:list={[span.protectedCompound && "editorial-keep-together"]}>{span.text}</span>
+    : span.text)}
+</span>

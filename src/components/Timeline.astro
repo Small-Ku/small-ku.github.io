@@ -8,6 +8,7 @@ import ChronologyRail from "./ChronologyRail.astro";
 import type { TimelineItem } from "../lib/content";
 import { contentKey, displayDate, htmlDate } from "../lib/content";
 import type { SiteLocale } from "../lib/i18n";
+import EditorialText from "./EditorialText.astro";
 
 interface Props {
   items: TimelineItem[];
@@ -18,6 +19,9 @@ interface Props {
 
 const { items, latestWritingIds = [], projectTitles = {}, locale = "en" } = Astro.props;
 const latestRankById = new Map(latestWritingIds.map((id, index) => [id, index + 1]));
+const timelineTitle = locale === "zh"
+  ? "\u6301\u7e8c\u767c\u5c55\u4e2d\u7684\u4f5c\u54c1\uff0c\u4ee5\u53ca\u570d\u7e5e\u5b83\u5011\u7684\u7b46\u8a18\u3002"
+  : "Work in motion, and the notes around it.";
 const filterOptions = [
   { value: "all", label: locale === "zh" ? "全部" : "All" },
   { value: "writing", label: locale === "zh" ? "文章" : "Writing" },
@@ -35,7 +39,7 @@ const filterOptions = [
   <div class="timeline-head">
     <div>
       <p class="eyebrow">{locale === "zh" ? "時間線／按時間排序" : "Timeline / chronological"}</p>
-      <h1 id="timeline-title">{locale === "zh" ? "持續發展中的作品，以及圍繞它們的筆記。" : "Work in motion, and the notes around it."}</h1>
+      <h1 id="timeline-title" data-editorial-role="display"><EditorialText text={timelineTitle} locale={locale} role="display" /></h1>
     </div>
     {items.length > 0 && <FilterSwitch options={filterOptions} active="all" label={locale === "zh" ? "篩選時間線" : "Filter timeline"} />}
   </div>
@@ -94,10 +98,10 @@ const filterOptions = [
               <div class="timeline-entry__copy">
                 <span class="timeline-entry__kicker meta">Project / {item.project.data.kicker} · {item.project.data.status}</span>
                 <div class="timeline-entry__title-row">
-                  <div class="timeline-entry__title-slot" data-vt-project-title><h2>{item.project.data.title}</h2></div>
+                  <div class="timeline-entry__title-slot" data-vt-project-title><h2 data-editorial-role="display"><EditorialText text={item.project.data.title} locale={locale} role="display" breakHints={item.project.data.displayBreakHints} /></h2></div>
                   <span class="timeline-entry__arrow" aria-hidden="true"><Icon name="arrow-up-right" /></span>
                 </div>
-                <p>{item.project.data.summary}</p>
+                <p data-editorial-role="compact"><EditorialText text={item.project.data.summary} locale={locale} role="compact" /></p>
                 <span class="timeline-entry__meta meta">{item.project.data.visibility}</span>
               </div>
             </a>

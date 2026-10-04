@@ -3,19 +3,22 @@ import { siteConfig } from '../../src/site.config.ts';
 const origin = `http://127.0.0.1:${process.env.MANGLING_BROWSER_PORT}`;
 const baselineOrigin = `http://127.0.0.1:${process.env.MANGLING_BASELINE_PORT}`;
 
-test('compiled class lists and nested CSS preserve pixels on all authored surfaces', async ({ page, browser }) => {
-  await page.emulateMedia({ reducedMotion: 'reduce' });
-  const baseline = await browser.newPage({ viewport: { width: 1280, height: 900 }, reducedMotion: 'reduce' });
+test('compiled class lists and nested CSS preserve pixels on all authored surfaces', async ({ browser }) => {
+  const options = { javaScriptEnabled: false, viewport: { width: 1280, height: 900 }, reducedMotion: 'reduce' };
+  const baselineContext = await browser.newContext(options);
+  const candidateContext = await browser.newContext(options);
+  const baseline = await baselineContext.newPage();
+  const candidate = await candidateContext.newPage();
   for (const route of ['/', '/zh/', '/timeline/', '/projects/mangling-fixture-violet/',
     '/projects/mangling-fixture-teal/', '/projects/mangling-fixture-coral/', '/projects/mangling-fixture-neutral/',
     '/writing/mangling-fixture-note/']) {
     await baseline.goto(`${baselineOrigin}${route}`);
-    await page.goto(route);
-    await Promise.all([baseline.evaluate(() => document.fonts.ready), page.evaluate(() => document.fonts.ready)]);
-    expect(await page.screenshot({ animations: 'disabled', fullPage: true })).toEqual(
+    await candidate.goto(`${origin}${route}`);
+    expect(await candidate.screenshot({ animations: 'disabled', fullPage: true })).toEqual(
       await baseline.screenshot({ animations: 'disabled', fullPage: true }));
   }
-  await baseline.close();
+  await candidateContext.close();
+  await baselineContext.close();
 });
 
 test('soft navigation, locale, filters, history, theme, and fragments keep their contracts', async ({ page }) => {
@@ -33,7 +36,7 @@ test('soft navigation, locale, filters, history, theme, and fragments keep their
   await page.locator('[popovertarget="language-popover"]').click();
   await page.locator('#language-popover a[href="/zh/timeline/"]').click();
   await expect(page).toHaveURL(/\/zh\/timeline\/$/);
-  await expect(page.locator('html')).toHaveAttribute('lang', 'zh-Hant');
+  await expect(page.locator('html')).toHaveAttribute('lang', 'zh-HK');
   await expect(page.locator('html')).toHaveAttribute('data-locale', 'zh');
   await expect(page.locator('link[rel=canonical]')).toHaveAttribute('href', new URL('/zh/timeline/', siteConfig.url).href);
   expect(await page.evaluate(() => window.__testHeader === document.querySelector('.site-header'))).toBe(true);
@@ -62,22 +65,22 @@ test('native View Transitions exercise mangled records and runtime writing fragm
     window.__transitions = 0;
     window.__fragmentSeen = false;
     new MutationObserver(() => {
-      if (document.querySelector('.writing-line-fragment')) window.__fragmentSeen = true;
+      if (document.querySelector('.title-line-fragment')) window.__fragmentSeen = true;
     }).observe(document, { childList: true, subtree: true });
     document.startViewTransition = (...args) => { window.__transitions++; return native(...args); };
   });
-  await page.goto('/');
+  await page.goto('/timeline/');
   await page.evaluate(() => { window.__testDocument = document; });
   await page.locator('a[data-work-slug="mangling-fixture-violet"]').first().click();
   await expect(page).toHaveURL(/\/projects\/mangling-fixture-violet\/$/);
   await expect.poll(() => page.evaluate(() => window.__transitions)).toBeGreaterThan(0);
   await page.goBack();
-  await expect(page).toHaveURL(`${origin}/`);
+  await expect(page).toHaveURL(`${origin}/timeline/`);
   const writing = page.locator('a[data-writing-slug="mangling-fixture-note"]').first();
   await writing.click();
   await expect(page).toHaveURL(/\/writing\/mangling-fixture-note\/$/);
   await expect.poll(() => page.evaluate(() => window.__fragmentSeen)).toBe(true);
-  await expect(page.locator('.writing-line-fragment')).toHaveCount(0);
+  await expect(page.locator('.title-line-fragment')).toHaveCount(0);
   await expect(page.locator('#fixture-fragment')).toHaveClass('external-content-contract');
   await expect(page.locator('#fixture-fragment')).toHaveAttribute('data-fixture', 'schema-value');
   expect(await page.evaluate(() => window.__testDocument === document)).toBe(true);

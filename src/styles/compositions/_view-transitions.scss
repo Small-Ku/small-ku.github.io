@@ -128,28 +128,36 @@ html[data-motion-type="representation-change"] {
 ::view-transition-old(writing-title),
 ::view-transition-new(writing-title) { mix-blend-mode: normal; }
 
-@for $i from 1 through 8 {
-  ::view-transition-group(writing-line-#{$i}) {
+@for $i from 1 through 16 {
+  ::view-transition-group(title-line-#{$i}) {
     z-index: 35;
     animation-duration: var(--ft-motion-route);
     animation-timing-function: var(--ft-ease-emphasized);
   }
-  ::view-transition-old(writing-line-#{$i}),
-  ::view-transition-new(writing-line-#{$i}) {
+  ::view-transition-old(title-line-#{$i}),
+  ::view-transition-new(title-line-#{$i}) {
     mix-blend-mode: normal;
     animation-duration: var(--ft-motion-route);
     animation-timing-function: linear;
     animation-fill-mode: both;
   }
-  ::view-transition-old(writing-line-#{$i}) { animation-name: ft-writing-line-old; }
-  ::view-transition-new(writing-line-#{$i}) { animation-name: ft-writing-line-new; }
+  ::view-transition-old(title-line-#{$i}) { animation-name: ft-title-line-old; }
+  ::view-transition-new(title-line-#{$i}) { animation-name: ft-title-line-new; }
+  html[data-motion-type="project-enter"] {
+    &::view-transition-old(title-line-#{$i}) { animation-name: ft-title-grow-old; }
+    &::view-transition-new(title-line-#{$i}) { animation-name: ft-title-grow-new; }
+  }
+  html[data-motion-type="project-exit"] {
+    &::view-transition-old(title-line-#{$i}) { animation-name: ft-title-shrink-old; }
+    &::view-transition-new(title-line-#{$i}) { animation-name: ft-title-shrink-new; }
+  }
 }
 
-@keyframes ft-writing-line-old {
+@keyframes ft-title-line-old {
   0%, 38% { opacity: 1; }
   68%, 100% { opacity: 0; }
 }
-@keyframes ft-writing-line-new {
+@keyframes ft-title-line-new {
   0%, 32% { opacity: 0; }
   48%, 100% { opacity: 1; }
 }

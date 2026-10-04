@@ -29,7 +29,7 @@ try {
         .replace('# translationKey: my-project', `translationKey: mangling-fixture-${tone}`)
         .replace('title: My Project', `title: Mangling Fixture ${tone}`)
         .replace('draft: true', 'draft: false').replace('selected: false', 'selected: true')
-        .replace('# selectedOrder: 1', `selectedOrder: ${index + 1}`).replace('tone: violet', `tone: ${tone}`);
+        .replace('# selectedOrder: 1', `selectedOrder: ${index + 101}`).replace('tone: violet', `tone: ${tone}`);
       await writeFile(path, content, { flag: 'wx' });
       created.push(path);
     }
@@ -38,6 +38,7 @@ try {
     await writeFile(path, writing.replace('locale: en', `locale: ${locale}`)
       .replace('# translationKey: my-note', 'translationKey: mangling-fixture-note')
       .replace('title: My Note', 'title: A writing identity fixture with enough words to wrap across multiple lines')
+      .replace('date: "YYYY-MM-DD"', 'date: "2026-09-01"')
       .replace('draft: true', 'draft: false')
       + '\n<p id="fixture-fragment" class="external-content-contract" data-fixture="schema-value">Content contract</p>\n',
     { flag: 'wx' });

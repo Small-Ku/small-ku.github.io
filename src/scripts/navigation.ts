@@ -1,6 +1,7 @@
 import { bindFilterSwitch } from "./filter-switch";
 import { bindTimelineFilter } from "./timeline";
 import { bindThemeControls } from "./theme";
+import { bindEditorialComposer } from "./editorial-composer";
 import {
   fetchNavigationDocument,
   installNavigationDocument
@@ -133,6 +134,8 @@ async function performNavigation(url: URL, anchor: HTMLAnchorElement | null, pus
         scrollInstant(alignedScroll);
       }
     }
+
+    bindEditorialComposer(currentMain);
 
     if (push) history.pushState({ ftNav: true, scrollY: window.scrollY } satisfies NavigationHistoryState, "", url.href);
     const target = prepareIncomingRouteMotion(context);

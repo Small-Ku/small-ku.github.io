@@ -2,6 +2,7 @@
 import type { WritingEntry as WritingContentEntry } from "../lib/content";
 import { contentKey, displayDate, htmlDate, writingHref } from "../lib/content";
 import type { SiteLocale } from "../lib/i18n";
+import EditorialText from "./EditorialText.astro";
 import Icon from "./Icon.astro";
 import ChronologyRail from "./ChronologyRail.astro";
 
@@ -38,10 +39,10 @@ const related = item.data.relatedProjects
   <div class="writing-entry__copy">
     <span class="writing-entry__kicker meta">{item.data.kind}</span>
     <div class="writing-entry__title-row">
-      {headingLevel === 2 ? <h2 data-vt-writing-title>{item.data.title}</h2> : <h3 data-vt-writing-title>{item.data.title}</h3>}
+      {headingLevel === 2 ? <h2 data-vt-writing-title data-editorial-role="display"><EditorialText text={item.data.title} locale={locale} role="display" breakHints={item.data.displayBreakHints} /></h2> : <h3 data-vt-writing-title data-editorial-role="display"><EditorialText text={item.data.title} locale={locale} role="display" breakHints={item.data.displayBreakHints} /></h3>}
       <span class="writing-entry__arrow" aria-hidden="true"><Icon name="arrow-up-right" /></span>
     </div>
-    <p>{item.data.summary}</p>
+    <p data-editorial-role="compact"><EditorialText text={item.data.summary} locale={locale} role="compact" /></p>
     {related && <span class="writing-entry__meta meta">Related / {related}</span>}
   </div>
 </a>
