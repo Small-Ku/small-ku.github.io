@@ -1,7 +1,9 @@
 import { defineConfig } from "astro/config";
 import { siteConfig } from "./src/site.config";
+import nameMangling from "./build/name-mangling.mjs";
 
 export default defineConfig({
+  integrations: [nameMangling()],
   site: siteConfig.url,
   trailingSlash: "always",
   i18n: {

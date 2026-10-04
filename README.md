@@ -122,6 +122,10 @@ The soft-navigation coordinator also synchronizes locale-sensitive site chrome, 
 
 See `docs/ARCHITECTURE.md` and `docs/MOTION.md`.
 
+Production builds also apply CSS class and private JavaScript property mangling.
+Source names remain readable in development. See [the build contract and validation](docs/NAME-MANGLING.md)
+for the reserved namespaces, hashing guarantees, diagnostic opt-out, and tests.
+
 ## Deployment
 
 `.github/workflows/deploy.yml` publishes `master` with `withastro/action@v6` and `actions/deploy-pages@v5`. The CI package-manager version is pinned to pnpm 12.4.2 rather than `latest`.
